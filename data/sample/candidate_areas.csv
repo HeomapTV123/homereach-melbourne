@@ -1,0 +1,7 @@
+area_name,median_weekly_rent,scheduled_commute_minutes,weekday_peak_departures,vegetation_percent,forecast_annual_growth_percent
+Demo Area A,430,42,22,31,3.0
+Demo Area B,510,28,48,18,5.5
+Demo Area C,390,58,16,42,2.0
+Demo Area D,570,24,65,12,6.8
+Demo Area E,465,37,35,27,4.0
+Demo Area F,410,50,25,36,3.2

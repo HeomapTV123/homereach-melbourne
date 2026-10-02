@@ -1,0 +1,28 @@
+project:
+  name: HomeReach Melbourne
+  version: 0.1.0
+  geography_stage_1: LGA
+  geography_stage_2: DFFH rental area
+
+paths:
+  rent_workbook: data/raw/rent/dffh_rental_time_series.xlsx
+  lga_boundaries: data/raw/geography/victoria_lga.gpkg
+  gtfs_root: data/raw/transport/gtfs
+  processed_rent: data/processed/rent_quarterly.parquet
+  feature_table: data/processed/area_features.parquet
+  database: data/processed/homereach.duckdb
+
+analysis:
+  default_property_type: 2 bedroom flat
+  peak_start: "07:00:00"
+  peak_end: "09:00:00"
+  projected_crs: "EPSG:7855"
+  web_crs: "EPSG:4326"
+
+scoring:
+  default_weights:
+    affordability_score: 0.35
+    transport_score: 0.25
+    commute_score: 0.20
+    environment_score: 0.10
+    stability_score: 0.10
