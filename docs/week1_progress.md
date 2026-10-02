@@ -31,7 +31,7 @@ Melbourne rental areas.
 - [x] Required Python libraries imported successfully
 - [x] Automated tests passed
 - [x] Streamlit application opened
-- [ ] Four recommendation scenarios tested
+- [x] Four recommendation scenarios tested
 - [ ] Project charter reviewed
 - [ ] Git repository created
 - [ ] Initial Git commit completed

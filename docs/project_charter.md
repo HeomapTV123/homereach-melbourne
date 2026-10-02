@@ -33,7 +33,7 @@ explanation and clearly stated limitations.
 ## Minimum viable scope
 
 - LGA-level rental analysis
-- one selected property type
+- one selected property type: two-bedroom flats
 - scheduled metropolitan transport indicators
 - transparent scoring
 - a deployed Streamlit application
@@ -56,3 +56,19 @@ explanation and clearly stated limitations.
 - model evaluation uses chronological holdout data
 - final model is compared with a seasonal-naive baseline
 - automated tests pass locally and in continuous integration
+
+## Initial implementation boundaries
+
+The first data pipeline will use metropolitan Melbourne Local Government
+Areas and the published rental category corresponding to two-bedroom flats.
+The source's exact category label will be confirmed during the Week 2 audit.
+
+The first recommendation version will use rental affordability and
+scheduled public-transport indicators.
+
+Destination-specific commute routing, rental forecasting, environmental
+layers and finer rental-area geography will be added only after the core
+rental-and-transport pipeline is working.
+
+The starter application's synthetic commute, environment and forecast
+values are demonstration inputs, not completed real-data features.
