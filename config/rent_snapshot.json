@@ -1,0 +1,17 @@
+{
+  "filename": "quarterly-median-rents-local-government-area-september-quarter-2025-excel.xlsx",
+  "sha256": "b8e96347494f09fea2a2ace55997fd34c9398f8509cb3450d65444aebfaaa837",
+  "sheet": "2br Flat",
+  "property_type": "2 bedroom flats",
+  "reporting_quarter": "2025Q3",
+  "first_quarter": "1999Q2",
+  "last_quarter": "2025Q3",
+  "raw_shape": [95, 214],
+  "all_lga_count": 79,
+  "metro_group_counts": {
+    "North and West Metro": 14,
+    "Eastern Metro": 7,
+    "Southern Metro": 10
+  },
+  "publisher_page": "https://www.dffh.vic.gov.au/publications/rental-report"
+}
