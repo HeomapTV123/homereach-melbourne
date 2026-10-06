@@ -32,6 +32,6 @@ Melbourne rental areas.
 - [x] Automated tests passed
 - [x] Streamlit application opened
 - [x] Four recommendation scenarios tested
-- [ ] Project charter reviewed
-- [ ] Git repository created
-- [ ] Initial Git commit completed
+- [x] Project charter reviewed
+- [x] Git repository created
+- [x] Initial Git commit completed

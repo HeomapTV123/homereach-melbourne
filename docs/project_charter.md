@@ -33,7 +33,8 @@ explanation and clearly stated limitations.
 ## Minimum viable scope
 
 - LGA-level rental analysis
-- one selected property type: two-bedroom flats
+- one selected property type: two-bedroom flats, with the exact source
+  category label to be confirmed during the rental-data audit
 - scheduled metropolitan transport indicators
 - transparent scoring
 - a deployed Streamlit application
