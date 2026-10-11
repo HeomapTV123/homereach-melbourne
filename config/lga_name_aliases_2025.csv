@@ -1,0 +1,4 @@
+rental_area_name,lga_code_2025,abs_lga_name,match_note
+Bayside,20910,Bayside (Vic.),Victoria-only lookup; ABS adds a state suffix to distinguish the name.
+Kingston,23430,Kingston (Vic.),Victoria-only lookup; ABS adds a state suffix to distinguish the name.
+Mornington Penin'a,25340,Mornington Peninsula,Reviewed expansion of the rental source's abbreviated name; Victoria code verified.

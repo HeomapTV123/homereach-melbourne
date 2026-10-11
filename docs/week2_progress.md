@@ -77,3 +77,46 @@ boundaries using reviewed names and official LGA codes.
 The map describes published median weekly rents for two-bedroom flats
 in 2025Q3 using ABS 2025 statistical boundaries. It is not a live-listing
 map, an individual-property valuation, or a suitability recommendation.
+
+## Reusable geography pipeline
+
+Moved the reviewed geographic matching and validation logic into a
+reusable Python module and command-line script. The three reviewed
+name translations are stored in a separate configuration CSV.
+
+### Local verification
+
+The complete automated test suite passed: 125 tests, with no skips.
+
+The read-only geography check matched all four existing notebook
+exports and wrote no files.
+
+The full geography build matched all 31 rental LGAs to their reviewed
+ABS boundary codes. There were no unmatched areas, duplicate codes,
+or missing or invalid mapped geometries.
+
+All 14 original rental fields and the native boundary shapes were
+preserved. GeoPackage, GeoJSON and CSV save-and-read-back checks
+passed.
+
+The boundaries record in the data registry was updated. Original
+input files, notebooks and the existing HTML map remained unchanged.
+
+### Reproduction commands
+
+    python -m pytest -o "addopts=" -q
+    python scripts/build_lga_geography.py --check-only
+    python scripts/build_lga_geography.py --update-registry
+
+### Scope
+
+This implementation is validated for the audited ABS 2025 boundary
+snapshot and the selected 2025Q3 two-bedroom-flat rental observations.
+A different source snapshot requires review rather than bypassing
+the fingerprint checks.
+
+### Next milestone
+
+Audit an official public-transport schedule snapshot, identify the
+relevant feeds and service dates, and prepare transport stops for
+geographic matching.

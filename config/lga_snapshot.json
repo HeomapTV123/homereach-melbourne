@@ -1,0 +1,30 @@
+{
+  "filename": "LGA_2025_AUST_GDA2020.zip",
+  "sha256": "acc3015a0ac78ade978c41a2e4110269b5219b60d6a56cbb70393ae647f31b15",
+  "layer": "LGA_2025_AUST_GDA2020",
+  "boundary_year": 2025,
+  "native_epsg": 7844,
+  "web_epsg": 4326,
+  "state_code": "2",
+  "state_name": "Victoria",
+  "national_records": 567,
+  "national_null_geometry": 19,
+  "state_records": 82,
+  "council_records": 79,
+  "excluded_codes": {
+    "29399": "Unincorporated area; not one of the 79 council-area records",
+    "29499": "Non-spatial statistical category: no usual address",
+    "29799": "Non-spatial statistical category: migratory/offshore/shipping"
+  },
+  "nonspatial_codes": ["29499", "29799"],
+  "map_quarter": "2025Q3",
+  "mapped_records": 31,
+  "exact_matches": 28,
+  "alias_matches": 3,
+  "archive_extensions": [".shp", ".shx", ".dbf", ".prj", ".cpg", ".xml"],
+  "source_columns": ["LGA_CODE25", "LGA_NAME25", "STE_CODE21", "STE_NAME21", "AUS_CODE21", "AUS_NAME21", "AREASQKM", "geometry"],
+  "publisher_page": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/non-abs-structures/local-government-areas",
+  "download_url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files/LGA_2025_AUST_GDA2020.zip",
+  "boundary_source": "Australian Bureau of Statistics; ASGS Edition 3 LGA 2025; CC BY 4.0",
+  "scope_note": "DFFH source's three metropolitan groups; 2025Q3 only. Reviewed name/code associations do not prove identical publisher boundary definitions."
+}
