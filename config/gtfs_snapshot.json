@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "filename": "gtfs.zip",
+  "sha256": "c88af3abcaf0872e45196dcc1d5af9bc20a82c54a00a9dfef46c809ec2e34814",
+  "service_date": "2026-10-13",
+  "timezone": "Australia/Melbourne",
+  "feed_ids": [
+    "2",
+    "3",
+    "4"
+  ],
+  "feed_labels": {
+    "2": "Metropolitan train operational feed",
+    "3": "Metropolitan tram",
+    "4": "Myki bus: metropolitan + regional town"
+  },
+  "outer_members": [
+    "1/google_transit.zip",
+    "2/google_transit.zip",
+    "3/google_transit.zip",
+    "4/google_transit.zip",
+    "5/google_transit.zip",
+    "6/google_transit.zip",
+    "10/google_transit.zip",
+    "11/google_transit.zip"
+  ],
+  "location_counts": {
+    "2": 2859,
+    "3": 1623,
+    "4": 22633
+  },
+  "platform_counts": {
+    "2": 775,
+    "3": 1623,
+    "4": 22633
+  },
+  "active_trip_counts": {
+    "2": 2828,
+    "3": 5044,
+    "4": 27708
+  },
+  "replacement_trip_counts": {
+    "2": 52,
+    "3": 0,
+    "4": 0
+  },
+  "scan_rows": {
+    "2": 688380,
+    "3": 2568892,
+    "4": 8589911
+  },
+  "point_epsg": 4326,
+  "native_epsg": 7844,
+  "match_epsg": 7855,
+  "boundary_year": 2025,
+  "near_boundary_metres": 10.0,
+  "lga_count": 31,
+  "spatial_counts": {
+    "matched_within": 21426,
+    "outside_selected_lgas": 3605
+  },
+  "near_boundary_count": 443,
+  "windows": {
+    "service_day": [
+      null,
+      null
+    ],
+    "am_peak_0700_0900": [
+      25200,
+      32400
+    ]
+  },
+  "category_feed": {
+    "train_not_labelled_replacement": "2",
+    "labelled_replacement_bus": "2",
+    "tram": "3",
+    "myki_bus": "4"
+  },
+  "replacement_label": "Replacement Bus",
+  "eligibility": "active trip; pickup 0 including blank; later full-trip stop sequence; matched_within LGA",
+  "expected_totals": {
+    "source_rows": 11847183,
+    "active_trips": 35580,
+    "active_events": 1311746,
+    "service_day_events": 1175281,
+    "am_events": 158932,
+    "am_trips": 5768,
+    "lga_rows": 248
+  },
+  "rental_reporting_quarter": "2025Q3",
+  "publisher_page": "https://opendata.transport.vic.gov.au/dataset/gtfs-schedule",
+  "method_note": "Pinned, audited snapshot. Not all transport, observed performance, headways, residential access or recommendations. Do not change the date/hash to bypass validation."
+}
