@@ -1,0 +1,37 @@
+{
+  "endorsement": "Independent student project. No endorsement by the source publishers is implied.",
+  "licence_scope": "Source data only; not logos, website design or HomeReach source-code licensing.",
+  "reviewed_on": "2026-10-26",
+  "sources": [
+    {
+      "changes": "Selected 31 source-group metropolitan LGAs and 2 bedroom flats; reshaped and joined by reviewed identifiers. Source rents and cell references retained.",
+      "component": "rent",
+      "dataset": "Quarterly median rents by Local Government Area, September quarter 2025",
+      "licence": "CC BY 4.0",
+      "licence_evidence": "https://discover.data.vic.gov.au/dataset/rental-report-quarterly-quarterly-median-rents-by-lga",
+      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+      "publisher": "Homes Victoria / Department of Families, Fairness and Housing, State of Victoria",
+      "source_url": "https://www.dffh.vic.gov.au/publications/rental-report"
+    },
+    {
+      "changes": "Derived LGA-level aggregates for feeds 2, 3 and 4 after calendar, pickup, terminal and spatial rules. Raw GTFS, trip IDs and stop IDs are not in this release.",
+      "component": "transport",
+      "dataset": "Transport Victoria GTFS Schedule; audited archive; service date 13 October 2026",
+      "licence": "CC BY 4.0",
+      "licence_evidence": "https://opendata.transport.vic.gov.au/dataset/gtfs-schedule",
+      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+      "publisher": "Department of Transport and Planning, State of Victoria",
+      "source_url": "https://opendata.transport.vic.gov.au/dataset/gtfs-schedule"
+    },
+    {
+      "changes": "Selected 31 reviewed LGAs, transformed to WGS84 for web display. Statistical, not legal, boundaries; no simplification or repair.",
+      "component": "boundaries",
+      "dataset": "ASGS Edition 3, Local Government Areas 2025, GDA2020",
+      "licence": "CC BY 4.0",
+      "licence_evidence": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files",
+      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+      "publisher": "Australian Bureau of Statistics, Commonwealth of Australia",
+      "source_url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files"
+    }
+  ]
+}

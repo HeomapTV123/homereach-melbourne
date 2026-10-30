@@ -1,0 +1,8 @@
+# Serving only; full build dependencies remain in the root environment files.
+# Community Cloud prefers this file beside deploy/streamlit_app.py.
+streamlit>=1.50,<2
+pandas>=2.2,<4
+numpy>=1.26,<3
+plotly>=5.24,<8
+shapely>=2.0,<3
+packaging>=24,<27

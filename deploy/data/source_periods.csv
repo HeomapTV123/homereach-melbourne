@@ -1,0 +1,4 @@
+component,period,scope,source_file,source_sha256,publisher_page
+rent,2025Q3,2 bedroom flats; 31 source-group metropolitan LGAs,quarterly-median-rents-local-government-area-september-quarter-2025-excel.xlsx,b8e96347494f09fea2a2ace55997fd34c9398f8509cb3450d65444aebfaaa837,https://www.dffh.vic.gov.au/publications/rental-report
+boundaries,2025,ABS statistical LGA boundaries; reviewed code/name crosswalk,LGA_2025_AUST_GDA2020.zip,acc3015a0ac78ade978c41a2e4110269b5219b60d6a56cbb70393ae647f31b15,https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/non-abs-structures/local-government-areas
+transport,2026-10-13,"Feeds 2,3,4; Melbourne service day; AM 07:00 inclusive–09:00 exclusive",gtfs.zip,c88af3abcaf0872e45196dcc1d5af9bc20a82c54a00a9dfef46c809ec2e34814,https://opendata.transport.vic.gov.au/dataset/gtfs-schedule

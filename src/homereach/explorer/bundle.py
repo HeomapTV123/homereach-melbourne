@@ -13,10 +13,8 @@ import json
 import sys
 from typing import Any
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
-import pyproj
 from shapely.geometry import shape
 
 from .analysis import (AM_WINDOW, CATEGORY_LABELS, CODE, RENT_QUARTER, SERVICE_DATE,
@@ -103,6 +101,9 @@ def validate_geometry_payload(payload: dict, areas: pd.DataFrame) -> None:
 
 
 def create_geometry(path: Path, geo_spec: dict, areas: pd.DataFrame) -> dict:
+    # Build-only dependencies; the frozen release reads existing GeoJSON.
+    import geopandas as gpd
+    import pyproj
     native = gpd.read_file(path, engine="pyogrio")
     require(native.crs is not None and native.crs.to_epsg() == geo_spec["native_epsg"], "Unexpected native CRS.")
     require(native[CODE].is_unique and len(native) == len(areas), "Native area inventory changed.")
@@ -146,6 +147,7 @@ def validate_bundle_tables(tables: dict[str, pd.DataFrame]) -> None:
 
 
 def run_build(root: Path, *, check_only: bool = False) -> dict:
+    import geopandas as gpd
     root = Path(root).resolve()
     print("Verifying processed rental, geography and transport inputs...", flush=True)
     inputs = load_inputs(root)

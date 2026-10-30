@@ -1,0 +1,3 @@
+# Release fingerprints are byte-specific. Disable Git line-ending conversion
+# only for the packaged data, including CSV/JSON, on Windows and Linux.
+data/** -text

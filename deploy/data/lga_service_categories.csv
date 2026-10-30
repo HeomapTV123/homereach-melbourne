@@ -1,0 +1,249 @@
+lga_code_2025,abs_lga_name,rental_area_name,service_category,feed_id,window,eligible_departure_events,unique_trip_records,served_stop_records,unique_route_records,near_boundary_events,extended_time_events,eligible_events_excluding_near_boundary,service_date,agency_timezone
+20660,Banyule,Banyule,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,train_not_labelled_replacement,2,am_peak_0700_0900,259,38,19,1,0,0,259,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,train_not_labelled_replacement,2,service_day,1375,166,19,1,0,28,1375,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,tram,3,am_peak_0700_0900,107,32,7,1,75,0,32,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,tram,3,service_day,871,250,7,1,629,32,242,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,myki_bus,4,am_peak_0700_0900,4649,273,553,26,53,0,4596,2026-10-13,Australia/Melbourne
+20660,Banyule,Banyule,myki_bus,4,service_day,34521,1760,554,29,399,47,34122,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,train_not_labelled_replacement,2,am_peak_0700_0900,215,56,15,2,31,0,184,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,train_not_labelled_replacement,2,service_day,1482,328,15,2,213,10,1269,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,tram,3,am_peak_0700_0900,114,23,10,1,0,0,114,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,tram,3,service_day,912,185,10,1,0,14,912,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,myki_bus,4,am_peak_0700_0900,2803,157,457,20,67,0,2736,2026-10-13,Australia/Melbourne
+20910,Bayside (Vic.),Bayside,myki_bus,4,service_day,20378,1038,457,23,528,88,19850,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,train_not_labelled_replacement,2,am_peak_0700_0900,300,55,26,3,0,0,300,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,train_not_labelled_replacement,2,service_day,2217,393,31,3,0,44,2217,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,tram,3,am_peak_0700_0900,3109,164,241,6,0,0,3109,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,tram,3,service_day,27438,1234,241,6,0,711,27438,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,myki_bus,4,am_peak_0700_0900,3278,251,429,33,95,0,3183,2026-10-13,Australia/Melbourne
+21110,Boroondara,Boroondara,myki_bus,4,service_day,20167,1213,433,35,676,94,19491,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,train_not_labelled_replacement,2,am_peak_0700_0900,248,47,13,1,0,0,248,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,train_not_labelled_replacement,2,service_day,1442,250,13,1,0,19,1442,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,myki_bus,4,am_peak_0700_0900,5522,382,826,42,73,0,5449,2026-10-13,Australia/Melbourne
+21180,Brimbank,Brimbank,myki_bus,4,service_day,38339,2388,827,42,510,98,37829,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,train_not_labelled_replacement,2,am_peak_0700_0900,82,20,10,1,0,0,82,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,train_not_labelled_replacement,2,service_day,656,146,10,1,0,17,656,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,myki_bus,4,am_peak_0700_0900,726,43,264,11,0,0,726,2026-10-13,Australia/Melbourne
+21450,Cardinia,Cardinia,myki_bus,4,service_day,6169,336,288,13,0,0,6169,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,train_not_labelled_replacement,2,am_peak_0700_0900,110,42,12,2,0,0,110,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,train_not_labelled_replacement,2,service_day,801,291,12,2,0,18,801,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,myki_bus,4,am_peak_0700_0900,6422,319,1278,40,0,0,6422,2026-10-13,Australia/Melbourne
+21610,Casey,Casey,myki_bus,4,service_day,51690,2077,1324,44,0,0,51690,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,train_not_labelled_replacement,2,am_peak_0700_0900,421,71,28,2,0,0,421,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,train_not_labelled_replacement,2,service_day,2247,321,28,2,0,38,2247,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,tram,3,am_peak_0700_0900,1679,72,113,2,32,0,1647,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,tram,3,service_day,13307,481,113,2,242,309,13065,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,myki_bus,4,am_peak_0700_0900,5084,329,674,31,96,0,4988,2026-10-13,Australia/Melbourne
+21890,Darebin,Darebin,myki_bus,4,service_day,38939,2153,722,32,859,46,38080,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,train_not_labelled_replacement,2,am_peak_0700_0900,64,27,8,2,0,0,64,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,train_not_labelled_replacement,2,service_day,581,242,8,2,0,16,581,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,myki_bus,4,am_peak_0700_0900,2912,158,586,25,8,0,2904,2026-10-13,Australia/Melbourne
+22170,Frankston,Frankston,myki_bus,4,service_day,23594,1112,622,26,82,55,23512,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,train_not_labelled_replacement,2,am_peak_0700_0900,462,135,22,4,0,0,462,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,train_not_labelled_replacement,2,service_day,3000,805,27,4,0,75,3000,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,tram,3,am_peak_0700_0900,1457,113,117,5,122,0,1335,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,tram,3,service_day,12646,917,117,5,914,344,11732,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,myki_bus,4,am_peak_0700_0900,3169,217,514,25,243,0,2926,2026-10-13,Australia/Melbourne
+22310,Glen Eira,Glen Eira,myki_bus,4,service_day,23784,1502,515,31,1896,33,21888,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,train_not_labelled_replacement,2,am_peak_0700_0900,223,51,11,2,0,0,223,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,train_not_labelled_replacement,2,service_day,1489,306,11,2,0,28,1489,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,myki_bus,4,am_peak_0700_0900,3886,251,733,39,193,0,3693,2026-10-13,Australia/Melbourne
+22670,Greater Dandenong,Greater Dandenong,myki_bus,4,service_day,31263,1657,739,47,1366,90,29897,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,labelled_replacement_bus,2,service_day,24,4,6,1,0,21,24,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,train_not_labelled_replacement,2,am_peak_0700_0900,181,53,17,2,11,0,170,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,train_not_labelled_replacement,2,service_day,1479,366,17,2,76,14,1403,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,myki_bus,4,am_peak_0700_0900,3248,159,421,17,15,0,3233,2026-10-13,Australia/Melbourne
+23110,Hobsons Bay,Hobsons Bay,myki_bus,4,service_day,23145,983,426,17,111,40,23034,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,labelled_replacement_bus,2,service_day,12,12,1,1,0,0,12,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,train_not_labelled_replacement,2,am_peak_0700_0900,119,48,11,3,0,0,119,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,train_not_labelled_replacement,2,service_day,751,304,11,3,0,15,751,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,myki_bus,4,am_peak_0700_0900,6132,330,1020,35,10,0,6122,2026-10-13,Australia/Melbourne
+23270,Hume,Hume,myki_bus,4,service_day,48271,2174,1022,35,61,124,48210,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,train_not_labelled_replacement,2,am_peak_0700_0900,392,97,24,3,51,0,341,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,train_not_labelled_replacement,2,service_day,2804,571,25,3,360,86,2444,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,myki_bus,4,am_peak_0700_0900,4490,230,745,37,247,0,4243,2026-10-13,Australia/Melbourne
+23430,Kingston (Vic.),Kingston,myki_bus,4,service_day,31994,1522,780,44,1863,82,30131,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,train_not_labelled_replacement,2,am_peak_0700_0900,61,16,8,1,0,0,61,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,train_not_labelled_replacement,2,service_day,433,109,8,1,0,20,433,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,myki_bus,4,am_peak_0700_0900,4240,216,699,32,5,0,4235,2026-10-13,Australia/Melbourne
+23670,Knox,Knox,myki_bus,4,service_day,30650,1350,783,51,33,74,30617,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,train_not_labelled_replacement,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,train_not_labelled_replacement,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,myki_bus,4,am_peak_0700_0900,6531,367,624,47,78,0,6453,2026-10-13,Australia/Melbourne
+24210,Manningham,Manningham,myki_bus,4,service_day,45582,2251,630,52,526,332,45056,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,train_not_labelled_replacement,2,am_peak_0700_0900,286,108,15,3,0,0,286,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,train_not_labelled_replacement,2,service_day,1923,665,15,3,0,21,1923,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,tram,3,am_peak_0700_0900,541,50,46,2,0,0,541,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,tram,3,service_day,4810,389,46,2,0,93,4810,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,myki_bus,4,am_peak_0700_0900,3709,245,395,18,36,0,3673,2026-10-13,Australia/Melbourne
+24330,Maribyrnong,Maribyrnong,myki_bus,4,service_day,26274,1562,395,18,236,112,26038,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,train_not_labelled_replacement,2,am_peak_0700_0900,125,38,11,2,0,0,125,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,train_not_labelled_replacement,2,service_day,755,243,11,2,0,23,755,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,myki_bus,4,am_peak_0700_0900,3141,185,520,33,59,0,3082,2026-10-13,Australia/Melbourne
+24410,Maroondah,Maroondah,myki_bus,4,service_day,21822,1151,527,40,381,5,21441,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,labelled_replacement_bus,2,service_day,202,48,9,2,0,33,202,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,train_not_labelled_replacement,2,am_peak_0700_0900,1244,437,56,15,39,0,1205,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,train_not_labelled_replacement,2,service_day,7184,2365,56,15,213,90,6971,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,tram,3,am_peak_0700_0900,8605,697,274,21,983,0,7622,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,tram,3,service_day,65738,4481,275,22,7589,969,58149,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,myki_bus,4,am_peak_0700_0900,4247,499,249,46,50,0,4197,2026-10-13,Australia/Melbourne
+24600,Melbourne,Melbourne,myki_bus,4,service_day,29775,3159,251,46,440,107,29335,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,train_not_labelled_replacement,2,am_peak_0700_0900,22,22,2,1,0,0,22,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,train_not_labelled_replacement,2,service_day,146,146,2,1,0,4,146,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,myki_bus,4,am_peak_0700_0900,3314,218,618,25,3,0,3311,2026-10-13,Australia/Melbourne
+24650,Melton,Melton,myki_bus,4,service_day,24815,1365,622,26,22,39,24793,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,labelled_replacement_bus,2,service_day,234,26,9,1,0,51,234,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,train_not_labelled_replacement,2,am_peak_0700_0900,254,47,26,2,0,0,254,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,train_not_labelled_replacement,2,service_day,1631,284,26,2,0,27,1631,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,tram,3,am_peak_0700_0900,2337,189,115,5,36,0,2301,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,tram,3,service_day,16957,1256,115,5,261,347,16696,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,myki_bus,4,am_peak_0700_0900,3878,254,641,30,30,0,3848,2026-10-13,Australia/Melbourne
+24700,Merri-bek,Merri-bek,myki_bus,4,service_day,28706,1731,649,30,204,13,28502,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,train_not_labelled_replacement,2,am_peak_0700_0900,250,82,14,3,0,0,250,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,train_not_labelled_replacement,2,service_day,1498,474,14,3,0,23,1498,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,myki_bus,4,am_peak_0700_0900,7345,503,852,46,577,0,6768,2026-10-13,Australia/Melbourne
+24970,Monash,Monash,myki_bus,4,service_day,52224,2985,852,60,4525,85,47699,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,train_not_labelled_replacement,2,am_peak_0700_0900,186,39,13,2,7,0,179,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,train_not_labelled_replacement,2,service_day,1226,254,13,2,49,33,1177,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,tram,3,am_peak_0700_0900,1415,91,89,3,92,0,1323,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,tram,3,service_day,11534,653,89,3,600,251,10934,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,myki_bus,4,am_peak_0700_0900,4088,295,461,27,0,0,4088,2026-10-13,Australia/Melbourne
+25060,Moonee Valley,Moonee Valley,myki_bus,4,service_day,26464,1851,461,27,0,61,26464,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,train_not_labelled_replacement,2,am_peak_0700_0900,16,3,8,1,0,0,16,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,train_not_labelled_replacement,2,service_day,136,18,8,1,0,0,136,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,myki_bus,4,am_peak_0700_0900,1952,54,609,11,13,0,1939,2026-10-13,Australia/Melbourne
+25340,Mornington Peninsula,Mornington Penin'a,myki_bus,4,service_day,17502,320,673,11,63,0,17439,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,train_not_labelled_replacement,2,am_peak_0700_0900,46,18,6,1,0,0,46,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,train_not_labelled_replacement,2,service_day,298,106,6,1,0,9,298,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,myki_bus,4,am_peak_0700_0900,1649,144,230,15,73,0,1576,2026-10-13,Australia/Melbourne
+25710,Nillumbik,Nillumbik,myki_bus,4,service_day,11633,926,232,15,590,3,11043,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,train_not_labelled_replacement,2,am_peak_0700_0900,58,29,4,1,0,0,58,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,train_not_labelled_replacement,2,service_day,422,211,4,1,0,6,422,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,tram,3,am_peak_0700_0900,3309,363,164,13,736,0,2573,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,tram,3,service_day,25461,2549,164,13,5328,551,20133,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,myki_bus,4,am_peak_0700_0900,1732,135,207,14,110,0,1622,2026-10-13,Australia/Melbourne
+25900,Port Phillip,Port Phillip,myki_bus,4,service_day,13394,940,207,14,861,74,12533,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,train_not_labelled_replacement,2,am_peak_0700_0900,539,165,34,5,0,0,539,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,train_not_labelled_replacement,2,service_day,3444,959,34,5,0,76,3444,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,tram,3,am_peak_0700_0900,2644,198,219,8,191,0,2453,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,tram,3,service_day,21692,1478,219,8,1655,605,20037,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,myki_bus,4,am_peak_0700_0900,1201,201,200,23,115,0,1086,2026-10-13,Australia/Melbourne
+26350,Stonnington,Stonnington,myki_bus,4,service_day,9378,1434,200,31,851,30,8527,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,train_not_labelled_replacement,2,am_peak_0700_0900,238,56,15,2,0,0,238,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,train_not_labelled_replacement,2,service_day,1371,281,15,2,0,18,1371,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,tram,3,am_peak_0700_0900,584,71,53,3,0,0,584,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,tram,3,service_day,5443,630,53,3,0,185,5443,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,myki_bus,4,am_peak_0700_0900,6604,431,820,48,124,0,6480,2026-10-13,Australia/Melbourne
+26980,Whitehorse,Whitehorse,myki_bus,4,service_day,46991,2707,822,58,790,150,46201,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,train_not_labelled_replacement,2,am_peak_0700_0900,192,34,14,1,0,0,192,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,train_not_labelled_replacement,2,service_day,1076,168,14,1,0,18,1076,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,tram,3,am_peak_0700_0900,92,32,6,1,45,0,47,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,tram,3,service_day,750,250,6,1,379,27,371,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,myki_bus,4,am_peak_0700_0900,6161,326,904,30,18,0,6143,2026-10-13,Australia/Melbourne
+27070,Whittlesea,Whittlesea,myki_bus,4,service_day,44814,1989,905,30,123,61,44691,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,labelled_replacement_bus,2,service_day,8,4,2,1,0,8,8,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,train_not_labelled_replacement,2,am_peak_0700_0900,77,26,7,1,14,0,63,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,train_not_labelled_replacement,2,service_day,456,152,8,1,76,2,380,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,myki_bus,4,am_peak_0700_0900,5736,331,1020,31,16,0,5720,2026-10-13,Australia/Melbourne
+27260,Wyndham,Wyndham,myki_bus,4,service_day,43654,2092,1022,31,111,355,43543,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,train_not_labelled_replacement,2,am_peak_0700_0900,615,244,26,8,0,0,615,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,train_not_labelled_replacement,2,service_day,3340,1337,26,8,0,49,3340,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,tram,3,am_peak_0700_0900,2649,331,152,11,351,0,2298,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,tram,3,service_day,20157,2353,152,11,2434,278,17723,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,myki_bus,4,am_peak_0700_0900,2091,315,127,33,46,0,2045,2026-10-13,Australia/Melbourne
+27350,Yarra,Yarra,myki_bus,4,service_day,14752,1908,127,33,381,55,14371,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,labelled_replacement_bus,2,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,labelled_replacement_bus,2,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,train_not_labelled_replacement,2,am_peak_0700_0900,62,31,9,2,0,0,62,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,train_not_labelled_replacement,2,service_day,418,211,9,2,0,17,418,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,tram,3,am_peak_0700_0900,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,tram,3,service_day,0,0,0,0,0,0,0,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,myki_bus,4,am_peak_0700_0900,3003,167,682,40,25,0,2978,2026-10-13,Australia/Melbourne
+27450,Yarra Ranges,Yarra Ranges,myki_bus,4,service_day,20320,997,758,63,157,0,20163,2026-10-13,Australia/Melbourne
