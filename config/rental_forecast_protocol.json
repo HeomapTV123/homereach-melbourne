@@ -1,0 +1,38 @@
+{
+  "protocol_id": "homereach-rental-baselines-v1",
+  "target": "median_weekly_rent",
+  "target_unit": "AUD per week, nominal",
+  "property_type": "2 bedroom flats",
+  "geography": "31 source-group metropolitan LGAs; original rental names",
+  "source_sha256": "b8e96347494f09fea2a2ace55997fd34c9398f8509cb3450d65444aebfaaa837",
+  "source_reporting_quarter": "2025Q3",
+  "first_quarter": "1999Q2",
+  "last_quarter": "2025Q3",
+  "initial_history_end": "2018Q4",
+  "validation_start": "2019Q1",
+  "validation_end": "2023Q3",
+  "holdout_start": "2023Q4",
+  "holdout_end": "2025Q3",
+  "forecast_horizon_quarters": 1,
+  "seasonal_period_quarters": 4,
+  "models": [
+    "last_observation",
+    "seasonal_naive"
+  ],
+  "primary_metric": "MAE",
+  "secondary_metrics": [
+    "RMSE",
+    "mean_signed_error_forecast_minus_actual"
+  ],
+  "aggregation": "Every LGA-quarter receives equal weight; report pooled, per-LGA, and per-quarter errors.",
+  "information_rule": "At target t, use only the same LGA/category rows dated at or before t-1; after scoring, earlier validation outcomes may enter later origins.",
+  "holdout_policy": "Reserve 2023Q4-2025Q3 from model selection and forecast-error scoring in this notebook. Structural checks read the complete input; prior EDA has already displayed these values.",
+  "vintage_limit": "Single 2025Q3 workbook vintage; publication lags and historical revisions are not reconstructed. This is period-based retrospective evaluation, not a real-time backtest.",
+  "excluded_predictors": [
+    "2026 transport snapshot",
+    "current target-quarter rent",
+    "current target-quarter published count",
+    "future rental observations"
+  ],
+  "deployment_policy": "Research only; no live-app, packaged-data, registry, or recommendation changes."
+}
