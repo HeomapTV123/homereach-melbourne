@@ -2,7 +2,7 @@ name: Python checks
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/rental-forecast-baselines]
   pull_request:
     branches: [main]
 
