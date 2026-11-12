@@ -1,5 +1,7 @@
 """File/Git guards and read-only comparison tests in isolated temporary projects."""
 from pathlib import Path
+from importlib.machinery import ModuleSpec
+from unittest.mock import Mock
 import json
 import shutil
 import subprocess
@@ -132,6 +134,18 @@ def test_actual_git_lock_gate(locked_git):
 def test_changed_gate_rejected_before_import(locked_git):
     root,git=locked_git;p=root/'scripts/verify_rental_final_protocol.py';p.write_text('raise RuntimeError("must not execute")')
     with pytest.raises(ValueError,match='verifier changed'):eq.verify_lock(root)
+
+
+@pytest.mark.parametrize('spec', [None, ModuleSpec('_homereach_frozen_gate', loader=None)],
+                         ids=['missing-spec', 'missing-loader'])
+def test_unavailable_gate_loader_rejected_before_import(locked_git, monkeypatch, spec):
+    root, _ = locked_git
+    module_from_spec = Mock(side_effect=AssertionError('Gate import must not be attempted.'))
+    monkeypatch.setattr(eq.importlib.util, 'spec_from_file_location', lambda *args: spec)
+    monkeypatch.setattr(eq.importlib.util, 'module_from_spec', module_from_spec)
+    with pytest.raises(ValueError, match=r'^Cannot import original protocol gate\.$'):
+        eq.verify_lock(root)
+    module_from_spec.assert_not_called()
 
 
 def test_wrong_branch_rejected(locked_git):

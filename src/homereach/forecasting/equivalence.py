@@ -86,10 +86,14 @@ def verify_lock(root: Path) -> tuple[dict, dict]:
     committed = git_bytes(root, 'show', f'{LOCK_COMMIT}:scripts/verify_rental_final_protocol.py')
     require(gate_path.read_text(encoding='utf-8-sig').replace('\r\n', '\n') ==
             committed.decode('utf-8-sig').replace('\r\n', '\n'), 'Original protocol verifier changed.')
-    loader = importlib.util.spec_from_file_location('_homereach_frozen_gate', gate_path)
-    require(loader is not None and loader.loader is not None, 'Cannot import original protocol gate.')
-    gate = importlib.util.module_from_spec(loader)
-    loader.loader.exec_module(gate)
+    spec = importlib.util.spec_from_file_location('_homereach_frozen_gate', gate_path)
+    if spec is None:
+        raise ValueError('Cannot import original protocol gate.')
+    module_loader = spec.loader
+    if module_loader is None:
+        raise ValueError('Cannot import original protocol gate.')
+    gate = importlib.util.module_from_spec(spec)
+    module_loader.exec_module(gate)
     lock = gate.verify_project(root, require_committed=True)
     require(lock['protocol_commit'] == LOCK_COMMIT, 'Pre-scoring lock commit differs.')
     git_bytes(root, 'merge-base', '--is-ancestor', LOCK_COMMIT, 'HEAD')

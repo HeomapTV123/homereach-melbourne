@@ -82,9 +82,10 @@ python scripts/verify_rental_forecast_refactor.py --check-only
 
 The original refactor added 138 collected cases to the previously confirmed 352,
 producing the **490-test** checkpoint at `cc46371`. The later compatibility patch
-at `2cebd1b` adds three regression cases. With the complete dependencies, the
-project installed (`python -m pip install -e .`) and Git available, expect
-**493 passed** for that updated code. The path-escape
+at `2cebd1b` adds three regression cases, producing the **493-test** maintenance
+checkpoint. Two subsequent import-loader regression cases bring the current
+suite to **495 tests**. With the complete dependencies, the project installed
+(`python -m pip install -e .`) and Git available, expect **495 passed**. The path-escape
 unit test simulates resolved-path traversal without requiring Windows symlink
 privileges. Git integration tests can skip if Git is absent. Review any skip
 rather than equating it to a pass. All application code remains outside the
@@ -149,6 +150,11 @@ test the original committed gate, wrong branches, changed protocols, altered
 files, unsafe paths, text/numeric mismatches and preservation on errors. The
 orchestration test uses a deliberately isolated adapter; a full local comparison
 against the user's real saved evidence remains a separate required checkpoint.
+
+The protocol-gate import uses explicit checks for a missing module specification
+or loader before module construction. Two regression cases verify the existing
+failure behaviour and error message for those conditions. This clarification
+preserves the valid import path, frozen protocol checks and forecast calculations.
 
 ## Input validation corrections in this package
 
