@@ -18,6 +18,8 @@ from typing import Any
 
 import pandas as pd
 
+from .paths import contained_path, safe_filename
+
 AGGREGATE_LABELS = {"Group Total", "Metro", "Non-Metro", "Victoria"}
 KEY_COLUMNS = ["rental_area_name", "quarter", "property_type"]
 COLUMN_ORDER = [
@@ -37,9 +39,26 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
-def fingerprint(path: str | Path) -> str:
-    """Return a source/content fingerprint without modifying the file."""
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def fingerprint(path: str | Path, *, root: str | Path | None = None) -> str:
+    """Hash an explicit local file, optionally enforcing project containment.
+
+    Config-derived paths must be checked against their project root. Without
+    ``root``, the caller deliberately selects the file, including external files.
+    """
+    path = Path(path)
+    if root is not None:
+        anchor = Path(root).resolve()
+        if path.is_absolute():
+            selected_root = Path(root).absolute()
+            if path.is_relative_to(selected_root):
+                path = path.relative_to(selected_root)
+            elif path.is_relative_to(anchor):
+                path = path.relative_to(anchor)
+            else:
+                raise ValueError("Fingerprint path escapes the project root.")
+        path = contained_path(anchor, path)
+    with path.open("rb") as handle:
+        return hashlib.file_digest(handle, "sha256").hexdigest()
 
 
 def load_snapshot(path: str | Path) -> dict[str, Any]:
@@ -54,7 +73,7 @@ def load_snapshot(path: str | Path) -> dict[str, Any]:
     require(isinstance(spec, dict), "Snapshot configuration must be a JSON object.")
     require(required.issubset(spec), f"Snapshot configuration needs: {sorted(required)}")
     require(bool(re.fullmatch(r"[0-9a-f]{64}", spec["sha256"])), "Invalid source SHA-256.")
-    require(Path(spec["filename"]).name == spec["filename"], "Use a filename, not a path, in the snapshot.")
+    safe_filename(spec["filename"])
     return spec
 
 

@@ -26,6 +26,7 @@ from homereach.geography.lga import (
     CROSSWALK_COLUMNS, load_geo_snapshot, load_aliases, build_crosswalk,
     read_boundaries,
 )
+from homereach.io.paths import contained_path
 from .gtfs import require, sha256_file, read_json, read_feed_tables, build_active_trips
 from .spatial import build_spatial, CODE, NAME
 from .service import (
@@ -192,16 +193,19 @@ def check_points(path: Path, expected: gpd.GeoDataFrame) -> None:
     require(all(a.equals_exact(b,0.0) for a,b in zip(actual.geometry, expected.geometry)), "Point coordinates changed on read-back.")
 
 
-def compare_folder(folder: Path, tables: dict[str, pd.DataFrame], points=None) -> list[str]:
+def compare_folder(root: Path, folder: Path, tables: dict[str, pd.DataFrame],
+                   names: tuple[str, ...], points=None) -> list[str]:
     """Compare all existing files; partial references are reported, never called complete."""
     compared=[]
-    for name,table in tables.items():
-        path=folder/name
+    for name in names:
+        path=contained_path(root,folder/name)
         if path.exists():
             require(path.is_file(), f"Output path is not a file: {path}")
-            check_csv(path,table); compared.append(str(path))
-    if points is not None and (folder/POINT_NAME).exists():
-        check_points(folder/POINT_NAME,points);compared.append(str(folder/POINT_NAME))
+            check_csv(path,tables[name]); compared.append(str(path))
+    if points is not None:
+        point_path=contained_path(root,folder/POINT_NAME)
+        if point_path.exists():
+            check_points(point_path,points);compared.append(str(point_path))
     return compared
 
 
@@ -251,10 +255,24 @@ def export_outputs(root: Path, spatial: dict, points: gpd.GeoDataFrame, services
     published last. Avoid simultaneous builds; a crash requires review/rebuild.
     """
     require(tuple(spatial)==SPATIAL_NAMES and tuple(services)==SERVICE_NAMES,"Unexpected export inventory.")
-    dest=root/'data/processed/transport'
-    references=compare_folder(root/'data/interim/gtfs_spatial',spatial,points)
-    references+=compare_folder(root/'data/interim/gtfs_service',services)
-    old=compare_folder(dest/'spatial',spatial,points)+compare_folder(dest/'service',services)
+    root=Path(root).resolve()
+    destination=Path('data/processed/transport')
+    dest=contained_path(root,destination)
+    # Check every reference and destination before reading comparisons or creating
+    # staging files. A symlinked base directory must also stay in this project.
+    for folder,names in [
+        (Path('data/interim/gtfs_spatial'),(*SPATIAL_NAMES,POINT_NAME)),
+        (Path('data/interim/gtfs_service'),SERVICE_NAMES),
+        (destination/'spatial',(*SPATIAL_NAMES,POINT_NAME)),
+        (destination/'service',SERVICE_NAMES),
+        (destination,(REPORT_NAME,)),
+    ]:
+        for name in names:
+            contained_path(root,folder/name)
+    references=compare_folder(root,Path('data/interim/gtfs_spatial'),spatial,SPATIAL_NAMES,points)
+    references+=compare_folder(root,Path('data/interim/gtfs_service'),services,SERVICE_NAMES)
+    old=compare_folder(root,destination/'spatial',spatial,SPATIAL_NAMES,points)
+    old+=compare_folder(root,destination/'service',services,SERVICE_NAMES)
     report=dict(report,notebook_exports_compared=[str(Path(p).relative_to(root)) for p in references],
                 previous_pipeline_exports_compared=[str(Path(p).relative_to(root)) for p in old],
                 check_only=check_only)
@@ -262,16 +280,22 @@ def export_outputs(root: Path, spatial: dict, points: gpd.GeoDataFrame, services
     print(f'Previous pipeline exports matched: {len(old)}/18',flush=True)
     if len(references)!=18:print('Some notebook reference files are absent; absent files were not compared.',flush=True)
     # Snapshot destination content as well so concurrent edits are not silently clobbered.
-    prior={p:sha256_file(p) for p in dest.rglob('*') if p.is_file()} if dest.exists() else {}
+    prior={}
+    if dest.exists():
+        for path in dest.rglob('*'):
+            path=contained_path(root,path.relative_to(root))
+            if path.is_file():
+                prior[path]=sha256_file(path)
     unchanged(hashes);unchanged(prior)
     if check_only:
         report['project_output_files_written']=0;return report
-    parent=root/'data/processed';parent.mkdir(parents=True,exist_ok=True)
+    parent=contained_path(root,'data/processed');parent.mkdir(parents=True,exist_ok=True)
     with TemporaryDirectory(prefix='.transport-stage-',dir=parent) as temp:
         stage=Path(temp);file_list=[];schemas={}
-        for folder,tables in [('spatial',spatial),('service',services)]:
+        for folder,tables,names in [('spatial',spatial,SPATIAL_NAMES),('service',services,SERVICE_NAMES)]:
             (stage/folder).mkdir()
-            for name,table in tables.items():
+            for name in names:
+                table=tables[name]
                 rel=Path(folder)/name;path=stage/rel
                 table.to_csv(path,index=False,encoding='utf-8',lineterminator='\n');check_csv(path,table)
                 file_list.append(rel);schemas[rel.as_posix()]={'rows':len(table),'columns':table.columns.tolist()}
@@ -284,7 +308,8 @@ def export_outputs(root: Path, spatial: dict, points: gpd.GeoDataFrame, services
         require(read_json(stage/REPORT_NAME)==report,'Pipeline report read-back mismatch.')
         unchanged(hashes);unchanged(prior)
         for rel in [*file_list,Path(REPORT_NAME)]:
-            target=dest/rel;target.parent.mkdir(parents=True,exist_ok=True);(stage/rel).replace(target)
+            target=contained_path(root,destination/rel)
+            target.parent.mkdir(parents=True,exist_ok=True);(stage/rel).replace(target)
     return report
 
 
