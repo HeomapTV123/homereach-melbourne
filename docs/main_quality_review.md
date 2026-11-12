@@ -43,6 +43,22 @@ both normal and check-only modes. Its original export-key inventory check
 already rejected unexpected table names; iterating literal names now makes the
 output path construction independent of data-derived mapping keys.
 
+The caller review after PR #3 also found that transport's input loader still
+joined the configured ABS filename without checking its resolved location. A
+valid filename could therefore refer to an outside file through a symlink. The
+follow-up contains that input, all required input paths, optional audit/rental
+paths and entries discovered in tracked reference folders before file probes or
+content reads. The transport entry point also contains its initial GTFS
+configuration before loading it. The selected project root may itself be a
+maintainer-selected alias; the canonical root anchors these checks.
+
+Sixteen additional regression cases cover escaping input files/directories,
+both forms of the configured boundary-file escape, entry-point configuration
+reads, and a valid fictional input build using real CSV/GeoPackage comparisons.
+The valid-input case checks the complete fingerprint inventory and unchanged
+file bytes. It stubs only the separately tested ABS boundary-format reader;
+this is not a replay of the private Melbourne raw-data pipeline.
+
 An explicit project root remains a local maintainer choice. Generic callers of
 `fingerprint(path)` can still select an external file deliberately; callers
 handling configuration-derived paths use containment and/or its `root=` check.
