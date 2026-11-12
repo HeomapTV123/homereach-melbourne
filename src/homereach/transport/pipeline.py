@@ -26,7 +26,7 @@ from homereach.geography.lga import (
     CROSSWALK_COLUMNS, load_geo_snapshot, load_aliases, build_crosswalk,
     read_boundaries,
 )
-from homereach.io.paths import contained_path
+from homereach.io.paths import contained_path, safe_filename
 from .gtfs import require, sha256_file, read_json, read_feed_tables, build_active_trips
 from .spatial import build_spatial, CODE, NAME
 from .service import (
@@ -89,20 +89,37 @@ def unchanged(hashes: dict[Path, str]) -> None:
 
 def read_inputs(root: Path, spec: dict):
     """Validate upstream geographic exports against their report and actual ABS shapes."""
-    paths = {
-        "gtfs": root / "data/raw/transport/gtfs.zip",
-        "geo_spec": root / "config/lga_snapshot.json",
-        "aliases": root / "config/lga_name_aliases_2025.csv",
-        "native": root / "data/processed/geography/metro_lga_2025.gpkg",
-        "crosswalk": root / "data/interim/geography/lga_crosswalk_2025.csv",
-        "geo_report": root / "data/interim/geography/geography_pipeline_report.json",
-        "transport_spec": root / "config/gtfs_snapshot.json",
-    }
+    root = Path(root).resolve()
+    paths = {key: contained_path(root, relative) for key, relative in {
+        "gtfs": "data/raw/transport/gtfs.zip",
+        "geo_spec": "config/lga_snapshot.json",
+        "aliases": "config/lga_name_aliases_2025.csv",
+        "native": "data/processed/geography/metro_lga_2025.gpkg",
+        "crosswalk": "data/interim/geography/lga_crosswalk_2025.csv",
+        "geo_report": "data/interim/geography/geography_pipeline_report.json",
+        "transport_spec": "config/gtfs_snapshot.json",
+    }.items()}
+    audit_path = contained_path(root, "data/interim/gtfs_audit/audit_summary.json")
+    reference_folders = [contained_path(root, relative) for relative in (
+        "notebooks", "docs", "data/interim/gtfs_spatial", "data/interim/gtfs_service",
+    )]
+    rental_paths = [contained_path(root, relative) for relative in (
+        "data/processed/rent_quarterly.csv", "data/processed/rent_quarterly.parquet",
+        "data/processed/rent_quality_report.json",
+    )]
+    tracked = set(paths.values())
+    for folder in reference_folders:
+        if folder.is_dir():
+            for child in folder.iterdir():
+                path = contained_path(root, child.relative_to(root))
+                if path.is_file():
+                    tracked.add(path)
+    tracked.update(path for path in rental_paths if path.is_file())
     for path in paths.values():
         if not path.is_file():
             raise FileNotFoundError(f"Missing upstream input: {path}. Complete the geography pipeline first.")
     geo_spec = load_geo_snapshot(paths["geo_spec"])
-    abs_path = root / "data/raw/geography" / geo_spec["filename"]
+    abs_path = contained_path(root, Path("data/raw/geography") / safe_filename(geo_spec["filename"]))
     require(abs_path.is_file() and sha256_file(abs_path) == geo_spec["sha256"], "ABS snapshot changed.")
     require(sha256_file(paths["gtfs"]) == spec["sha256"], "GTFS fingerprint differs from the audited source.")
     with ZipFile(paths["gtfs"]) as archive:
@@ -135,20 +152,14 @@ def read_inputs(root: Path, spec: dict):
         code = getattr(row, CODE)
         require(code in by_code.index and getattr(row, NAME) == by_code.loc[code, "LGA_NAME25"], "Wrong ABS code/name.")
         require(row.geometry.equals_exact(by_code.loc[code].geometry, 0.0), f"Native geometry differs: {code}")
-    tracked = set(paths.values()) | {abs_path}
+    tracked.add(abs_path)
     # Notebook audit is provenance evidence, not an audit that this refactor pretends to rerun.
-    audit_path = root / "data/interim/gtfs_audit/audit_summary.json"
     if audit_path.is_file():
         audit = read_json(audit_path)
         require(audit.get("source", {}).get("sha256") == spec["sha256"] and audit.get("source_unchanged") is True,
                 "Existing GTFS audit belongs to another/incomplete snapshot.")
         require(audit.get("proposed_service_date") == spec["service_date"], "Audit date differs.")
         tracked.add(audit_path)
-    for folder in (root/"notebooks", root/"docs", root/"data/interim/gtfs_spatial", root/"data/interim/gtfs_service"):
-        if folder.is_dir():
-            tracked.update(p for p in folder.iterdir() if p.is_file())
-    for rel in ("data/processed/rent_quarterly.csv","data/processed/rent_quarterly.parquet","data/processed/rent_quality_report.json"):
-        if (root/rel).is_file(): tracked.add(root/rel)
     return paths["gtfs"], native, crosswalk, {p:sha256_file(p) for p in tracked}
 
 
@@ -316,7 +327,7 @@ def export_outputs(root: Path, spatial: dict, points: gpd.GeoDataFrame, services
 def run_transport(root: Path, *, check_only: bool=False, update_registry: bool=False, chunk_rows: int=100_000) -> dict:
     require(not(check_only and update_registry),'--check-only cannot update the registry.')
     require(type(chunk_rows) is int and 1<=chunk_rows<=1_000_000,'Use a chunk size from 1 to 1000000.')
-    root=Path(root).resolve();spec=load_transport_snapshot(root/'config/gtfs_snapshot.json')
+    root=Path(root).resolve();spec=load_transport_snapshot(contained_path(root,'config/gtfs_snapshot.json'))
     # Disable optional grid downloads during this offline analysis; restore caller's setting.
     network_before=pyproj.network.is_network_enabled();pyproj.network.set_network_enabled(False)
     try:
