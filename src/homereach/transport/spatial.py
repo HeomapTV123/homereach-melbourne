@@ -110,7 +110,7 @@ def assign_points(points, areas):
     result.loc[assigned, CODE] = result.loc[assigned, "_point_row"].map(single[CODE]).astype("string").to_numpy()
     result.loc[assigned, NAME] = result.loc[assigned, "_point_row"].map(single[NAME]).astype("string").to_numpy()
     codes = pairs.groupby("_point_row")[CODE].agg(lambda x: json.dumps(sorted(x.astype(str)), separators=(",", ":")))
-    result["candidate_lga_codes_json"] = result._point_row.map(codes).fillna("[]").astype("string")
+    result["candidate_lga_codes_json"] = result._point_row.map(codes).astype("string").fillna("[]")
     # Audit all candidate associations, not just selected assignments.
     candidate_table = pairs.drop(columns="_point_row").merge(
         pd.DataFrame(result[["stop_key", *STOP_KEYS]]), on="stop_key", how="left", validate="many_to_one")

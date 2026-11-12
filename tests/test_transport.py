@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import io
 import json
+import warnings
 from datetime import date, datetime
 from pathlib import Path
 from zipfile import ZipFile
@@ -116,13 +117,18 @@ def points(geometries,feeds=None,ids=None):
                             geometry=geometries,crs=7855)
 
 
-@pytest.mark.parametrize('point,status,code',[(Point(50,50),'matched_within','20001'),
-    (Point(250,50),'outside_selected_lgas',None),(Point(0,50),'boundary_review',None),
-    (Point(100,50),'ambiguous_review',None),(None,'invalid_coordinates',None)])
-def test_spatial_status(areas,point,status,code):
-    p=points([point]);r,_=spatial.assign_points(p,areas)
+@pytest.mark.parametrize('point,status,code,candidates',[(Point(50,50),'matched_within','20001',['20001']),
+    (Point(250,50),'outside_selected_lgas',None,[]),(Point(0,50),'boundary_review',None,['20001']),
+    (Point(100,50),'ambiguous_review',None,['20001','20002']),(None,'invalid_coordinates',None,[])])
+def test_spatial_status(areas,point,status,code,candidates):
+    p=points([point])
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        r,_=spatial.assign_points(p,areas)
     assert r.spatial_match_status.iloc[0]==status
     assert r[spatial.CODE].iloc[0]==code if code else pd.isna(r[spatial.CODE].iloc[0])
+    assert isinstance(r.candidate_lga_codes_json.dtype,pd.StringDtype)
+    assert r.candidate_lga_codes_json.iloc[0]==json.dumps(candidates,separators=(',',':'))
     spatial.verify_assignments(r,p,areas)
 
 

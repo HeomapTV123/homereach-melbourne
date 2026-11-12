@@ -9,7 +9,12 @@ transport timetables and geographic boundaries into a reproducible, interactive
 comparison. It combines source audits, data cleaning, reviewed geographic joins,
 service-indicator engineering, automated tests and a hosted Streamlit application.
 
-> **This is a descriptive explorer of differently dated snapshots.** Rent is from
+The `feat/rental-forecast-baselines` branch also records completed retrospective
+rental-forecast experiments and a tested reusable implementation. See the
+[research summary](docs/rental_modelling_summary.md) and
+[model card](docs/model_card.md) for their methods, results and limitations.
+
+> **The deployed application is a descriptive explorer of differently dated snapshots.** Rent is from
 > **2025Q3**; scheduled transport is for **13 October 2026**; LGA boundaries are
 > **ABS 2025**. It is not a live property search, a recommendation ranking, a
 > commute-time calculator or a forecasting service.
@@ -23,9 +28,14 @@ statistics and transport schedules describe different things, use different
 identifiers and cover different periods. HomeReach makes those differences
 explicit while giving users a way to inspect the data together.
 
-The current question is: **How do published rents and scheduled morning service
+The explorer's question is: **How do published rents and scheduled morning service
 supply vary across the selected LGAs?** It does not assume that a cheap area, or
 an area with many stop visits, is automatically a suitable place to live.
+
+The forecasting research asks: **How accurately can next quarter's published
+median weekly rent for two-bedroom flats be predicted from earlier observations
+of the same LGA?** It evaluates historical forecasts separately from the deployed
+explorer's descriptive comparisons.
 
 ## Explore the application
 
@@ -145,6 +155,99 @@ or the suitability of an area. The release CI passed with pandas deprecation
 warnings; dependency compatibility remains a maintenance task. The test count is
 a record for this code snapshot, not a permanently fixed target.
 
+## Completed rental-forecast research
+
+The first modelling round is recorded on `feat/rental-forecast-baselines`.
+It uses the same 31 rental-source LGAs and two-bedroom-flat series, with nominal
+AUD/week as the target unit. Initial history is **1999Q2–2018Q4**, development
+validation is **2019Q1–2023Q3** (589 targets per method), and the fixed final
+evaluation is **2023Q4–2025Q3** (248 targets per method).
+
+Every forecast targets the next quarter using that LGA's history through the
+previous quarter. Both Ridge methods refit a training-only StandardScaler and
+Ridge model at every origin, with alpha **1.0**, an intercept and the SVD solver.
+The candidate predicts quarterly change and adds a fixed **0.5** of that predicted
+change to the last observed rent. Earlier final-period outcomes enter history
+only for later origins under the fixed rolling procedure.
+
+### Findings
+
+| Method | Role in final evaluation | Validation MAE | Final MAE |
+|---|---|---:|---:|
+| Last observation | Primary reference | 10.9728 | 13.6089 |
+| Half-adjusted change Ridge | Primary candidate | 10.9133 | 13.1493 |
+| Earlier level Ridge | Secondary reference | 13.2135 | 13.7226 |
+| Seasonal naive | Secondary reference | 25.2937 | 40.6411 |
+
+MAE is measured in nominal AUD/week, with equal weight for each LGA-quarter.
+The primary candidate reduced final MAE by approximately **0.4595 AUD/week
+(3.3767%)** relative to last observation. Its MAE was lower in **21 LGAs** and
+higher in **10**. Full RMSE, signed-error and paired-comparison results are in
+the [final evaluation report](docs/rental_final_evaluation.md) and
+[model card](docs/model_card.md).
+
+This is a modest, mixed later-period result. The candidate was developed after
+validation diagnostics; final outcomes had appeared in earlier descriptive work.
+One workbook vintage was used, without reconstructing historical publication
+lags or revisions. The study is a retrospective evaluation, and its descriptive
+error differences do not establish statistical significance or future performance.
+The completed final period is not a new tuning set. Forecasting remains research
+work; the hosted application serves the descriptive release above.
+
+### Research trail
+
+| Notebook | Purpose |
+|---|---|
+| [09 — Forecast baselines](notebooks/09_rental_forecast_baselines.ipynb) | Last-observation and seasonal-naive validation benchmarks |
+| [10 — Level Ridge](notebooks/10_rental_ridge_validation.ipynb) | Fixed per-LGA level regression and baseline comparison |
+| [11 — Error diagnostics](notebooks/11_rental_ridge_error_diagnostics.ipynb) | Inspect the saved validation errors |
+| [12 — Change correction](notebooks/12_rental_correction_validation.ipynb) | Evaluate the fixed half-adjusted change candidate |
+| [13 — Final evaluation](notebooks/13_rental_final_evaluation.ipynb) | Evaluate the four methods under the committed final protocol |
+
+The [modelling summary](docs/rental_modelling_summary.md) connects these stages.
+The [refactor guide](docs/forecasting_refactor.md) documents the reusable package
+and its regression/equivalence checks.
+
+### Research verification checkpoint — 11 November 2026
+
+The maintainer verified the refactor locally before committing it as
+[`cc46371`](https://github.com/HeomapTV123/homereach-melbourne/commit/cc46371fe16310ce24150cb85a07b27dac3df656).
+
+| Check | Recorded local result |
+|---|---|
+| Complete automated test suite | **490 passed** in **105.05 seconds**, in the Windows `homereach` environment |
+| Saved notebook 13 evidence | **13/13 CSV tables matched** |
+| Fixed calculation reproduced | **992 forecasts**, **496 trained fits** |
+| Read-only equivalence run | **0 project files written**; **0 additional independent final tests** |
+
+The 490 cases comprise the earlier 352 tests plus 138 forecasting/equivalence
+cases. The comparison ran while Git HEAD was `dce9b7b`; `cc46371` then recorded
+the tested files. The original final-evaluation execution remains `2919a4e`,
+with the protocol locked at `d0858bd`.
+
+This is a local verification record. The [CI workflow](.github/workflows/ci.yml)
+at `cc46371` triggers on pushes to `main` and pull requests targeting `main`;
+the direct research-branch push did not trigger a GitHub Actions run. The
+352-test entry above remains the historical first-deployed-release checkpoint.
+
+### Compatibility maintenance checkpoint — 11 November 2026
+
+The later pandas compatibility patch was committed and pushed as
+[`2cebd1b`](https://github.com/HeomapTV123/homereach-melbourne/commit/2cebd1b).
+Its three added regression cases bring the complete suite to **493 tests**.
+
+| Check | Recorded result |
+|---|---|
+| Local complete test suite | **493 passed in 54.81 seconds**, in the Windows `homereach` environment |
+| GitHub Actions test suite | **493 passed in 25.42 seconds** in [run #19](https://github.com/HeomapTV123/homereach-melbourne/actions/runs/43056263652) |
+| Standalone release verification | **11 files verified**; release identifier still begins `fe2035fbc37e64a4` |
+
+Both recorded pytest runs completed without pandas warnings. The packaged data
+release remains unchanged. The **352-test** first-release record and **490-test**
+refactor record above retain their original scope and dates. The completed
+**13/13 saved-table comparison** belongs to the earlier refactor checkpoint;
+this compatibility-maintenance record is not another forecast evaluation.
+
 ## Run the packaged application locally
 
 **No raw-data download or full pipeline rebuild is required for this path.**
@@ -244,23 +347,51 @@ review; this is not a general automatic-update command. See the
 The original sources, most intermediate/processed outputs and credentials must
 not be force-added to Git. `deploy/data` is the deliberate publication exception.
 
+### Verify the completed forecasting refactor
+
+From the project root on `feat/rental-forecast-baselines`, with the existing
+development environment installed:
+
+```bat
+conda activate homereach
+git branch --show-current
+python -m pytest -o "addopts=" -q
+python scripts/verify_rental_forecast_refactor.py --check-only
+```
+
+The automated tests use fictional inputs and temporary files. The separate
+equivalence command requires the original completed local research evidence:
+`data/processed/rent_quarterly.csv`, its quality report, the preceding experiment
+manifests/outputs and `data/interim/rental_final_evaluation/`. Those files are
+Git-ignored, so a fresh clone can run the tests but cannot perform that saved-file
+comparison until the original evidence is available.
+
+The command validates the frozen protocol and evidence fingerprints, then compares
+all 13 tables using the documented schemas, keys and numeric tolerances. It is
+read-only and stops on missing or changed evidence. Reproducing the same scored
+period verifies the implementation; it does not create another independent final
+test. See the [refactor guide](docs/forecasting_refactor.md) for the full contract.
+
 ## Repository guide
 
 | Location | Role |
 |---|---|
 | `notebooks/01`–`08` | Source audits, rental EDA, maps, GTFS analysis and combined EDA |
+| `notebooks/09`–`13` | Rental baselines, level Ridge, validation diagnostics, change correction and fixed final evaluation |
 | `src/homereach/io`, `geography`, `transport` | Reusable source preparation and geographic/service validation |
 | `src/homereach/explorer` | Comparison logic, bundle validation, charts, local UI and release loading |
-| `scripts/` | Reproducible builders and package/release-verification commands |
-| `config/` | Audited snapshot settings and explicit name aliases |
+| `src/homereach/forecasting` | Fixed forecast construction, evaluation tables and saved-evidence comparison |
+| `scripts/` | Reproducible builders, release verification, and frozen-protocol/forecast-refactor checks |
+| `config/` | Audited snapshots, explicit name aliases and frozen research protocols |
 | `deploy/` | Hosting entry point, serving dependencies, attribution and packaged data |
-| `tests/` | Unit/integration checks and Streamlit AppTest interactions |
-| `docs/` | Methods, source registry, implementation guides and release evidence |
+| `tests/` | Unit/integration checks, forecast regression/equivalence cases and Streamlit AppTest interactions |
+| `docs/` | Methods, source registry, model card, research findings, implementation guides and release evidence |
 
 Start with the [real-data explorer guide](docs/real_data_explorer.md),
 [deployment guide](docs/explorer_deployment.md),
 [combined EDA findings](docs/transport_rent_eda.md) and
-[data registry](docs/data_registry.csv).
+[data registry](docs/data_registry.csv). For forecasting, start with the
+[modelling summary](docs/rental_modelling_summary.md) and [model card](docs/model_card.md).
 
 ## Interpretation boundaries
 
@@ -283,13 +414,17 @@ The newer transport snapshot is not backfilled into historical rental-model
 validation. The release does not fetch newer rents or timetables automatically,
 and contains **no combined suitability score, forecast or recommendation**.
 
-## Future work — not implemented in this release
+## Further work
 
-Possible next research stages are chronological rental forecasting against a
-seasonal-naive baseline, destination-based routing and better-justified access
-measures, and a reviewed snapshot-refresh process. These require their own data,
-validation and interpretation work before entering the deployed application.
-Dependency maintenance and usability improvements remain separate engineering work.
+The first chronological rental-forecasting round is complete on the research
+branch. Any later model redesign needs disclosed development and additional
+independent evaluation evidence; the already-scored final period cannot provide
+a fresh test of choices made after inspecting its errors.
+
+Potential further work includes destination-based routing, better-justified access
+measures and a reviewed snapshot-refresh process. Each needs its own data,
+validation and interpretation work before a deployment proposal. Dependency
+maintenance and usability improvements remain separate engineering work.
 
 ## Sources, attribution and project ownership
 

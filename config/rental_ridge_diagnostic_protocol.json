@@ -1,0 +1,35 @@
+{
+  "protocol_id": "homereach-ridge-error-diagnostics-v1",
+  "purpose": "Describe saved validation forecast errors; no refitting, tuning, forecast replacement or holdout scoring.",
+  "design_timing": "Specified after the overall fixed-Ridge validation result was known. This is development-set diagnosis, not new independent evaluation.",
+  "validation_start": "2019Q1",
+  "validation_end": "2023Q3",
+  "holdout_start": "2023Q4",
+  "holdout_end": "2025Q3",
+  "property_type": "2 bedroom flats",
+  "unit": "AUD per week, nominal",
+  "models": [
+    "last_observation",
+    "ridge_lags_seasonal_alpha1",
+    "seasonal_naive"
+  ],
+  "primary_comparison": "abs(Ridge forecast - actual) - abs(last observation forecast - actual)",
+  "groupings": [
+    "rental_area_name",
+    "target_quarter",
+    "target_year",
+    "observed_change_direction"
+  ],
+  "observed_change_rule": "actual target rent minus verified lag-1 rent; negative, zero or positive with numeric tolerance only",
+  "numerical_tolerance_aud_week": 1e-09,
+  "aggregation": "Equal weight per LGA-quarter. Every group contribution is its sum of paired loss differences divided by all 589 targets.",
+  "case_examples": "Ten largest and ten smallest paired loss differences, labelled retrospective selections; all 589 rows remain in scoring.",
+  "prohibitions": [
+    "No final-period outcomes loaded into analysis",
+    "No filtering difficult periods out of the headline result",
+    "No oracle selection based on realised changes",
+    "No p-values or iid confidence intervals",
+    "No current-rent or future forecast",
+    "No app or data-release changes"
+  ]
+}

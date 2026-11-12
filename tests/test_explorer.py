@@ -2,6 +2,7 @@
 from copy import deepcopy
 from pathlib import Path
 import json
+import warnings
 import numpy as np
 import pandas as pd
 import pytest
@@ -124,6 +125,48 @@ def test_csv_round_trip_preserves_missing_ratio_and_string_codes(tmp_path):
     back = read_table(path, table_schema(frame))
     assert back.code.iloc[0] == "02001" and pd.isna(back.ratio.iloc[1])
     assert str(back.quarter_end.dtype) == "datetime64[ns]"
+
+
+def test_csv_round_trip_preserves_exact_float_bits_without_warnings(tmp_path):
+    values = np.array([0.30000000000000004, 0.12345678901234568,
+                       np.nextafter(1.0, 2.0), np.nextafter(0.0, 1.0),
+                       np.finfo(float).max, np.finfo(float).tiny, -0.0,
+                       1.2345678901234567e-200, np.nan], dtype="float64")
+    frame = pd.DataFrame({"ratio": values})
+    path = tmp_path / "precise.csv"; frame.to_csv(path, index=False)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        back = read_table(path, table_schema(frame))
+        compare_csv(path, frame)
+    np.testing.assert_array_equal(back.ratio.isna(), frame.ratio.isna())
+    present = frame.ratio.notna().to_numpy()
+    np.testing.assert_array_equal(back.ratio.to_numpy()[present].view("uint64"),
+                                  values[present].view("uint64"))
+
+
+def test_csv_reader_preserves_nullable_schema_and_literal_na_text(tmp_path):
+    frame = pd.DataFrame({
+        "code": pd.Series(["001", "NA", "", "null"], dtype="string"),
+        "ratio": pd.Series([0.30000000000000004, np.nan, 0.0, -0.0], dtype="float64"),
+        "nullable_ratio": pd.Series([0.5, pd.NA, 0.0, -1.5], dtype="Float64"),
+        "nullable_count": pd.Series([0, pd.NA, 2, 3], dtype="Int64"),
+        "quarter_end": pd.to_datetime(["2024-12-31", "2025-03-31", "2025-06-30", "2025-09-30"]).as_unit("ns"),
+    })
+    path = tmp_path / "typed.csv"; frame.to_csv(path, index=False, date_format="%Y-%m-%d")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        back = read_table(path, table_schema(frame))
+    pd.testing.assert_frame_equal(back, frame, check_exact=True)
+
+
+def test_csv_comparison_rejects_a_single_float_step(tmp_path):
+    expected = pd.DataFrame({"ratio": [0.30000000000000004]})
+    changed = expected.copy(); changed.loc[0, "ratio"] = np.nextafter(expected.ratio.iloc[0], np.inf)
+    path = tmp_path / "changed.csv"; changed.to_csv(path, index=False)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        with pytest.raises(ValueError, match="Values differ"):
+            compare_csv(path, expected)
 
 
 @pytest.mark.parametrize("change", ["value", "column", "row"])

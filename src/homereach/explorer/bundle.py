@@ -63,8 +63,12 @@ def read_table(path: Path, schema: dict) -> pd.DataFrame:
         else:
             types[column] = dtype
     numeric_na = {c: [""] for c, d in types.items() if d in ("float64", "Float64", "Int64")}
+    # Older pandas needs round_trip for exact stored decimals. Since 3.1 all
+    # precision modes share one converter and the keyword is deprecated.
+    version = tuple(int(part) for part in pd.__version__.split(".")[:2])
+    precision = {"float_precision": "round_trip"} if version < (3, 1) else {}
     result = pd.read_csv(path, dtype=types, parse_dates=dates, keep_default_na=False,
-                         na_values=numeric_na, float_precision="round_trip")
+                         na_values=numeric_na, **precision)
     for c in dates:
         result[c] = pd.DatetimeIndex(result[c]).as_unit("ns")
     require(result.columns.tolist() == schema["columns"] and len(result) == schema["rows"],

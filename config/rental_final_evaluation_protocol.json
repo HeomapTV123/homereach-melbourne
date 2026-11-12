@@ -1,0 +1,221 @@
+{
+  "protocol_id": "homereach-rental-final-evaluation-v1",
+  "stage": "specification_only_commit_before_final_scoring",
+  "research_branch": "feat/rental-forecast-baselines",
+  "development_evidence_commit": "f6e16e1359408f37f1e6c7272d13c7594b2c3417",
+  "design_timing": "Fixed after inspecting validation results from notebooks 09-12 and before scoring the reserved final period. Not independent preregistration, not a pristine blind test.",
+  "pinned_development_protocols": {
+    "config/rental_forecast_protocol.json": {
+      "protocol_id": "homereach-rental-baselines-v1",
+      "canonical_json_sha256": "ac96b5cdae0341a108764a0d38f9e6d2e4dcb8c4ebc4efbeff679d6f133f5d83"
+    },
+    "config/rental_ridge_protocol.json": {
+      "protocol_id": "homereach-rental-ridge-v1",
+      "canonical_json_sha256": "e98c4793b0e3c4f9bdfc0bfad9e54a9e1507fcc3851e49d8f1c21ec2672475e8"
+    },
+    "config/rental_ridge_diagnostic_protocol.json": {
+      "protocol_id": "homereach-ridge-error-diagnostics-v1",
+      "canonical_json_sha256": "98af177f32c9718639f2a1a2dbb293d9e28bca952b617218fb7495be56fb5168"
+    },
+    "config/rental_correction_protocol.json": {
+      "protocol_id": "homereach-rental-damped-change-ridge-v1",
+      "canonical_json_sha256": "16f85a6c887eb12fb623c59259592791f620aa4a2c635f156fac9f5f080f6542"
+    }
+  },
+  "source": {
+    "filename": "quarterly-median-rents-local-government-area-september-quarter-2025-excel.xlsx",
+    "sha256": "b8e96347494f09fea2a2ace55997fd34c9398f8509cb3450d65444aebfaaa837",
+    "reporting_quarter": "2025Q3",
+    "history_start": "1999Q2",
+    "history_end": "2025Q3",
+    "processed_input": "data/processed/rent_quarterly.csv",
+    "local_integrity_report": "data/processed/rent_quality_report.json"
+  },
+  "target": {
+    "field": "median_weekly_rent",
+    "unit": "AUD per week, nominal",
+    "property_type": "2 bedroom flats",
+    "area_count": 31,
+    "geography": "The same 31 rental-source metropolitan LGAs and original area labels as notebooks 09-12",
+    "key": [
+      "rental_area_name",
+      "property_type",
+      "target_quarter"
+    ],
+    "forecast_horizon_quarters": 1
+  },
+  "periods": {
+    "initial_history_end": "2018Q4",
+    "validation_start": "2019Q1",
+    "validation_end": "2023Q3",
+    "final_start": "2023Q4",
+    "final_end": "2025Q3",
+    "final_target_quarters": [
+      "2023Q4",
+      "2024Q1",
+      "2024Q2",
+      "2024Q3",
+      "2024Q4",
+      "2025Q1",
+      "2025Q2",
+      "2025Q3"
+    ],
+    "targets_per_method": 248,
+    "comparison_rows_all_methods": 992
+  },
+  "primary_comparison": {
+    "candidate": "damped_change_ridge_alpha1_weight05",
+    "reference": "last_observation",
+    "primary_metric": "MAE",
+    "paired_difference": "abs(candidate - actual) minus abs(last_observation - actual)",
+    "direction": "Negative pooled difference favours the candidate. Positive favours last_observation. Numeric differences alone imply neither practical importance nor statistical significance.",
+    "numeric_tie_tolerance_aud_week": 1e-09,
+    "tie_policy": "Describe as numerically tied within tolerance; retain last_observation as the simpler reference, not a deployment decision."
+  },
+  "methods": [
+    {
+      "name": "last_observation",
+      "role": "primary_reference",
+      "rule": "forecast(t) = rent(t-1), same area/property",
+      "fit": false
+    },
+    {
+      "name": "damped_change_ridge_alpha1_weight05",
+      "role": "primary_candidate",
+      "settings_protocol": "config/rental_correction_protocol.json",
+      "alpha": 1.0,
+      "damping_weight": 0.5,
+      "rule": "forecast(t) = rent(t-1) + 0.5 * predicted_change(t)",
+      "training_target": "rent(t) minus rent(t-1)",
+      "features": [
+        "change_lag_1",
+        "change_lag_2",
+        "change_lag_3",
+        "target_is_q2",
+        "target_is_q3",
+        "target_is_q4"
+      ],
+      "change_definitions": [
+        "rent(t-1) minus rent(t-2)",
+        "rent(t-2) minus rent(t-3)",
+        "rent(t-3) minus rent(t-4)"
+      ],
+      "estimator": "Ridge",
+      "fit_intercept": true,
+      "solver": "svd",
+      "scaler": "StandardScaler",
+      "with_mean": true,
+      "with_std": true
+    },
+    {
+      "name": "ridge_lags_seasonal_alpha1",
+      "role": "secondary_reference_only",
+      "settings_protocol": "config/rental_ridge_protocol.json",
+      "alpha": 1.0,
+      "features": [
+        "rent_lag_1",
+        "rent_lag_2",
+        "rent_lag_3",
+        "rent_lag_4",
+        "target_is_q2",
+        "target_is_q3",
+        "target_is_q4"
+      ],
+      "training_target": "rent(t)",
+      "estimator": "Ridge",
+      "fit_intercept": true,
+      "solver": "svd",
+      "scaler": "StandardScaler",
+      "with_mean": true,
+      "with_std": true,
+      "prediction_transform": "None"
+    },
+    {
+      "name": "seasonal_naive",
+      "role": "secondary_reference_only",
+      "rule": "forecast(t) = rent(t-4), same area/property; origin is still t-1",
+      "seasonal_period_quarters": 4,
+      "fit": false
+    }
+  ],
+  "rolling_evaluation": {
+    "origin_rule": "target t minus one calendar quarter",
+    "history_access": "Only same-area/property observations with quarters <= t-1; no cross-area pooling. Construct the prediction before attaching target t actuals for scoring.",
+    "refit_policy": "Refit the scaler and trained model at every area/origin on all earlier eligible supervised targets. No fitted coefficients are frozen across origins.",
+    "supervised_training_start": "2000Q2",
+    "minimum_training_examples": 40,
+    "training_examples_per_trained_fit_first_origin": 94,
+    "training_examples_per_trained_fit_last_origin": 101,
+    "expected_trained_models_per_method": 248,
+    "expected_trained_models_total": 496,
+    "earlier_final_outcomes": "An earlier final-period outcome may enter history only for later origins under this fixed one-step protocol. Final-period errors must not alter features, alpha, damping, model choice or window.",
+    "first_origin": "2023Q3",
+    "last_origin": "2025Q2",
+    "warm_up": "Exactly the first four source quarters cannot form complete historical lag vectors. No further target deletion or filling.",
+    "calendar_encoding": "Known target Q2/Q3/Q4 indicators; Q1 reference; standardize all model inputs within each training fold."
+  },
+  "metrics": {
+    "primary": "MAE",
+    "secondary": [
+      "RMSE",
+      "mean_signed_error_forecast_minus_actual"
+    ],
+    "weighting": "Every one of the 248 LGA-quarter targets has equal weight; no rental-count, population or LGA-size weights.",
+    "summaries": [
+      "overall",
+      "by_LGA",
+      "by_target_quarter"
+    ],
+    "pooled_rmse": "sqrt(mean(all individual squared errors)); not the mean of LGA RMSEs.",
+    "relative_mae_improvement_percent": "100 * (MAE_last - MAE_candidate) / MAE_last; undefined when MAE_last is zero.",
+    "paired_reporting": "Report both forecast-level error differences and per-LGA/per-quarter differences. Keep every target.",
+    "inference": "Descriptive only. No p-values, iid confidence intervals, statistical-significance claims, prediction intervals or automatic deployment rule. Targets share quarters and histories and are not asserted independent."
+  },
+  "safeguards": {
+    "current_future_outcomes_as_inputs": false,
+    "all_published_counts_as_features": false,
+    "transport_features": false,
+    "geographic_features": false,
+    "new_hyperparameter_search": false,
+    "per_LGA_winner_selection": false,
+    "clipping_rounding_deadband_or_direction_oracle": false,
+    "retain_finite_negative_predictions": "Retain and flag if any occur; no after-the-fact clipping. Non-finite predictions or missing coverage stop the run.",
+    "missing_or_duplicate_targets": "Fail, investigate and document; never silently omit records to improve results.",
+    "after_results": "Do not retune on these outcomes and present a repeat as a fresh final test. A later redesign requires new independent evidence.",
+    "implementation_bug": "Preserve the original attempt, identify the bug, document any outcome exposure and the correction, and rerun the unchanged intended specification. Do not erase an unfavourable result or claim a rerun is unseen evidence."
+  },
+  "required_final_evidence": [
+    "248 unique area/quarter predictions per method; 992 total",
+    "Baseline source-quarter/value/cell checks",
+    "Training range and scaler evidence for every trained fit",
+    "Independent mathematical checks of trained predictions",
+    "Target-actual mutation/removal self-checks on fictional data",
+    "Identical target coverage and paired-loss reconciliation",
+    "Prior validation evidence verified, not silently regenerated or overwritten",
+    "CSV save/read-back and input/release fingerprint checks",
+    "Python, pandas, numpy and scikit-learn versions recorded",
+    "Protocol fingerprint, pre-scoring lock commit and execution commit recorded separately"
+  ],
+  "limitations": [
+    "Single 2025Q3 workbook vintage; historical publication lags and revisions not reconstructed. Period-based retrospective evaluation, not a real-time backtest.",
+    "Final outcomes appeared in prior descriptive EDA and the explorer. Reserved from modelling evaluation, not a pristine blind test.",
+    "Candidate designed after inspecting validation errors; the validation advantage is development evidence.",
+    "Published nominal medians cover changing lettings, not a fixed property or inflation-adjusted series.",
+    "Eight final quarters are a limited later-period check, not proof of performance at all future dates."
+  ],
+  "output_policy": {
+    "future_directory": "data/interim/rental_final_evaluation",
+    "earlier_evidence": "Do not overwrite notebooks 09-12, their configs, reports or outputs.",
+    "comparison_policy": "Keep final-period metrics separate from validation metrics; do not blend them to manufacture a better headline.",
+    "publication": "Research only. No current-rent forecast, online-app change, release-data edit, registry change, model pickle or automatic promotion."
+  },
+  "commit_gate": {
+    "before_scoring": "Commit these three protocol files and push the research branch; run the verifier with --require-committed. The later scoring notebook must record that pre-scoring commit and protocol digest.",
+    "what_the_verifier_proves": "Configuration identity, branch and local Git recording only; not that nobody has inspected outcomes, not remote push success, not correctness of future forecast code."
+  },
+  "references": [
+    "https://otexts.com/fpp3/tscv.html",
+    "https://scikit-learn.org/stable/modules/cross_validation.html",
+    "https://scikit-learn.org/stable/common_pitfalls.html"
+  ]
+}
