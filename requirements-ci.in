@@ -1,0 +1,11 @@
+# CI inputs for Ubuntu 24.04 / x86_64 / CPython 3.12.
+# Compile into requirements-ci-py312-linux.lock; CI installs that hashed lock.
+# The developer/runtime compatibility ranges remain in requirements.txt.
+-r requirements.txt
+
+# CI installer and local wheel build tools. These are not runtime dependencies.
+pip
+build
+# Keep these two build requirements aligned with pyproject.toml.
+setuptools>=69
+wheel

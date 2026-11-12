@@ -10,6 +10,7 @@ from homereach.io.dffh_rent import (
     build_panel, fingerprint, load_snapshot, read_workbook, require,
     updated_registry_text, validate_panel, write_outputs,
 )
+from homereach.io.paths import contained_path, safe_filename
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -26,8 +27,8 @@ def main(argv: list[str] | None = None) -> int:
     if not (root / "pyproject.toml").is_file():
         parser.error("Copy this file into the existing project's scripts folder.")
     try:
-        spec = load_snapshot(root / "config" / "rent_snapshot.json")
-        source = root / "data" / "raw" / "rent" / spec["filename"]
+        spec = load_snapshot(contained_path(root, "config/rent_snapshot.json"))
+        source = contained_path(root, Path("data/raw/rent") / safe_filename(spec["filename"]))
         registry = root / "docs" / "data_registry.csv"
         # Validate the existing registry early so a malformed file does not cause
         # a surprise only after data exports have been replaced.
@@ -37,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
         print("Building and validating the rental panel...")
         panel = build_panel(raw, spec)
         quality = validate_panel(panel, raw, spec)
-        require(fingerprint(source) == spec["sha256"], "Original workbook changed.")
+        require(fingerprint(source, root=root) == spec["sha256"], "Original workbook changed.")
         if args.check_only:
             print("PIPELINE VALIDATION PASSED (no files written)")
         else:

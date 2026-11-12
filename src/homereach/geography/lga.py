@@ -26,6 +26,7 @@ from homereach.io.dffh_rent import (
     AGGREGATE_LABELS, COLUMN_ORDER, KEY_COLUMNS, fingerprint,
     load_snapshot, read_panel_csv, require,
 )
+from homereach.io.paths import contained_path, safe_filename
 
 CODE = "lga_code_2025"
 NAME = "abs_lga_name"
@@ -49,7 +50,7 @@ def load_geo_snapshot(path: str | Path) -> dict[str, Any]:
               "exact_matches", "alias_matches", "archive_extensions", "source_columns",
               "boundary_source", "publisher_page", "download_url", "scope_note"}
     require(isinstance(spec, dict) and needed.issubset(spec), "Incomplete LGA snapshot configuration.")
-    require(Path(spec["filename"]).name == spec["filename"], "Boundary filename must not contain a path.")
+    safe_filename(spec["filename"])
     require(re.fullmatch(r"[0-9a-f]{64}", spec["sha256"]) is not None, "Invalid boundary SHA-256.")
     require(spec["boundary_year"] == 2025 and spec["map_quarter"] == "2025Q3",
             "This implementation is reviewed for 2025 boundaries and 2025Q3 rents only.")
@@ -106,28 +107,31 @@ def select_latest(panel: pd.DataFrame, rent_spec: dict, geo_spec: dict) -> pd.Da
 
 def read_inputs(root: Path, geo_spec: dict) -> tuple[pd.DataFrame, dict, dict[Path, str]]:
     """Verify the rental fingerprint and track upstream files for later checks."""
-    root = Path(root)
-    input_path = root / "data/processed/rent_quarterly.csv"
-    rent_spec_path = root / "config/rent_snapshot.json"
-    quality_path = root / "data/processed/rent_quality_report.json"
+    root = Path(root).resolve()
+    input_path = contained_path(root, "data/processed/rent_quarterly.csv")
+    rent_spec_path = contained_path(root, "config/rent_snapshot.json")
+    quality_path = contained_path(root, "data/processed/rent_quality_report.json")
+    paths = [input_path, rent_spec_path, quality_path,
+             contained_path(root, "config/lga_snapshot.json"),
+             contained_path(root, "config/lga_name_aliases_2025.csv"),
+             contained_path(root, Path("data/raw/geography") / safe_filename(geo_spec["filename"]))]
     rent_spec = load_snapshot(rent_spec_path)
+    raw = contained_path(root, Path("data/raw/rent") / safe_filename(rent_spec["filename"]))
+    optional = [contained_path(root, rel) for rel in [
+        "data/processed/rent_quarterly.parquet", "docs/lga_geography_audit.md",
+        "notebooks/04_lga_geography_and_rent_map.ipynb",
+        "data/interim/geography/rent_map_2025q3.html", "data/interim/geography/geography_manifest.json",
+    ]]
     quality = json.loads(quality_path.read_text(encoding="utf-8"))
     require(quality.get("source", {}).get("sha256") == rent_spec["sha256"], "Rental quality snapshot differs.")
-    require(quality.get("output_sha256", {}).get(input_path.name) == fingerprint(input_path),
+    require(quality.get("output_sha256", {}).get(input_path.name) == fingerprint(input_path, root=root),
             "Rental CSV differs from its pipeline report. Recheck it; do not bypass this check.")
     latest = select_latest(read_panel_csv(input_path), rent_spec, geo_spec)
-    paths = [input_path, rent_spec_path, quality_path, root / "config/lga_snapshot.json",
-             root / "config/lga_name_aliases_2025.csv", root / "data/raw/geography" / geo_spec["filename"]]
-    raw = root / "data/raw/rent" / rent_spec["filename"]
     if raw.is_file():
-        require(fingerprint(raw) == rent_spec["sha256"], "Raw rental workbook differs from audit.")
+        require(fingerprint(raw, root=root) == rent_spec["sha256"], "Raw rental workbook differs from audit.")
         paths.append(raw)
-    for rel in ["data/processed/rent_quarterly.parquet", "docs/lga_geography_audit.md",
-                "notebooks/04_lga_geography_and_rent_map.ipynb",
-                "data/interim/geography/rent_map_2025q3.html", "data/interim/geography/geography_manifest.json"]:
-        if (root / rel).is_file():
-            paths.append(root / rel)
-    return latest, rent_spec, {p: fingerprint(p) for p in paths}
+    paths.extend(path for path in optional if path.is_file())
+    return latest, rent_spec, {p: fingerprint(p, root=root) for p in paths}
 
 
 def verify_fingerprints(hashes: dict[Path, str]) -> None:
