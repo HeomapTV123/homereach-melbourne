@@ -80,9 +80,11 @@ python -m pytest -o "addopts=" -q
 python scripts/verify_rental_forecast_refactor.py --check-only
 ```
 
-The new tests add 138 collected cases to the previously confirmed 352. With the
-complete dependencies, the project installed (`python -m pip install -e .`) and
-Git available, expect **490 passed**. The path-escape
+The original refactor added 138 collected cases to the previously confirmed 352,
+producing the **490-test** checkpoint at `cc46371`. The later compatibility patch
+at `2cebd1b` adds three regression cases. With the complete dependencies, the
+project installed (`python -m pip install -e .`) and Git available, expect
+**493 passed** for that updated code. The path-escape
 unit test simulates resolved-path traversal without requiring Windows symlink
 privileges. Git integration tests can skip if Git is absent. Review any skip
 rather than equating it to a pass. All application code remains outside the
@@ -195,6 +197,23 @@ they do not change the valid recorded forecasts, protocol, or original notebook.
 - The reconstructed comparison is not access to the user's local CSV evidence
   or a new final test. The CLI comparison on the user's computer remains the
   separate checkpoint against the originally saved files.
+
+## Subsequent maintainer verification — 11 November 2026
+
+After the preparation checks above, the maintainer completed the comparison
+against the original saved evidence on the Windows project: **13/13 tables
+matched**, covering **992 forecasts** and **496 trained fits**, with zero project
+files written and zero additional independent final tests. That run occurred
+while HEAD was `dce9b7b`; the verified refactor was then committed as `cc46371`.
+This completed the separate saved-evidence checkpoint described in the historical
+preparation notes. It was not rerun as part of the later compatibility work.
+
+The subsequent `2cebd1b` maintenance checkpoint records **493 local tests passed
+in 54.81 seconds** and **493 CI tests passed in 25.42 seconds**, without pandas
+warnings in those pytest runs. Standalone verification retained the same
+**11-file** release, whose identifier begins `fe2035fbc37e64a4`. See the
+[README maintenance record](../README.md#compatibility-maintenance-checkpoint--11-november-2026)
+and [GitHub Actions run #19](https://github.com/HeomapTV123/homereach-melbourne/actions/runs/43056263652).
 
 ## Failure handling
 

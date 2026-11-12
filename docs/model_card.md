@@ -170,6 +170,11 @@ This is a local verification record. The [CI workflow](../.github/workflows/ci.y
 at `cc46371` triggers on pushes to `main` and pull requests targeting `main`.
 The direct research-branch push did not trigger a CI run for that commit.
 
+The later `2cebd1b` compatibility checkpoint records **493 passing tests** locally
+and in CI; see the [README maintenance record](../README.md#compatibility-maintenance-checkpoint--11-november-2026).
+It preserves the original forecasting results, saved-evidence comparison and
+provenance recorded here.
+
 ## Provenance
 
 | Record | Commit |

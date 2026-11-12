@@ -230,6 +230,24 @@ at `cc46371` triggers on pushes to `main` and pull requests targeting `main`;
 the direct research-branch push did not trigger a GitHub Actions run. The
 352-test entry above remains the historical first-deployed-release checkpoint.
 
+### Compatibility maintenance checkpoint — 11 November 2026
+
+The later pandas compatibility patch was committed and pushed as
+[`2cebd1b`](https://github.com/HeomapTV123/homereach-melbourne/commit/2cebd1b).
+Its three added regression cases bring the complete suite to **493 tests**.
+
+| Check | Recorded result |
+|---|---|
+| Local complete test suite | **493 passed in 54.81 seconds**, in the Windows `homereach` environment |
+| GitHub Actions test suite | **493 passed in 25.42 seconds** in [run #19](https://github.com/HeomapTV123/homereach-melbourne/actions/runs/43056263652) |
+| Standalone release verification | **11 files verified**; release identifier still begins `fe2035fbc37e64a4` |
+
+Both recorded pytest runs completed without pandas warnings. The packaged data
+release remains unchanged. The **352-test** first-release record and **490-test**
+refactor record above retain their original scope and dates. The completed
+**13/13 saved-table comparison** belongs to the earlier refactor checkpoint;
+this compatibility-maintenance record is not another forecast evaluation.
+
 ## Run the packaged application locally
 
 **No raw-data download or full pipeline rebuild is required for this path.**
