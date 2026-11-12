@@ -6,9 +6,12 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+from zipfile import ZipFile
 
+import geopandas as gpd
 import pandas as pd
 import pytest
+from shapely.geometry import box
 
 from homereach.geography import lga
 from homereach.io.dffh_rent import fingerprint, load_snapshot
@@ -218,3 +221,145 @@ def test_transport_export_inventory_rejects_untrusted_keys(tmp_path, name):
     with pytest.raises(ValueError, match="inventory"):
         pipeline.export_outputs(tmp_path, spatial, None, services, {}, {}, check_only=False)
     assert not (tmp_path / "data").exists()
+
+
+@pytest.mark.parametrize("relative", [
+    "config", "data/raw/transport", "data/raw/transport/gtfs.zip",
+    "data/processed/geography/metro_lga_2025.gpkg",
+    "data/interim/geography/geography_pipeline_report.json",
+    "docs", "notebooks/reference.ipynb", "data/interim/gtfs_spatial",
+    "data/interim/gtfs_service/reference.csv", "data/processed/rent_quarterly.csv",
+    "data/interim/gtfs_audit/audit_summary.json",
+])
+def test_transport_input_paths_reject_escapes_before_content_reads(tmp_path, monkeypatch, relative):
+    root, external = tmp_path / "project", tmp_path / "external"
+    root.mkdir()
+    if Path(relative).suffix:
+        external.write_bytes(b"outside")
+    else:
+        external.mkdir()
+    link_to(root / relative, external)
+
+    def unexpected_read(*args, **kwargs):
+        pytest.fail("Reject escaping input paths before opening configs or hashing content.")
+
+    monkeypatch.setattr(pipeline, "load_geo_snapshot", unexpected_read)
+    monkeypatch.setattr(pipeline, "sha256_file", unexpected_read)
+    # Other prerequisites are intentionally absent: containment must fail first.
+    with pytest.raises(ValueError, match="escapes"):
+        pipeline.read_inputs(root, {})
+
+
+@pytest.mark.parametrize("symlink_base", [True, False])
+def test_transport_contains_config_selected_boundary_before_hashing(tmp_path, monkeypatch, symlink_base):
+    root, external = tmp_path / "project", tmp_path / "external"
+    geo_spec = json.loads((PROJECT_ROOT / "config/lga_snapshot.json").read_text())
+    for relative in (
+        "data/raw/transport/gtfs.zip", "config/lga_name_aliases_2025.csv",
+        "data/processed/geography/metro_lga_2025.gpkg",
+        "data/interim/geography/lga_crosswalk_2025.csv",
+        "data/interim/geography/geography_pipeline_report.json", "config/gtfs_snapshot.json",
+    ):
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"prerequisite")
+    (root / "config/lga_snapshot.json").write_text(json.dumps(geo_spec))
+    external.mkdir()
+    source = external / geo_spec["filename"]
+    source.write_bytes(b"outside boundary")
+    if symlink_base:
+        link_to(root / "data/raw/geography", external)
+    else:
+        link_to(root / "data/raw/geography" / geo_spec["filename"], source)
+
+    def unexpected_hash(*args, **kwargs):
+        pytest.fail("The config-selected boundary must be contained before fingerprinting.")
+
+    monkeypatch.setattr(pipeline, "sha256_file", unexpected_hash)
+    with pytest.raises(ValueError, match="escapes"):
+        pipeline.read_inputs(root, {})
+    assert source.read_bytes() == b"outside boundary"
+
+
+@pytest.mark.parametrize("relative", ["config", "config/gtfs_snapshot.json"])
+def test_transport_entrypoint_contains_initial_snapshot_before_loading(tmp_path, monkeypatch, relative):
+    root, external = tmp_path / "project", tmp_path / "external"
+    root.mkdir()
+    if Path(relative).suffix:
+        external.write_text("{}")
+    else:
+        external.mkdir()
+    link_to(root / relative, external)
+
+    def unexpected_load(*args, **kwargs):
+        pytest.fail("The transport entrypoint must contain its initial snapshot path.")
+
+    monkeypatch.setattr(pipeline, "load_transport_snapshot", unexpected_load)
+    with pytest.raises(ValueError, match="escapes"):
+        pipeline.run_transport(root, check_only=True)
+
+
+def test_transport_valid_inputs_preserve_inventory_and_bytes(tmp_path, monkeypatch):
+    root = tmp_path / "chosen project"
+
+    def path(relative):
+        value = root / relative
+        value.parent.mkdir(parents=True, exist_ok=True)
+        return value
+
+    spec = json.loads((PROJECT_ROOT / "config/gtfs_snapshot.json").read_text())
+    gtfs = path("data/raw/transport/gtfs.zip")
+    with ZipFile(gtfs, "w") as archive:
+        for member in spec["outer_members"]:
+            archive.writestr(member, b"outer-inventory fixture")
+    spec["sha256"] = hashlib.sha256(gtfs.read_bytes()).hexdigest()
+    path("config/gtfs_snapshot.json").write_text(json.dumps(spec))
+    geo_spec = json.loads((PROJECT_ROOT / "config/lga_snapshot.json").read_text())
+    boundary = path("data/raw/geography/" + geo_spec["filename"])
+    boundary.write_bytes(b"boundary-reader fixture")
+    geo_spec["sha256"] = hashlib.sha256(boundary.read_bytes()).hexdigest()
+    path("config/lga_snapshot.json").write_text(json.dumps(geo_spec))
+
+    codes = [str(20000 + i) for i in range(31)]
+    names = [f"Area {i:02d}" for i in range(31)]
+    native = gpd.GeoDataFrame(
+        {pipeline.CODE: codes, pipeline.NAME: names},
+        geometry=[box(145 + i / 100, -38, 145.005 + i / 100, -37.995) for i in range(31)], crs=7844,
+    )
+    native_path = path("data/processed/geography/metro_lga_2025.gpkg")
+    native.to_file(native_path, layer="metro_lga_2025", driver="GPKG", engine="pyogrio")
+    aliases = pd.DataFrame(columns=lga.ALIAS_COLUMNS).astype("string")
+    aliases.to_csv(path("config/lga_name_aliases_2025.csv"), index=False)
+    source_names = pd.DataFrame({"rental_area_name": names, "source_region": "Fixture region"})
+    crosswalk = lga.build_crosswalk(source_names, native[[pipeline.CODE, pipeline.NAME]], aliases)
+    crosswalk_path = path("data/interim/geography/lga_crosswalk_2025.csv")
+    crosswalk.to_csv(crosswalk_path, index=False)
+    report = {
+        "boundary_snapshot": geo_spec, "check_only": False,
+        "gpkg_readback_matches": True, "geojson_readback_matches": True, "csv_readback_matches": True,
+        "output_sha256": {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                          for p in (native_path, crosswalk_path)},
+    }
+    path("data/interim/geography/geography_pipeline_report.json").write_text(json.dumps(report))
+    path("data/interim/gtfs_audit/audit_summary.json").write_text(json.dumps({
+        "source": {"sha256": spec["sha256"]}, "source_unchanged": True,
+        "proposed_service_date": spec["service_date"],
+    }))
+    for relative in ("docs/audit.md", "notebooks/reference.ipynb",
+                     "data/interim/gtfs_spatial/reference.csv", "data/processed/rent_quarterly.csv"):
+        path(relative).write_bytes(b"retained evidence")
+
+    def audited_boundaries(source_path, received_spec):
+        # Boundary-format validation has its own tests; keep this case focused
+        # on input selection, real CSV/GPKG comparisons, and tracked fingerprints.
+        assert source_path == boundary and received_spec == geo_spec
+        return native.rename(columns={pipeline.CODE: "LGA_CODE25", pipeline.NAME: "LGA_NAME25"}), None, None
+
+    monkeypatch.setattr(pipeline, "read_boundaries", audited_boundaries)
+    before = {p: p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    source, loaded_native, loaded_crosswalk, hashes = pipeline.read_inputs(root, spec)
+    assert source == gtfs
+    assert loaded_native[pipeline.CODE].tolist() == codes
+    assert loaded_crosswalk[pipeline.CODE].tolist() == codes
+    assert hashes == {p: hashlib.sha256(content).hexdigest() for p, content in before.items()}
+    assert {p: p.read_bytes() for p in root.rglob("*") if p.is_file()} == before
