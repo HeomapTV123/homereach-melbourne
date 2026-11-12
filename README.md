@@ -426,6 +426,12 @@ measures and a reviewed snapshot-refresh process. Each needs its own data,
 validation and interpretation work before a deployment proposal. Dependency
 maintenance and usability improvements remain separate engineering work.
 
+The [scheduled commute pilot](docs/commute_routing_pilot.md) now starts with a
+read-only input preflight: `python scripts/check_routing_inputs.py`. It checks the
+original local GTFS archive against the audited snapshot and reports missing
+routing prerequisites. Street-network data and verified origin/destination
+coordinates are not yet configured; no journey times have been produced.
+
 ## Sources, attribution and project ownership
 
 Source publishers are **Homes Victoria / DFFH**, **Transport Victoria / Department
