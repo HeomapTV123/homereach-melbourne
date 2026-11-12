@@ -9,6 +9,7 @@ from homereach.geography.lga import (
     join_boundaries, export_geography, registry_update_text, save_registry,
 )
 from homereach.io.dffh_rent import fingerprint, require
+from homereach.io.paths import contained_path, safe_filename
 
 
 def main() -> None:
@@ -19,8 +20,8 @@ def main() -> None:
     flags.add_argument("--update-registry", action="store_true", help="Update only the boundaries registry row after successful export.")
     args = parser.parse_args()
     root = args.project_root.resolve()
-    spec = load_geo_snapshot(root / "config/lga_snapshot.json")
-    aliases = load_aliases(root / "config/lga_name_aliases_2025.csv")
+    spec = load_geo_snapshot(contained_path(root, "config/lga_snapshot.json"))
+    aliases = load_aliases(contained_path(root, "config/lga_name_aliases_2025.csv"))
     print("Checking the validated rental input...", flush=True)
     latest, rent_spec, input_hashes = read_inputs(root, spec)
     registry_text, registry_hash = None, None
@@ -29,7 +30,8 @@ def main() -> None:
         registry_hash = fingerprint(registry_path)
         registry_text = registry_update_text(registry_path, spec)  # validate BEFORE changing exports
     print("Reading and validating the local ABS boundary ZIP...", flush=True)
-    councils, audit, exclusions = read_boundaries(root / "data/raw/geography" / spec["filename"], spec)
+    boundary_path = contained_path(root, Path("data/raw/geography") / safe_filename(spec["filename"]))
+    councils, audit, exclusions = read_boundaries(boundary_path, spec)
     print("Matching reviewed names and attaching the original polygons...", flush=True)
     native, crosswalk, mapped = join_boundaries(latest, councils, aliases)
     require(len(mapped) == spec["mapped_records"], "Wrong mapped area count.")

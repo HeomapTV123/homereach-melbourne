@@ -1,6 +1,7 @@
 """Synthetic tests: never need official source files, a network or a running UI."""
 from copy import deepcopy
 from pathlib import Path
+import hashlib
 import json
 import warnings
 import numpy as np
@@ -245,8 +246,14 @@ def test_missing_bundle_gives_build_instruction(tmp_path):
 
 
 def test_signature_accepts_unchanged_inventory(tmp_path):
-    seed_signature_fixture(tmp_path)
-    assert bundle_signature(tmp_path) == bundle_signature(tmp_path)
+    dest, _ = seed_signature_fixture(tmp_path)
+    # The cache key must include the manifest and every payload in filename order.
+    # Compute it from fixture bytes independently of bundle_signature/fingerprint.
+    expected = "|".join(
+        hashlib.sha256((dest / name).read_bytes()).hexdigest()
+        for name in [MANIFEST, *sorted([*TABLE_NAMES, GEOJSON])]
+    )
+    assert bundle_signature(tmp_path) == expected
 
 
 @pytest.mark.parametrize("problem", ["changed_output", "missing_output", "stale_upstream", "bad_builder", "missing_schema", "check_only", "failed_readback"])

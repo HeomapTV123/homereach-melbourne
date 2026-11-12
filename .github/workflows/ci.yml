@@ -19,12 +19,39 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements-ci-py312-linux.lock
 
-      - name: Install package and test tools
+      - name: Create an isolated test environment
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -e .
+          python -m venv "$RUNNER_TEMP/homereach-ci-env"
+          echo "$RUNNER_TEMP/homereach-ci-env/bin" >> "$GITHUB_PATH"
+
+      - name: Install locked dependencies from verified wheels
+        run: |
+          python -m pip --isolated install --index-url https://pypi.org/simple --require-hashes --only-binary=:all: -r requirements-ci-py312-linux.lock
+
+      - name: Build and install the local project without dependency downloads
+        env:
+          PIP_NO_INDEX: "1"
+        run: |
+          python -m build --wheel --no-isolation --outdir "$RUNNER_TEMP/homereach-wheel"
+          python - <<'PY'
+          import hashlib
+          import os
+          from pathlib import Path
+
+          wheel_dir = Path(os.environ["RUNNER_TEMP"]) / "homereach-wheel"
+          wheels = list(wheel_dir.glob("homereach_melbourne-*.whl"))
+          if len(wheels) != 1:
+              raise RuntimeError("Expected exactly one wheel built from this checkout.")
+          wheel = wheels[0]
+          digest = hashlib.sha256(wheel.read_bytes()).hexdigest()
+          (wheel_dir / "requirements.txt").write_text(
+              f"{wheel.as_uri()} --hash=sha256:{digest}\n", encoding="utf-8"
+          )
+          PY
+          python -m pip install --no-index --no-deps --require-hashes --only-binary=:all: -r "$RUNNER_TEMP/homereach-wheel/requirements.txt"
+          python -m pip check
 
       - name: Compile Python files
         run: |
@@ -32,4 +59,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest
+          python -m pytest
