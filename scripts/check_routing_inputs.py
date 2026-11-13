@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from importlib.util import find_spec
 import json
 from pathlib import Path
 import sys
@@ -16,7 +17,27 @@ def main() -> int:
     parser.add_argument("--project-root", type=Path, default=ROOT)
     parser.add_argument("--json", action="store_true", help="Print a machine-readable report.")
     args = parser.parse_args()
-    from homereach.routing import check_routing_inputs
+    try:
+        # pandas wraps missing NumPy in ImportError; check both names first.
+        for dependency in ("numpy", "pandas"):
+            if find_spec(dependency) is None:
+                raise ModuleNotFoundError(f"No module named '{dependency}'", name=dependency)
+        from homereach.routing import check_routing_inputs
+    except ModuleNotFoundError as error:
+        # A missing project module is a code/checkout error, not an environment hint.
+        if not error.name or error.name.split(".")[0] == "homereach":
+            raise
+        message = f"Missing Python dependency: {error.name}"
+        hint = ("From the project folder, run: conda run --no-capture-output "
+                "-n homereach python scripts/check_routing_inputs.py")
+        if args.json:
+            print(json.dumps({"status": "environment_error", "error": message,
+                              "python_executable": sys.executable, "hint": hint}))
+        else:
+            print(f"ROUTING INPUT PREFLIGHT ENVIRONMENT ERROR: {message}", file=sys.stderr)
+            print(f"Python executable: {sys.executable}", file=sys.stderr)
+            print(hint, file=sys.stderr)
+        return 1
     try:
         report = check_routing_inputs(args.project_root)
     except (OSError, ValueError) as error:

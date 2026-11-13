@@ -21,7 +21,7 @@ import pandas as pd
 from homereach.transport.gtfs import (
     build_active_trips, open_feed, read_feed_tables, require, sha256_file,
 )
-from homereach.transport.pipeline import load_transport_snapshot
+from homereach.transport.snapshot import load_transport_snapshot
 from homereach.transport.service import RAW_EVENT_COLUMNS
 
 

@@ -18,8 +18,9 @@ No real Melbourne journey has been calculated or validated at this checkpoint.
 ## Fixed timetable context
 
 `config/routing_pilot.json` references the existing `config/gtfs_snapshot.json`.
-The preflight reuses the transport pipeline's pinned snapshot validator; editing
-that source fingerprint or its audited counts is rejected.
+The preflight and transport pipeline share the pinned validator in
+`homereach.transport.snapshot`; editing that source fingerprint or its audited
+counts is rejected. The pipeline continues to expose the original import name.
 
 | Setting | Pilot value |
 | --- | --- |
@@ -54,6 +55,27 @@ For machine-readable output:
 python scripts/check_routing_inputs.py --json
 ```
 
+To select the existing environment explicitly from PowerShell or Command Prompt:
+
+```text
+conda run --no-capture-output -n homereach python scripts/check_routing_inputs.py
+```
+
+This invokes Python from the named environment without relying on the current
+shell's activation state. If `conda` is unavailable in that terminal, use the
+Anaconda Prompt from the existing installation. The
+[Conda command reference](https://docs.conda.io/projects/conda/en/stable/commands/run.html)
+documents environment selection and live output.
+
+The preflight uses pandas/NumPy and does not import GeoPandas, Pyogrio, PyProj,
+Shapely or a routing/JVM runtime. Full spatial builds still need the geospatial
+packages in `environment.yml`. If pandas or NumPy is missing,
+the CLI reports an environment error with the interpreter path and an explicit
+environment command. It does not inspect or classify the GTFS archive in that
+case. Missing project modules still raise their original exception so checkout
+or programming defects are not hidden. Other import failures retain their
+original error.
+
 `--project-root` can point at another checkout containing the pilot configuration
 and original archive. Paths inside the configuration must stay within that
 project root. The command does not download an archive, replace source files,
@@ -73,10 +95,14 @@ temporary directory and cleans them up after use.
 - **Error:** configuration or a present archive violates the input contract.
   Inspect the reported cause and preserve the original data. A different feed
   needs its own reviewed snapshot rather than an edited expected fingerprint.
+- **Environment error:** the selected Python interpreter cannot import a required
+  external dependency. Use the existing project environment and rerun the
+  command; no conclusion about the data has been reached.
 
 Exit code **2** means prerequisites are still blocked. This is expected at this
 input-preparation stage, including when the timetable checks succeed. Exit code
-**1** means an invalid configuration or an invalid/unreadable present input.
+**1** means an invalid configuration, an invalid/unreadable present input, or a
+missing Python dependency. JSON distinguishes `invalid` from `environment_error`.
 There is no successful-routing exit code in this implementation.
 
 The report separates completed checks from prerequisites and validations that

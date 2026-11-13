@@ -301,6 +301,41 @@ def test_cli_missing_archive_returns_blocked_exit_two(project):
     assert tree_contents(project) == before
 
 
+def test_cli_missing_archive_does_not_import_gis_or_routing_runtime(project):
+    before = tree_contents(project)
+    bootstrap = """
+import importlib.abc
+import runpy
+import sys
+
+class RejectUnusedRuntime(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {
+            'geopandas', 'pyogrio', 'pyproj', 'shapely', 'r5py', 'jpype', 'jnius',
+        }:
+            raise AssertionError('Input preflight must not import ' + fullname)
+        return None
+
+sys.meta_path.insert(0, RejectUnusedRuntime())
+script, *arguments = sys.argv[1:]
+sys.argv = [script, *arguments]
+runpy.run_path(script, run_name='__main__')
+"""
+    result = subprocess.run(
+        [sys.executable, '-c', bootstrap, str(ROOT / 'scripts/check_routing_inputs.py'),
+         '--project-root', str(project), '--json'],
+        capture_output=True, text=True, check=False, timeout=30,
+        env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'},
+    )
+    assert result.returncode == 2, result.stderr
+    report = json.loads(result.stdout)
+    assert report['status'] == 'blocked' and report['gtfs']['status'] == 'missing'
+    assert report['service_date'] == '2026-10-13'
+    assert report['timezone'] == 'Australia/Melbourne'
+    assert report['project_files_written'] == report['journeys_computed'] == 0
+    assert tree_contents(project) == before
+
+
 def test_cli_invalid_config_returns_exit_one(project):
     config = json.loads((project / PILOT_PATH).read_text())
     config['timezone'] = 'UTC'
