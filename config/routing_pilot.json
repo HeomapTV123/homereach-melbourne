@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "pilot_id": "melbourne_commute_pilot_v1",
+  "stage": "input_preflight",
+  "gtfs_snapshot_path": "config/gtfs_snapshot.json",
+  "gtfs_path": "data/raw/transport/gtfs.zip",
+  "service_date": "2026-10-13",
+  "timezone": "Australia/Melbourne",
+  "feed_ids": ["2", "3", "4"],
+  "departure_times": ["07:00:00", "07:30:00", "08:00:00", "08:30:00"],
+  "street_network": null,
+  "locations": null
+}
