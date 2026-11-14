@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "purpose": "Candidate station records, not final public entrances or journey origins",
+  "gtfs_archive": "data/raw/transport/gtfs.zip",
+  "gtfs_sha256": "c88af3abcaf0872e45196dcc1d5af9bc20a82c54a00a9dfef46c809ec2e34814",
+  "feed_id": "2",
+  "service_date": "2026-10-13",
+  "crs": "EPSG:4326",
+  "candidates": [
+    {"id": "dest_flinders", "role": "destination", "place": "Flinders Street Station", "match_text": "Flinders Street", "status": "needs_public_entrance_review"},
+    {"id": "orig_footscray", "role": "origin", "place": "Footscray Station", "match_text": "Footscray", "status": "needs_origin_review"},
+    {"id": "orig_coburg", "role": "origin", "place": "Coburg Station", "match_text": "Coburg", "status": "needs_origin_review"},
+    {"id": "orig_box_hill", "role": "origin", "place": "Box Hill Station", "match_text": "Box Hill", "status": "needs_origin_review"},
+    {"id": "orig_dandenong", "role": "origin", "place": "Dandenong Station", "match_text": "Dandenong", "status": "needs_origin_review"}
+  ]
+}
