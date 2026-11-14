@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "Conservative OSM topology diagnostic; not public-access certification or routing",
+  "source_pbf": "data/interim/routing/melbourne_highway_ways.osm.pbf",
+  "source_osm_sha256": "5e775844a1b4424dc3c549e601c4a014f4d2816fe7f0ea3fda7d1b39fb966cc0",
+  "source_osm_snapshot_utc": "2026-10-01T20:22:06Z",
+  "locations": [
+    {"id": "dest_flinders", "station": "Flinders Street", "node_id": null, "status": "blocked: no verified Flinders Street public entrance"},
+    {"id": "orig_footscray", "station": "Footscray", "node_id": 3953464544, "status": "OSM candidate; not certified"},
+    {"id": "orig_coburg", "station": "Coburg", "node_id": 13503054206, "status": "OSM candidate; not certified"},
+    {"id": "orig_box_hill", "station": "Box Hill", "node_id": 8317160002, "status": "OSM candidate; indoor or area geometry needs review"},
+    {"id": "orig_dandenong", "station": "Dandenong", "node_id": 13901273237, "status": "alternative OSM candidate; not certified"}
+  ]
+}

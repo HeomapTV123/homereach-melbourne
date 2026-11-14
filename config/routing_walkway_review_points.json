@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "purpose": "Proximity audit only; nodes are unverified station-access candidates, not approved entrances",
+  "crs": "EPSG:4326",
+  "osm_source_sha256": "5e775844a1b4424dc3c549e601c4a014f4d2816fe7f0ea3fda7d1b39fb966cc0",
+  "source_file": "data/interim/routing/melbourne_highway_ways.geojsonseq",
+  "radius_metres": 100,
+  "top_k": 5,
+  "points": [
+    {"id":"dest_flinders_reference","latitude":-37.8183051,"longitude":144.9669644,"source":"GTFS feed 2 parent vic:rail:FSS; NOT a street entrance"},
+    {"id":"orig_footscray_candidate","latitude":-37.8016355,"longitude":144.9022831,"source":"OSM node 3953464544; entrance=main; UNVERIFIED"},
+    {"id":"orig_coburg_candidate","latitude":-37.7416688,"longitude":144.9634047,"source":"OSM node 13503054206; entrance=yes; UNVERIFIED"},
+    {"id":"orig_box_hill_candidate","latitude":-37.8191744,"longitude":145.1220481,"source":"OSM node 8317160002; entrance=main; UNVERIFIED"},
+    {"id":"orig_dandenong_candidate","latitude":-37.9898820,"longitude":145.2098479,"source":"OSM node 13830533511; entrance=main; UNVERIFIED"}
+  ]
+}
