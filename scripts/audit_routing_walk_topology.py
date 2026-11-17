@@ -138,7 +138,8 @@ def audit_lines(lines: Iterable[str], targets: dict[str, int | None]) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="config/routing_walk_topology_review.json")
-    parser.add_argument("--osmium", default="osmium", help="Path to osmium executable available in PATH")
+    # Use the osmium executable from the activated, trusted Conda environment.
+    # Never accept an arbitrary executable path from CLI input.
     parser.add_argument("--project-root", default=".")
     args = parser.parse_args()
     root = Path(args.project_root).resolve()
@@ -150,7 +151,7 @@ def main() -> int:
     if not source.is_relative_to(root) or not source.is_file():
         parser.error("Source missing or outside project root")
     targets = {x["id"]: x["node_id"] for x in config["locations"]}
-    command = [args.osmium, "cat", "-f", "opl", str(source)]
+    command = ["osmium", "cat", "-f", "opl", str(source)]
     print("OSM STRICT WALKING COMPONENT DIAGNOSTIC — NOT A ROUTE", flush=True)
     print("Reading OSM ways; this can use several hundred MB of memory.", flush=True)
     try:

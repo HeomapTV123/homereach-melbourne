@@ -11,8 +11,11 @@ import math
 from pathlib import Path
 
 
-STATION_FILE = Path("config/routing_station_references.json")
-DEFAULT_FEATURES = Path("data/interim/routing/osm_entrance_candidates.geojsonseq")
+# Fixed project-local data sources for this reproducible audit.
+# No arbitrary filesystem path is accepted via CLI.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+STATION_FILE = PROJECT_ROOT / "config/routing_station_references.json"
+DEFAULT_FEATURES = PROJECT_ROOT / "data/interim/routing/osm_entrance_candidates.geojsonseq"
 
 
 def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -84,16 +87,14 @@ def nearest_candidates(stations: list[dict], features: list[dict], radius_m: flo
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--features", type=Path, default=DEFAULT_FEATURES)
-    parser.add_argument("--stations", type=Path, default=STATION_FILE)
     parser.add_argument("--radius-m", type=float, default=450)
     args = parser.parse_args()
     if not (0 < args.radius_m <= 1000) or not math.isfinite(args.radius_m):
         parser.error("--radius-m must be between 0 and 1000")
-    if not args.features.is_file() or not args.stations.is_file():
+    if not DEFAULT_FEATURES.is_file() or not STATION_FILE.is_file():
         parser.error("Missing inputs: see docs/commute_osm_entrance_review.md")
-    stations = json.loads(args.stations.read_text(encoding="utf-8"))["stations"]
-    features = list(load_features(args.features))
+    stations = json.loads(STATION_FILE.read_text(encoding="utf-8"))["stations"]
+    features = list(load_features(DEFAULT_FEATURES))
     results = nearest_candidates(stations, features, args.radius_m)
     print("OSM ENTRANCE TAG CANDIDATES — HUMAN REVIEW REQUIRED")
     print(f"OSM snapshot 2026-10-01; GTFS station references 2026-10-13; radius {args.radius_m:g}m")
