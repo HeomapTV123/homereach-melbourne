@@ -2,7 +2,7 @@
 
 ## Checkpoint and selected environment
 
-The first development pair is recorded in [the station-access review](commute_station_access_review.md) and [its provisional reference manifest](../config/routing_development_references.json). The next step is a separate routing environment, followed by a tiny synthetic engine smoke test.
+The first development pair is recorded in [the station-access review](commute_station_access_review.md) and [its provisional reference manifest](../config/routing_development_references.json). The separate Windows environment now passes the prerequisite inventory. The [synthetic engine experiment](commute_routing_smoke_test.md) subsequently ran on Linux and exposed inconsistent itinerary timestamps; resolving that failure is the next routing checkpoint.
 
 [`scripts/check_routing_runtime.py`](../scripts/check_routing_runtime.py) inventories the Python interpreter that actually runs it, installed distribution metadata, and the output of a bounded `java -version` subprocess. It uses only Python's standard library. It does not import r5py, JPype or GIS packages, start an embedded JVM, download the engine, load project datasets, or compute journeys.
 
@@ -18,9 +18,38 @@ The inventory reports other installed Python/r5py/Java versions as requiring sep
 
 The channel list includes `nodefaults`, so creating this environment uses conda-forge without appending the user's configured default channels. This is scoped to this specification and does not change global Conda settings. [Conda's environment-file specification](https://conda.org/learn/specifications/exchange/environment-yml/#channels) documents this behavior.
 
+## Observed Windows checkpoint — 18 November 2026
+
+The maintainer supplied a completed environment-creation log and a successful prerequisite inventory from checkout `dcf7c2e`. The selected environment is `D:\homereach-conda\envs\homereach-routing`; the reported Python and Java executables are inside that prefix.
+
+| Observed component | Reported version |
+| --- | --- |
+| Python | 3.12.16, 64-bit |
+| r5py | 1.1.7 |
+| JPype1 | 1.7.1 |
+| GeoPandas | 1.2.0 |
+| pandas | 3.0.3 |
+| NumPy | 2.3.5 |
+| Shapely | 2.2.0 |
+| pyproj | 3.8.0 |
+| rasterio | 1.5.2 |
+| Java | OpenJDK 21.0.10, Zulu21.48+17-CA, build 21.0.10+7-LTS |
+
+The checker reported `ROUTING RUNTIME PREREQUISITES: PASSED`, with zero project datasets read, project files written or journeys computed. This verifies the reported interpreter, package metadata and Java version probe. Package/native-library imports, the embedded JVM, R5 compatibility, network loading and routing remain for [the controlled synthetic smoke test](commute_routing_smoke_test.md).
+
+The same supplied session reported 8.98 GiB free on C: and 238.34 GiB on D: after archive cleanup, and `tempfile.gettempdir()` returned `D:\homereach-conda\tmp`. However, `conda config --show pkgs_dirs` still listed three C: cache locations after the D: override command. **The environment and temporary-directory relocation were observed; package-cache relocation was not confirmed.** The cause of that discrepancy is unresolved. Preserve the working environment; use the scoped checks below before future package installations or updates.
+
+The creation log's `Channels` section listed only conda-forge. A later informational notice mentioned `defaults`; that notice alone does not establish which channels supplied installed packages. This checkpoint did not inspect every package's channel provenance or produce a complete environment lock.
+
 ## Run on Windows
 
-For the machine with the confirmed C: storage failure, use [the D: recovery procedure](#windows-disk-space-recovery) below. The ordinary named-environment commands in this section assume sufficient space in Conda's default locations.
+The maintainer's D: environment has already been created successfully. Inspect it with the explicit prefix; do not repeat creation:
+
+```bat
+conda run --no-capture-output --prefix "D:\homereach-conda\envs\homereach-routing" python scripts/check_routing_runtime.py
+```
+
+The [D: recovery procedure](#windows-disk-space-recovery) below records the storage setup and the additional cache-verification requirement. The ordinary named-environment commands in this section are for another setup with sufficient space in Conda's default locations.
 
 Use Anaconda Prompt / CMD from the project directory:
 
@@ -64,7 +93,7 @@ failed with error: [Errno 28] No space left on device
 
 The later `AttributeError: 'InvalidArchiveError' object has no attribute 'dump_map'` occurs during JSON error reporting, after the storage failure. `EnvironmentLocationNotFound` follows because no valid routing environment was created. The earlier archive-renaming retry was diagnostic; repeated downloads into the same C: cache will not address insufficient storage. The `nodefaults` correction remains appropriate for channel selection but did not resolve disk capacity.
 
-The recovery places the new environment, package cache and temporary extraction files together on D:, outside the repository. Existing `base`, `homereach` and `homereach-osm` installations remain at their current locations. Conda recommends putting the environment and cache on the same volume so files can be hard linked when supported; otherwise packages may need to be copied. See [custom environment/cache locations](https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/custom-env-and-pkg-locations.html).
+This procedure is intended to place the new environment, package cache and temporary extraction files together on D:, outside the repository. The observed checkpoint above confirms only the environment and temporary locations; cache verification must succeed before future package operations. Existing `base`, `homereach` and `homereach-osm` installations remain at their current locations. Conda recommends putting the environment and cache on the same volume so files can be hard linked when supported; otherwise packages may need to be copied. See [custom environment/cache locations](https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/custom-env-and-pkg-locations.html).
 
 ### Free cached archive space and check capacity
 
@@ -100,14 +129,24 @@ set "TEMP=D:\homereach-conda\tmp"
 set "TMP=D:\homereach-conda\tmp"
 ```
 
-[`CONDA_PKGS_DIRS`](https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/settings.html#pkgs-dirs-specify-package-directories) overrides package-cache locations. All three temporary variables are set because [Python/Conda checks TMPDIR, TEMP, then TMP](https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/temp-files.html). Verify both destinations before downloading:
+[`CONDA_PKGS_DIRS`](https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/settings.html#pkgs-dirs-specify-package-directories) sets package-cache configuration; verify the effective list rather than assuming that the command took effect. All three temporary variables are set because [Python/Conda checks TMPDIR, TEMP, then TMP](https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/temp-files.html). Verify both destinations before downloading:
 
 ```bat
 conda config --show pkgs_dirs
 "C:\Users\PhamDang\anaconda3\python.exe" -c "import tempfile; print('Temporary directory:', tempfile.gettempdir())"
 ```
 
-These should show `D:\homereach-conda\pkgs` and `D:\homereach-conda\tmp`, respectively.
+The first configured cache should be `D:\homereach-conda\pkgs`, and the temporary directory should be `D:\homereach-conda\tmp`. **If D: is absent from the cache list, C: remains first, or the temporary path is wrong, stop before starting another package operation.** A successful environment creation does not retrospectively prove that its cache used D:.
+
+For that mismatch, run only these narrowly scoped, read-only diagnostics in the same child prompt after setting the variables:
+
+```bat
+where conda
+"C:\Users\PhamDang\anaconda3\python.exe" -c "import os,sys,conda; from conda.base.context import context; print('Python:',sys.executable); print('Conda:',conda.__version__); print('CONDA_PKGS_DIRS:',repr(os.environ.get('CONDA_PKGS_DIRS'))); print('Effective pkgs_dirs:',list(context.pkgs_dirs))"
+"C:\Users\PhamDang\anaconda3\python.exe" -m conda config --show pkgs_dirs
+```
+
+Compare these with the ordinary `conda config --show pkgs_dirs` output. They inspect command discovery, the one relevant inherited variable and Conda's resolved cache list without printing unrelated configuration or credentials. In [Conda 26.1.1's implementation](https://github.com/conda/conda/blob/26.1.1/conda/cli/main_config.py), `--show` reads the effective context; [the cache property](https://github.com/conda/conda/blob/26.1.1/conda/base/context.py) returns the standard C: locations when no configured cache list is present. The supplied output is insufficient to attribute the mismatch to a wrapper, configuration or another cause. Diagnose it before changing configuration; a working routing environment does not need rebuilding for this check.
 
 ### Create and inspect the explicit D: environment
 
@@ -136,13 +175,13 @@ If creation fails, retain the full log and inspect its specific error. An existi
 
 [r5py's configuration documentation](https://r5py.readthedocs.io/stable/user-guide/user-manual/configuration.html) describes an automatic compatible-R5 download when no custom classpath is supplied, first-run configuration templates, and a default JVM heap setting of 80% of memory. Therefore importing r5py is a separate execution step from reading its installed metadata.
 
-The planned synthetic runner will use an explicitly identified local R5 JAR, validate its fingerprint before import, bound the JVM heap, and use temporary working/cache directories. That runner is not implemented or verified by this inventory checkpoint. It will write temporary engine artifacts; it must not claim the inventory's read-only behavior.
+The separate [synthetic runner](../scripts/run_routing_smoke_test.py) now uses an explicitly identified local R5 JAR, validates its fingerprint before import, bounds the JVM heap, and uses temporary working/cache directories. It writes temporary engine artifacts and has a different contract from this inventory. Its captured Linux execution exercised the engine but failed detailed-itinerary chronology checks; a Windows engine execution remains unverified.
 
 ## Validation and next stage
 
 The inventory's focused regression tests cover missing packages, unreadable metadata, version parsing, different baselines, environment mismatch, missing/failing/timed-out Java, executable discovery, and a fresh interpreter that denies imports of all routing/GIS packages. They run without installing r5py or launching an R5 engine.
 
-At the 18 November 2026 implementation checkpoint, all 30 inventory cases passed and the full Linux suite passed **697 tests in 47.38 seconds**, with no skips. A real inventory of that test environment correctly reported missing r5py, JPype1 and rasterio while detecting OpenJDK 21.0.13. This exercises the blocked path; it does not verify the user's Windows routing environment or an R5 engine.
+At the initial 18 November 2026 implementation checkpoint (`fc4a693`), all 30 inventory cases passed and the full Linux suite passed **697 tests in 47.38 seconds**, with no skips. A real inventory of that test environment correctly reported missing r5py, JPype1 and rasterio while detecting OpenJDK 21.0.13. That initial run exercises the blocked path. The later successful Windows inventory is recorded above, and the subsequent engine experiment has its own evidence and failed chronology result.
 
 Run them in the existing test environment:
 
@@ -150,7 +189,7 @@ Run them in the existing test environment:
 conda run --no-capture-output -n homereach python -m pytest -o "addopts=" -q tests/test_routing_runtime.py
 ```
 
-The next engine test should build a tiny fictional connected street network and daytime GTFS fixture, verify a walking result, verify an actual transit segment, and exercise a no-service date. It establishes runtime/API behavior independently of Melbourne's station-access questions.
+The engine diagnostic builds a tiny fictional connected street network and daytime GTFS fixture, checks a walking result and actual transit segments, and exercises a no-service date. These behaviors ran on Linux, but the returned itinerary chronology did not pass. See [the smoke-test checkpoint and raw evidence](commute_routing_smoke_test.md) for the defect and the next resolution step, independently of Melbourne's station-access questions.
 
 Before a Melbourne development itinerary, validate the complete GTFS timing/references and the chosen complete street-network input. In particular, [r5py's advanced-use documentation](https://r5py.readthedocs.io/stable/user-guide/user-manual/advanced-use.html) reports a limitation for GTFS times beyond `24:00:00`; the current small-table preflight does not evaluate that issue. Do not silently transform the frozen timetable to accommodate an engine.
 
