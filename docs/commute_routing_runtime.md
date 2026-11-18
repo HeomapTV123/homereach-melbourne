@@ -16,6 +16,8 @@ The selected development baseline in [`environment-routing.yml`](../environment-
 
 The inventory reports other installed Python/r5py/Java versions as requiring separate review for this baseline, not as proof they are incompatible. The environment file is an input specification, not a lock of every resolved dependency. The actual Windows solve and native-library compatibility have not been demonstrated by Linux unit tests.
 
+The channel list includes `nodefaults`, so creating this environment uses conda-forge without appending the user's configured default channels. This is scoped to this specification and does not change global Conda settings. [Conda's environment-file specification](https://conda.org/learn/specifications/exchange/environment-yml/#channels) documents this behavior.
+
 ## Run on Windows
 
 Use Anaconda Prompt / CMD from the project directory:
@@ -49,6 +51,33 @@ For machine-readable output, the same command accepts `--json`. The checker read
 | `ROUTING RUNTIME PREREQUISITES: BLOCKED` | 2 | A prerequisite is missing, unreadable or outside the selected baseline, or the interpreter/environment disagree. The report names it. |
 
 Conda may append a generic failed-command message after exit code 2. Use the specific preceding inventory messages to diagnose the environment. This is separate from the existing routing-input preflight, which still reports the original street/location approval fields as unconfigured.
+
+## Recovering the reported OpenJDK archive failure
+
+On 18 November 2026, the user confirmed checkout `fc4a693` but environment creation failed while processing `openjdk-21.0.10-h56f2b75_22.conda`. The subsequent `EnvironmentLocationNotFound` means there was no valid `homereach-routing` environment to run. The truncated `InvalidArchiveError` does not establish whether the underlying problem was a damaged download, an extraction/path issue or another filesystem error. The displayed newer-Conda notice is separate from the archive exception.
+
+That attempt also showed both conda-forge and defaults. The `nodefaults` correction addresses the observed channel configuration; it is not claimed to explain the archive failure. After pulling the correction, use one targeted retry in Anaconda Prompt / CMD.
+
+First, quarantine only the exact cached archive named in the error, if it still exists:
+
+```bat
+set "HOMEREACH_FAILED_JDK=C:\Users\PhamDang\anaconda3\pkgs\openjdk-21.0.10-h56f2b75_22.conda"
+if exist "%HOMEREACH_FAILED_JDK%" ren "%HOMEREACH_FAILED_JDK%" "openjdk-21.0.10-h56f2b75_22.conda.failed-%RANDOM%-%RANDOM%"
+```
+
+This preserves the failed archive under a different filename, leaves unpacked packages and existing environments in place, and prevents reuse of that file as the named package archive. If it is already absent, the conditional command does nothing. Do not remove the whole package-cache directory or an environment directory as part of this retry.
+
+Capture the retry in a unique temporary log so a repeated error retains its full inner exception:
+
+```bat
+set "HOMEREACH_ROUTING_LOG=%TEMP%\homereach-routing-create-%RANDOM%-%RANDOM%.log"
+conda env create -f environment-routing.yml --json > "%HOMEREACH_ROUTING_LOG%" 2>&1
+type "%HOMEREACH_ROUTING_LOG%"
+```
+
+Output is redirected, so the terminal may remain quiet while Conda downloads and extracts packages. Wait for the prompt to return before displaying the log. [Conda's environment-creation command](https://docs.conda.io/projects/conda/en/stable/commands/env/create.html) documents the `--json` option.
+
+If creation succeeds, run the prerequisite inventory command above. If it fails, inspect the full log before changing the retry strategy. In particular, an absent valid environment does not prove that no partial directory exists: report any prefix-already-exists message instead of deleting that directory blindly. A fresh cache location or Windows-specific path correction should be chosen from the complete exception, rather than assumed from `InvalidArchiveError` alone.
 
 ## Why inventory precedes importing the engine
 

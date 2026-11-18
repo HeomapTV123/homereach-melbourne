@@ -1,6 +1,7 @@
 name: homereach-routing
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
   - python=3.12
   - openjdk=21
