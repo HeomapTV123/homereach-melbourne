@@ -1,6 +1,6 @@
 # HomeReach: diagnostic OSM walking-topology review
 
-This package supplements, and does not overwrite, the existing commute location candidate and proximity audits. It records the OSM nodes already verified by hand and conducts a deliberately **strict**, read-only OSM graph component check. It is **not** a routing model or proof that a station is publicly accessible.
+This package supplements the existing commute location candidate and proximity audits. It records the node-to-way memberships checked by hand and conducts a deliberately **strict**, read-only OSM graph component check. It is **not** a routing model or proof that a station is publicly accessible.
 
 ## Verified manual evidence
 
@@ -29,15 +29,14 @@ conda activate homereach-osm
 "C:\Users\PhamDang\anaconda3\python.exe" scripts/audit_routing_walk_topology.py
 ```
 
-Or stay in `(base)` and use `--osmium` with the full path printed by `conda run -n homereach-osm where osmium` (the executable location depends on the Conda build):
+The script uses the `osmium` executable on the activated environment's PATH. An executable-path override is not supported.
 
-```bat
-conda run -n homereach-osm where osmium
-python scripts/audit_routing_walk_topology.py --osmium "<path-to-osmium.exe>"
-```
+Use `conda run --no-capture-output -n homereach python -m pytest -q tests/test_routing_walk_topology.py` for fixture-only tests. There is no project-data write and no request to edit the raw snapshots.
 
-Use `conda run --no-capture-output -n homereach python -m pytest -q tests/test_routing_walk_topology.py` for fixture-only tests. There is no project-data write and no request to edit the raw snapshots. Do not commit until the real run is reviewed.
+## Inspect excluded ways at a component boundary
+
+The optional boundary review preserves the strict graph and inspects excluded ways that share exact node IDs with selected components. It reports all applicable exclusion reasons and distinguishes references in other strict components from references absent from the strict graph. See [the boundary review guide](commute_walk_boundary_review.md) for the Windows command, output fields, provenance checks, and the recorded comparison results.
 
 ## Next milestone
 
-After diagnosis, review Flinders Street's **actual railway** public entrance from an authoritative station plan or verified OSM mapping, differentiate Town Hall subway entrances from Flinders Street railway entrances, review barriers and vertical transitions, and then test a realistic walking router on a bounded network. Preserve mixed-vintage October 2026 OSM/GTFS reporting.
+After diagnosis, review Flinders Street's **actual railway** public entrance from an authoritative station plan or verified OSM mapping. Establish which station each investigated entrance serves; the tag `railway=subway_entrance` alone does not establish station identity. Review barriers and vertical transitions, then test a realistic walking router on a bounded network. Preserve mixed-vintage October 2026 OSM/GTFS reporting.
