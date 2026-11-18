@@ -10,9 +10,10 @@ import argparse
 from importlib import metadata
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
 import platform
 import re
+import shlex
 import struct
 import subprocess
 
@@ -27,6 +28,15 @@ CHECK_COMMAND = (
     "conda run --no-capture-output -n homereach-routing "
     "python scripts/check_routing_runtime.py"
 )
+
+
+def check_command(prefix: PurePath, *, windows: bool) -> str:
+    """Format a display-only hint that retains a relocated routing environment."""
+    if prefix.name.casefold() != "homereach-routing":
+        return CHECK_COMMAND
+    arguments = ["conda", "run", "--no-capture-output", "--prefix", str(prefix),
+                 "python", "scripts/check_routing_runtime.py"]
+    return subprocess.list2cmdline(arguments) if windows else shlex.join(arguments)
 
 
 def java_major_version(output: str) -> int | None:
@@ -136,7 +146,7 @@ def inspect_runtime() -> dict:
         "packages": packages,
         "java": java,
         "blockers": blockers,
-        "next_check_command": CHECK_COMMAND,
+        "next_check_command": check_command(prefix, windows=os.name == "nt"),
         "not_tested": ["Python package imports and native dependencies", "Embedded JVM and R5 JAR compatibility",
                        "Street/GTFS network loading", "Walking/transit routing and journey timing"],
         "routing_engine_imported": False,
@@ -169,8 +179,8 @@ def main(argv: list[str] | None = None) -> int:
         for blocker in report["blockers"]:
             print("Blocked:", blocker)
         if report["blockers"]:
-            print("Create the separate environment if absent: conda env create -f environment-routing.yml")
-            print("Check that environment:", CHECK_COMMAND)
+            print("Setup and storage recovery: docs/commute_routing_runtime.md")
+            print("Check that environment:", report["next_check_command"])
         else:
             print("Ready for a controlled engine smoke test; the routing engine has not been tested.")
         for item in report["not_tested"]:

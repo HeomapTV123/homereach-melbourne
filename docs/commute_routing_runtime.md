@@ -20,6 +20,8 @@ The channel list includes `nodefaults`, so creating this environment uses conda-
 
 ## Run on Windows
 
+For the machine with the confirmed C: storage failure, use [the D: recovery procedure](#windows-disk-space-recovery) below. The ordinary named-environment commands in this section assume sufficient space in Conda's default locations.
+
 Use Anaconda Prompt / CMD from the project directory:
 
 ```bat
@@ -52,32 +54,81 @@ For machine-readable output, the same command accepts `--json`. The checker read
 
 Conda may append a generic failed-command message after exit code 2. Use the specific preceding inventory messages to diagnose the environment. This is separate from the existing routing-input preflight, which still reports the original street/location approval fields as unconfigured.
 
-## Recovering the reported OpenJDK archive failure
+## Windows disk-space recovery
 
-On 18 November 2026, the user confirmed checkout `fc4a693` but environment creation failed while processing `openjdk-21.0.10-h56f2b75_22.conda`. The subsequent `EnvironmentLocationNotFound` means there was no valid `homereach-routing` environment to run. The truncated `InvalidArchiveError` does not establish whether the underlying problem was a damaged download, an extraction/path issue or another filesystem error. The displayed newer-Conda notice is separate from the archive exception.
+The full retry log supplied on 18 November 2026 from checkout `43acc1a` establishes the primary failure while extracting `C:\Users\PhamDang\anaconda3\pkgs\openjdk-21.0.10-h56f2b75_22.conda`:
 
-That attempt also showed both conda-forge and defaults. The `nodefaults` correction addresses the observed channel configuration; it is not claimed to explain the archive failure. After pulling the correction, use one targeted retry in Anaconda Prompt / CMD.
-
-First, quarantine only the exact cached archive named in the error, if it still exists:
-
-```bat
-set "HOMEREACH_FAILED_JDK=C:\Users\PhamDang\anaconda3\pkgs\openjdk-21.0.10-h56f2b75_22.conda"
-if exist "%HOMEREACH_FAILED_JDK%" ren "%HOMEREACH_FAILED_JDK%" "openjdk-21.0.10-h56f2b75_22.conda.failed-%RANDOM%-%RANDOM%"
+```text
+failed with error: [Errno 28] No space left on device
 ```
 
-This preserves the failed archive under a different filename, leaves unpacked packages and existing environments in place, and prevents reuse of that file as the named package archive. If it is already absent, the conditional command does nothing. Do not remove the whole package-cache directory or an environment directory as part of this retry.
+The later `AttributeError: 'InvalidArchiveError' object has no attribute 'dump_map'` occurs during JSON error reporting, after the storage failure. `EnvironmentLocationNotFound` follows because no valid routing environment was created. The earlier archive-renaming retry was diagnostic; repeated downloads into the same C: cache will not address insufficient storage. The `nodefaults` correction remains appropriate for channel selection but did not resolve disk capacity.
 
-Capture the retry in a unique temporary log so a repeated error retains its full inner exception:
+The recovery places the new environment, package cache and temporary extraction files together on D:, outside the repository. Existing `base`, `homereach` and `homereach-osm` installations remain at their current locations. Conda recommends putting the environment and cache on the same volume so files can be hard linked when supported; otherwise packages may need to be copied. See [custom environment/cache locations](https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/custom-env-and-pkg-locations.html).
+
+### Free cached archive space and check capacity
+
+From the original Anaconda Prompt / CMD, before setting the D: cache override:
 
 ```bat
-set "HOMEREACH_ROUTING_LOG=%TEMP%\homereach-routing-create-%RANDOM%-%RANDOM%.log"
-conda env create -f environment-routing.yml --json > "%HOMEREACH_ROUTING_LOG%" 2>&1
+conda clean --tarballs --yes
+"C:\Users\PhamDang\anaconda3\python.exe" -c "import shutil; print('C: free GiB:', round(shutil.disk_usage('C:/').free / 1024**3, 2)); print('D: free GiB:', round(shutil.disk_usage('D:/').free / 1024**3, 2))"
+```
+
+[`conda clean --tarballs`](https://docs.conda.io/projects/conda/en/26.1.x/commands/clean.html) removes downloaded package archives, not installed environment packages. It does not remove the previously renamed `.failed-*` archive or necessarily clear partial extractions. Avoid broad package-cache or environment-directory deletion.
+
+Check the current numbers; earlier D: capacity measurements are not current evidence. About 10 GiB free on D: is a practical working margin for this attempt, not a measured package requirement. C: still needs headroom for Windows and small Conda/account metadata writes. If it remains effectively full after archive cleanup, resolve that storage shortage before proceeding.
+
+### Configure a temporary child command prompt
+
+Run `cmd /d` once. The following settings apply only to that child prompt; `exit` later returns to the original settings. This uses [CMD's inherited, process-local environment](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd) without editing global Conda configuration.
+
+```bat
+cmd /d
+```
+
+In the child prompt, create the parent/cache/temp directories. If directory creation fails, inspect that error before continuing. Let Conda create the final environment directory itself.
+
+```bat
+if not exist "D:\homereach-conda\pkgs" mkdir "D:\homereach-conda\pkgs"
+if not exist "D:\homereach-conda\tmp" mkdir "D:\homereach-conda\tmp"
+if not exist "D:\homereach-conda\envs" mkdir "D:\homereach-conda\envs"
+
+set "CONDA_PKGS_DIRS=D:\homereach-conda\pkgs"
+set "TMPDIR=D:\homereach-conda\tmp"
+set "TEMP=D:\homereach-conda\tmp"
+set "TMP=D:\homereach-conda\tmp"
+```
+
+[`CONDA_PKGS_DIRS`](https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/settings.html#pkgs-dirs-specify-package-directories) overrides package-cache locations. All three temporary variables are set because [Python/Conda checks TMPDIR, TEMP, then TMP](https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/temp-files.html). Verify both destinations before downloading:
+
+```bat
+conda config --show pkgs_dirs
+"C:\Users\PhamDang\anaconda3\python.exe" -c "import tempfile; print('Temporary directory:', tempfile.gettempdir())"
+```
+
+These should show `D:\homereach-conda\pkgs` and `D:\homereach-conda\tmp`, respectively.
+
+### Create and inspect the explicit D: environment
+
+Use ordinary console output for this retry because the observed JSON exception formatter failed. The optional log below captures all output on D:; wait for the command prompt before displaying it.
+
+```bat
+cd /d "D:\My project\homereach_melbourne"
+set "HOMEREACH_ROUTING_LOG=D:\homereach-conda\tmp\create-routing-%RANDOM%-%RANDOM%.log"
+conda env create --prefix "D:\homereach-conda\envs\homereach-routing" -f environment-routing.yml --yes > "%HOMEREACH_ROUTING_LOG%" 2>&1
 type "%HOMEREACH_ROUTING_LOG%"
 ```
 
-Output is redirected, so the terminal may remain quiet while Conda downloads and extracts packages. Wait for the prompt to return before displaying the log. [Conda's environment-creation command](https://docs.conda.io/projects/conda/en/stable/commands/env/create.html) documents the `--json` option.
+Both [`conda env create`](https://docs.conda.io/projects/conda/en/26.1.x/commands/env/create.html) and [`conda run`](https://docs.conda.io/projects/conda/en/stable/commands/run.html) accept an explicit prefix. After successful creation, use that same path:
 
-If creation succeeds, run the prerequisite inventory command above. If it fails, inspect the full log before changing the retry strategy. In particular, an absent valid environment does not prove that no partial directory exists: report any prefix-already-exists message instead of deleting that directory blindly. A fresh cache location or Windows-specific path correction should be chosen from the complete exception, rather than assumed from `InvalidArchiveError` alone.
+```bat
+conda run --no-capture-output --prefix "D:\homereach-conda\envs\homereach-routing" python scripts/check_routing_runtime.py
+```
+
+Keep using `--prefix` for this environment; `-n homereach-routing` may still resolve to the absent C: location because the new folder is outside the configured environment directories. The checker now uses the actual interpreter prefix in its retry hint when the prefix's final directory is `homereach-routing`. Runtime imports, the embedded JVM and actual journeys remain untested by this inventory.
+
+If creation fails, retain the full log and inspect its specific error. An existing-prefix message does not authorize deleting the directory. After recording the outcome, run `exit` to return to the original prompt. The installed D: environment and log remain; the child's cache/temp overrides do not. Reapply those overrides for future installation/update operations that need D: storage.
 
 ## Why inventory precedes importing the engine
 

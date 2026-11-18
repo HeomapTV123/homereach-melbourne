@@ -4,9 +4,10 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -215,3 +216,43 @@ def test_cli_has_no_arbitrary_executable_or_path_option(capsys):
         m.main(["--java", "some-program"])
     assert error.value.code == 2
     assert "unrecognized arguments" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("prefix,windows,expected", [
+    (PureWindowsPath(r"D:\My Tools\envs\HoMeReAcH-RoUtInG"), True,
+     'conda run --no-capture-output --prefix "D:\\My Tools\\envs\\HoMeReAcH-RoUtInG" '
+     'python scripts/check_routing_runtime.py'),
+    (PurePosixPath("/mnt/data/owner's envs/homereach-routing"), False,
+     "conda run --no-capture-output --prefix '/mnt/data/owner'\"'\"'s envs/homereach-routing' "
+     "python scripts/check_routing_runtime.py"),
+    (PureWindowsPath(r"C:\Users\PhamDang\anaconda3"), True,
+     "conda run --no-capture-output -n homereach-routing python scripts/check_routing_runtime.py"),
+    (PurePosixPath("/opt/conda/envs/homereach"), False,
+     "conda run --no-capture-output -n homereach-routing python scripts/check_routing_runtime.py"),
+])
+def test_check_hint_preserves_routing_prefix_and_quotes_for_the_target_shell(prefix, windows, expected):
+    assert m.check_command(prefix, windows=windows) == expected
+
+
+@pytest.mark.parametrize("as_json", [False, True])
+def test_relocated_environment_hint_reaches_cli_output(baseline, monkeypatch, tmp_path, capsys, as_json):
+    prefix = tmp_path / "custom envs" / "homereach-routing"
+    # Replace this module's sys binding, without changing the interpreter's sys.prefix.
+    monkeypatch.setattr(m, "sys", SimpleNamespace(
+        prefix=str(prefix), version_info=(3, 12, 14), executable=str(prefix / "python"),
+    ))
+    monkeypatch.setenv("CONDA_PREFIX", str(prefix))
+    monkeypatch.setattr(m, "find_java", lambda: None)
+    quote = '"' if os.name == "nt" else "'"
+    expected = (f"conda run --no-capture-output --prefix {quote}{prefix}{quote} "
+                "python scripts/check_routing_runtime.py")
+    assert m.main(["--json"] if as_json else []) == 2
+    output = capsys.readouterr().out
+    if as_json:
+        report = json.loads(output)
+        assert report["next_check_command"] == expected
+        assert report["java"]["status"] == "missing"
+    else:
+        assert f"Check that environment: {expected}" in output
+        assert "Setup and storage recovery: docs/commute_routing_runtime.md" in output
+        assert "conda env create -f" not in output
