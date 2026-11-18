@@ -20,7 +20,7 @@ from routing_leg_isolation import isolate_cached_legs
 import run_routing_smoke_test as smoke
 
 
-def records(frame) -> list[dict]:
+def records(frame, *, include_geometry: bool = False) -> list[dict]:
     result = []
     for _, row in frame.iterrows():
         def optional_id(name):
@@ -39,10 +39,16 @@ def records(frame) -> list[dict]:
             "agency_id": optional_id("agency_id"), "route_id": optional_id("route_id"),
             "start_stop_id": optional_id("start_stop_id"), "end_stop_id": optional_id("end_stop_id"),
         })
+        if include_geometry:
+            # Preserve the returned coordinates for independent checks. Do not
+            # clip, reverse, snap or otherwise repair the engine's geometry.
+            from shapely.geometry import mapping
+            result[-1]["geometry"] = None if row.geometry is None else mapping(row.geometry)
     return result
 
 
-def execute(work: Path, report: dict, *, isolate_legs: bool = False) -> None:
+def execute(work: Path, report: dict, *, isolate_legs: bool = False,
+            check_walking_geometry: bool = False) -> None:
     jar = work / smoke.ENGINE_NAME
     smoke.check_engine(jar)
     if smoke.sha256(work / "streets.osm.pbf") != smoke.STREET_SHA256:
@@ -86,6 +92,8 @@ def execute(work: Path, report: dict, *, isolate_legs: bool = False) -> None:
     origins = gpd.GeoDataFrame({"id": [smoke.ORIGIN_ID]}, geometry=[Point(*fixture.ORIGIN)], crs="EPSG:4326")
     destinations = gpd.GeoDataFrame({"id": [smoke.DESTINATION_ID]}, geometry=[Point(*fixture.DESTINATION)], crs="EPSG:4326")
     context = isolate_cached_legs(r5py) if isolate_legs else nullcontext()
+    if check_walking_geometry:
+        report["geometry_crs"] = {}
     with context as adapter:
         if isolate_legs:
             report["itinerary_adapter"] = adapter
@@ -103,13 +111,16 @@ def execute(work: Path, report: dict, *, isolate_legs: bool = False) -> None:
                 max_time=datetime.timedelta(minutes=90), max_time_walking=datetime.timedelta(minutes=90),
                 max_public_transport_rides=1, speed_walking=3.6,
             )
-            report[label] = records(frame)
+            report[label] = records(frame, include_geometry=check_walking_geometry)
+            if check_walking_geometry:
+                report["geometry_crs"][label] = str(frame.crs)
     report["status"] = "completed"
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--isolate-itinerary-legs", action="store_true")
+    parser.add_argument("--check-walking-geometry", action="store_true")
     args = parser.parse_args()
     work = Path.cwd().resolve()
     # Parent creates the run directory; direct invocation from a checkout is invalid.
@@ -120,7 +131,8 @@ def main() -> int:
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         try:
-            execute(work, report, isolate_legs=args.isolate_itinerary_legs)
+            execute(work, report, isolate_legs=args.isolate_itinerary_legs,
+                    check_walking_geometry=args.check_walking_geometry)
         except Exception as error:
             report["error"] = f"{type(error).__name__}: {error}"
             traceback.print_exc()

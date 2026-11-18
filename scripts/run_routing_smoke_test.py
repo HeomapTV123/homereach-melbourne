@@ -20,6 +20,7 @@ if __name__ == "__main__":
 import check_routing_runtime as runtime
 import routing_leg_isolation as leg_isolation
 import routing_smoke_fixture as fixture
+import routing_walk_geometry as walk_geometry
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -284,11 +285,13 @@ def read_log_tail(path: Path) -> str:
         return handle.read().decode("utf-8", errors="replace")
 
 
-def run_worker(work: Path, *, isolate_legs: bool = False) -> dict:
+def run_worker(work: Path, *, isolate_legs: bool = False, check_walking_geometry: bool = False) -> dict:
     log_path = work / "worker.log"
     command = [sys.executable, "-I", "-B", str(WORKER)]
     if isolate_legs:
         command.append("--isolate-itinerary-legs")
+    if check_walking_geometry:
+        command.append("--check-walking-geometry")
     with log_path.open("wb") as log:
         try:
             completed = subprocess.run(
@@ -312,6 +315,9 @@ def run_worker(work: Path, *, isolate_legs: bool = False) -> dict:
         if isinstance(report.get("transit"), list):
             report["timeline_diagnostics"] = timeline_diagnostics(report["transit"])
             report["single_bus_diagnostics"] = single_bus_diagnostics(report["transit"])
+        if check_walking_geometry:
+            report["walking_geometry_diagnostics"] = walk_geometry.audit_walk_geometry(report)
+            problems.extend(report["walking_geometry_diagnostics"]["problems"])
     except (OSError, ValueError, TypeError, KeyError) as error:
         report = {}
         problems = [f"Cannot validate worker report: {error}"]
@@ -323,10 +329,12 @@ def run_worker(work: Path, *, isolate_legs: bool = False) -> dict:
     return report
 
 
-def inspect_smoke(jar: Path, work_root: Path, *, isolate_legs: bool = False) -> dict:
+def inspect_smoke(jar: Path, work_root: Path, *, isolate_legs: bool = False,
+                  check_walking_geometry: bool = False) -> dict:
     started = time.monotonic()
-    report = {"schema_version": 2, "status": "blocked", "synthetic_fixture_only": True,
+    report = {"schema_version": 3, "status": "blocked", "synthetic_fixture_only": True,
               "requested_itinerary_mode": "isolated_legs" if isolate_legs else "upstream",
+              "walking_geometry_requested": check_walking_geometry,
               "real_project_datasets_read": 0, "melbourne_journeys_computed": 0,
               "temporary_workspace_removed": False, "problems": [],
               "started_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()}
@@ -359,7 +367,8 @@ def inspect_smoke(jar: Path, work_root: Path, *, isolate_legs: bool = False) -> 
                 "streets.osm.pbf": sha256(work / "streets.osm.pbf"),
                 "synthetic.gtfs.zip": sha256(work / "synthetic.gtfs.zip"),
             }
-            report.update(run_worker(work, isolate_legs=isolate_legs))
+            report.update(run_worker(work, isolate_legs=isolate_legs,
+                                     check_walking_geometry=check_walking_geometry))
         report["temporary_workspace_removed"] = True
     except (OSError, ValueError) as error:
         report.update(status="failed", problems=[str(error)])
@@ -374,14 +383,18 @@ def main(argv=None) -> int:
     parser.add_argument("--json", action="store_true", help="Print the complete machine-readable result.")
     parser.add_argument("--isolate-itinerary-legs", action="store_true",
                         help="Opt in to the source-verified r5py 1.1.7 leg-copy adapter for this worker only.")
+    parser.add_argument("--check-walking-geometry", action="store_true",
+                        help="Check returned walking coordinates and distances against the fixed street grid.")
     args = parser.parse_args(argv)
-    report = inspect_smoke(args.jar, args.work_root, isolate_legs=args.isolate_itinerary_legs)
+    report = inspect_smoke(args.jar, args.work_root, isolate_legs=args.isolate_itinerary_legs,
+                           check_walking_geometry=args.check_walking_geometry)
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False))
     else:
         print("SYNTHETIC ROUTING ENGINE SMOKE TEST:", report["status"].upper())
         print("Fictional street grid and timetable | No Melbourne travel-time claim")
         print("Itinerary integration:", report.get("requested_itinerary_mode", "unreported"))
+        print("Walking geometry check:", "requested" if report.get("walking_geometry_requested") else "not requested")
         if isinstance(report.get("engine"), dict):
             print("Embedded JVM started:", report["engine"].get("jvm_started", False))
             print("Synthetic queries attempted:", report.get("queries_attempted", 0))
@@ -389,12 +402,26 @@ def main(argv=None) -> int:
             print("Timeline diagnostic:", json.dumps(report["timeline_diagnostics"]))
         if "single_bus_diagnostics" in report:
             print("Single-bus diagnostic:", json.dumps(report["single_bus_diagnostics"]))
+        if isinstance(report.get("walking_geometry_diagnostics"), dict):
+            diagnostic = report["walking_geometry_diagnostics"]
+            print("Walking geometry diagnostic:", json.dumps(diagnostic.get("counts", {})))
+            shown = set()
+            for observation in diagnostic.get("observations", []):
+                role = observation.get("role")
+                if role in shown:
+                    continue
+                shown.add(role)
+                print("Walk reference:", role, "| reported metres:", observation.get("reported_distance_m"),
+                      "| reference metres:", round(observation["reference_distance_m"], 3))
         if isinstance(report.get("itinerary_adapter"), dict):
             adapter = report["itinerary_adapter"]
             print("Leg snapshots:", adapter.get("legs_snapshotted", 0),
                   "| Original method restored:", adapter.get("restored", False))
-        for problem in report["problems"]:
+        for problem in report["problems"][:8]:
             print("Detail:", problem)
+        if len(report["problems"]) > 8:
+            print("Additional diagnostic problems:", len(report["problems"]) - 8,
+                  "| Use --json to retain the full report.")
         if report["status"] == "passed":
             print("Engine: r5py", report["engine"]["r5py"], "| R5 v7.5.1-r5py | SHA-256 verified")
             print("Java heap limit:", report["engine"]["max_heap_bytes"], "bytes | Python routing jobs: 1")

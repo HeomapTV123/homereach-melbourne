@@ -371,8 +371,9 @@ def test_staging_keeps_inputs_unchanged_and_removes_generated_workspace(fake_inp
     originals = {jar: jar.read_bytes(), street: street.read_bytes()}
     visited = []
 
-    def worker(work, *, isolate_legs):
+    def worker(work, *, isolate_legs, check_walking_geometry):
         assert isolate_legs is False
+        assert check_walking_geometry is False
         visited.append(work)
         assert work.parent == work_root
         assert work.name.startswith("homereach-smoke-")
@@ -487,6 +488,70 @@ def test_requested_adapter_cannot_silently_run_upstream(tmp_path, monkeypatch, c
     report = m.run_worker(tmp_path, isolate_legs=True)
     assert report["status"] == "failed"
     assert any("integration mode" in problem for problem in report["problems"])
+
+
+def geometric_report(completed_report):
+    report = deepcopy(completed_report)
+    report["geometry_crs"] = {"walking": "EPSG:4326", "transit": "EPSG:4326", "no_service": "EPSG:4326"}
+    for row, points, distance in (
+        (report["walking"][0], [[0.0061, 0.018], [0.0299, 0.018]], 2646.439124),
+        (report["transit"][0], [[0.0061, 0.018], [0.006, 0.018]], 11.119492),
+        (report["transit"][2], [[0.030, 0.018], [0.0299, 0.018]], 11.119492),
+    ):
+        row["geometry"] = {"type": "LineString", "coordinates": points}
+        row["distance_m"] = distance
+    report["transit"][1]["geometry"] = {
+        "type": "LineString", "coordinates": [[0.006, 0.018], [0.030, 0.018]],
+    }
+    return report
+
+
+def test_geometry_flag_requests_coordinates_and_checks_analytic_paths(tmp_path, monkeypatch, completed_report):
+    worker_report = geometric_report(completed_report)
+
+    def run(command, **_):
+        assert command == [sys.executable, "-I", "-B", str(m.WORKER), "--check-walking-geometry"]
+        (tmp_path / "worker-result.json").write_text(json.dumps(worker_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, check_walking_geometry=True)
+    assert report["status"] == "passed"
+    assert report["walking_geometry_diagnostics"]["status"] == "passed"
+    assert report["walking_geometry_diagnostics"]["counts"]["walking_legs_checked"] == 3
+    assert report["transit"] == worker_report["transit"]
+
+
+def test_geometry_check_cannot_pass_with_only_nonempty_geometry_booleans(tmp_path, monkeypatch, completed_report):
+    def run(command, **_):
+        (tmp_path / "worker-result.json").write_text(json.dumps(completed_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, check_walking_geometry=True)
+    assert report["status"] == "failed"
+    assert report["walking_geometry_diagnostics"]["status"] == "failed"
+    assert report["transit"] == completed_report["transit"]
+
+
+def test_known_long_egress_fails_geometry_while_timing_remains_valid(tmp_path, monkeypatch, completed_report):
+    worker_report = geometric_report(isolated_report(completed_report))
+    egress = worker_report["transit"][2]
+    egress.update(distance_m=677.897, travel_time_seconds=678,
+                  geometry={"type": "LineString", "coordinates": [[0.030, 0.018], [0.036, 0.018]]})
+
+    def run(command, **_):
+        assert command[-2:] == ["--isolate-itinerary-legs", "--check-walking-geometry"]
+        (tmp_path / "worker-result.json").write_text(json.dumps(worker_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, isolate_legs=True, check_walking_geometry=True)
+    assert report["status"] == "failed"
+    assert report["timeline_diagnostics"]["overlaps"] == 0
+    assert report["timeline_diagnostics"]["wait_mismatches"] == 0
+    assert report["walking_geometry_diagnostics"]["counts"]["shortest_distance_mismatches"] == 1
+    assert report["transit"] == worker_report["transit"]
 
 
 def test_nonzero_worker_cannot_pass_with_an_otherwise_valid_report(tmp_path, monkeypatch, completed_report):
@@ -645,13 +710,26 @@ def test_cli_json_has_distinct_status_codes_without_native_output(monkeypatch, c
 
 
 def test_cli_passes_explicit_adapter_choice_to_inspection(monkeypatch, capsys):
-    def inspect(jar, work_root, *, isolate_legs):
+    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry):
         assert isolate_legs is True
+        assert check_walking_geometry is False
         return {"status": "blocked", "problems": ["Synthetic prerequisite failure."]}
 
     monkeypatch.setattr(m, "inspect_smoke", inspect)
     assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary",
                    "--isolate-itinerary-legs", "--json"]) == 2
+    assert json.loads(capsys.readouterr().out)["status"] == "blocked"
+
+
+def test_cli_passes_independent_geometry_choice_to_inspection(monkeypatch, capsys):
+    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry):
+        assert isolate_legs is True
+        assert check_walking_geometry is True
+        return {"status": "blocked", "problems": ["Synthetic prerequisite failure."]}
+
+    monkeypatch.setattr(m, "inspect_smoke", inspect)
+    assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary", "--isolate-itinerary-legs",
+                   "--check-walking-geometry", "--json"]) == 2
     assert json.loads(capsys.readouterr().out)["status"] == "blocked"
 
 
@@ -668,7 +746,8 @@ def test_fresh_help_uses_only_stdlib_and_does_not_write_checkout(tmp_path):
     checkout = tmp_path / "checkout"
     scripts = checkout / "scripts"
     scripts.mkdir(parents=True)
-    for name in ("run_routing_smoke_test.py", "check_routing_runtime.py", "routing_smoke_fixture.py", "routing_leg_isolation.py"):
+    for name in ("run_routing_smoke_test.py", "check_routing_runtime.py", "routing_smoke_fixture.py",
+                 "routing_leg_isolation.py", "routing_walk_geometry.py"):
         shutil.copyfile(SCRIPT.parent / name, scripts / name)
     before = {path.relative_to(checkout): path.read_bytes() for path in checkout.rglob("*") if path.is_file()}
     runner = """
