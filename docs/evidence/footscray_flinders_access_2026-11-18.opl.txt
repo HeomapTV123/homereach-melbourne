@@ -1,0 +1,29 @@
+n314476055 v6 dV c0 t2014-06-30T09:08:19Z i0 u T x144.9015865 y-37.8021392
+n591431015 v4 dV c0 t2025-11-19T12:05:46Z i0 u T x144.9674303 y-37.8179923
+n591431019 v2 dV c0 t2020-03-05T09:23:41Z i0 u T x144.9671961 y-37.8177265
+n655123860 v3 dV c0 t2025-06-05T07:08:32Z i0 u T x144.902128 y-37.801729
+n1964021911 v5 dV c0 t2025-08-07T02:01:02Z i0 u T x144.9671222 y-37.8180761
+n2311217158 v5 dV c0 t2025-10-31T06:15:44Z i0 u Tbarrier=bollard,bollard=removable,foot=yes,maxwidth:physical=1.7,motor_vehicle=no,source:maxwidth:physical=ARCore x144.9018732 y-37.8019695
+n2382446612 v7 dV c0 t2025-06-05T07:08:32Z i0 u T x144.9019295 y-37.801826
+n2492542323 v2 dV c0 t2016-01-18T12:39:47Z i0 u T x144.9023125 y-37.8016904
+n2492542335 v4 dV c0 t2022-01-18T08:27:50Z i0 u T x144.9022488 y-37.8016075
+n2492542338 v4 dV c0 t2023-09-16T08:54:15Z i0 u T x144.9024193 y-37.8017587
+n3953464542 v4 dV c0 t2026-06-03T09:46:04Z i0 u Tentrance=main x144.9023785 y-37.8017339
+n3953464544 v3 dV c0 t2026-06-03T09:46:04Z i0 u Tentrance=main x144.9022831 y-37.8016355
+n4714436860 v1 dV c0 t2017-03-03T03:51:48Z i0 u T x144.9671399 y-37.8178449
+n6738695240 v4 dV c0 t2025-05-20T04:50:19Z i0 u Tbarrier=turnstile,entrance=yes,level=0,name=Myki%20%Turnstile x144.9673242 y-37.8180211
+n6738750072 v2 dV c0 t2020-03-02T13:21:25Z i0 u Tbarrier=turnstile,entrance=yes,level=0,name=Myki%20%Turnstile x144.9671097 y-37.81792
+n13055350565 v1 dV c0 t2025-08-07T02:01:02Z i0 u T x144.9670922 y-37.8180042
+n13055350566 v1 dV c0 t2025-08-07T02:01:02Z i0 u T x144.9670802 y-37.8179703
+n13055350568 v1 dV c0 t2025-08-07T02:01:02Z i0 u T x144.9671094 y-37.8180456
+n13293687371 v3 dV c0 t2025-11-19T12:05:46Z i0 u Tbicycle=yes,name=Flinders%20%Street,railway=subway_entrance,ref=1,wheelchair=yes x144.9671793 y-37.8177598
+n13316343402 v1 dV c0 t2025-11-19T12:05:46Z i0 u Tbicycle=yes,name=Flinders%20%Street,railway=subway_entrance,ref=1,wheelchair=yes x144.9673833 y-37.8180051
+n13728939500 v1 dV c0 t2026-04-14T04:28:05Z i0 u T x144.9016347 y-37.8021617
+n13728950701 v1 dV c0 t2026-04-14T04:28:05Z i0 u T x144.9014273 y-37.8022876
+w28615601 v12 dV c0 t2026-07-16T03:11:46Z i0 u Tcycleway:both=no,foot=yes,highway=unclassified,lane_markings=no,lit=yes,name=McNab%20%Avenue,sidewalk:left=no,sidewalk:right=separate,surface=asphalt Nn314476055,n2311217158
+w46325052 v12 dV c0 t2025-11-19T12:05:46Z i0 u Tfoot=yes,handrail=yes,highway=steps,incline=up,name=Flinders%20%Street%20%entrance,ramp=no,step_count=9,surface=paving_stones,tactile_paving=yes,width=5%20%m Nn591431019,n13293687371
+w51335781 v10 dV c0 t2026-06-26T12:53:29Z i0 u Taccess=yes,handrail=yes,highway=steps,incline=down,level=1;0,lit=yes,ramp=no,surface=concrete,tactile_paving=yes Nn2382446612,n655123860
+w185737824 v15 dV c0 t2025-11-19T12:05:46Z i0 u Thighway=corridor,indoor=yes,lit=24/7,tunnel=building_passage Nn1964021911,n13055350568,n13055350565,n13055350566,n6738750072,n4714436860,n13293687371
+w241661387 v6 dV c0 t2025-10-31T06:13:06Z i0 u Thighway=footway,lit=24/7,surface=concrete Nn2492542335,n3953464544,n2492542323,n3953464542,n2492542338
+w1420649145 v2 dV c0 t2025-11-19T12:05:46Z i0 u Thighway=corridor,indoor=yes,tunnel=building_passage Nn1964021911,n6738695240,n13316343402,n591431015
+w1499210381 v2 dV c0 t2026-07-16T03:12:08Z i0 u Tbridge=yes,highway=footway,layer=1,surface=asphalt Nn13728950701,n13728939500
