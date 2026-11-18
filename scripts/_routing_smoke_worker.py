@@ -1,6 +1,8 @@
 """Internal fresh-process worker for the fixed synthetic routing experiment."""
 from __future__ import annotations
 
+import argparse
+from contextlib import nullcontext
 import datetime
 import json
 import os
@@ -14,6 +16,7 @@ import warnings
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import routing_smoke_fixture as fixture
+from routing_leg_isolation import isolate_cached_legs
 import run_routing_smoke_test as smoke
 
 
@@ -39,7 +42,7 @@ def records(frame) -> list[dict]:
     return result
 
 
-def execute(work: Path, report: dict) -> None:
+def execute(work: Path, report: dict, *, isolate_legs: bool = False) -> None:
     jar = work / smoke.ENGINE_NAME
     smoke.check_engine(jar)
     if smoke.sha256(work / "streets.osm.pbf") != smoke.STREET_SHA256:
@@ -82,34 +85,42 @@ def execute(work: Path, report: dict) -> None:
     network = r5py.TransportNetwork(work / "streets.osm.pbf", [work / "synthetic.gtfs.zip"], allow_errors=False)
     origins = gpd.GeoDataFrame({"id": [smoke.ORIGIN_ID]}, geometry=[Point(*fixture.ORIGIN)], crs="EPSG:4326")
     destinations = gpd.GeoDataFrame({"id": [smoke.DESTINATION_ID]}, geometry=[Point(*fixture.DESTINATION)], crs="EPSG:4326")
-    for label, departure, mode in (
-        ("walking", fixture.ACTIVE_DEPARTURE, r5py.TransportMode.WALK),
-        ("transit", fixture.ACTIVE_DEPARTURE, r5py.TransportMode.BUS),
-        ("no_service", fixture.INACTIVE_DEPARTURE, r5py.TransportMode.BUS),
-    ):
-        report["queries_attempted"] += 1
-        frame = r5py.DetailedItineraries(
-            network, origins=origins, destinations=destinations,
-            departure=departure, departure_time_window=datetime.timedelta(minutes=10),
-            transport_modes=[mode], access_modes=[r5py.TransportMode.WALK],
-            egress_modes=[r5py.TransportMode.WALK], snap_to_network=False,
-            max_time=datetime.timedelta(minutes=90), max_time_walking=datetime.timedelta(minutes=90),
-            max_public_transport_rides=1, speed_walking=3.6,
-        )
-        report[label] = records(frame)
+    context = isolate_cached_legs(r5py) if isolate_legs else nullcontext()
+    with context as adapter:
+        if isolate_legs:
+            report["itinerary_adapter"] = adapter
+        for label, departure, mode in (
+            ("walking", fixture.ACTIVE_DEPARTURE, r5py.TransportMode.WALK),
+            ("transit", fixture.ACTIVE_DEPARTURE, r5py.TransportMode.BUS),
+            ("no_service", fixture.INACTIVE_DEPARTURE, r5py.TransportMode.BUS),
+        ):
+            report["queries_attempted"] += 1
+            frame = r5py.DetailedItineraries(
+                network, origins=origins, destinations=destinations,
+                departure=departure, departure_time_window=datetime.timedelta(minutes=10),
+                transport_modes=[mode], access_modes=[r5py.TransportMode.WALK],
+                egress_modes=[r5py.TransportMode.WALK], snap_to_network=False,
+                max_time=datetime.timedelta(minutes=90), max_time_walking=datetime.timedelta(minutes=90),
+                max_public_transport_rides=1, speed_walking=3.6,
+            )
+            report[label] = records(frame)
     report["status"] = "completed"
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--isolate-itinerary-legs", action="store_true")
+    args = parser.parse_args()
     work = Path.cwd().resolve()
     # Parent creates the run directory; direct invocation from a checkout is invalid.
     if not work.name.startswith("homereach-smoke-") or work.is_relative_to(smoke.ROOT):
         raise ValueError("Run this worker through run_routing_smoke_test.py.")
-    report = {"status": "failed", "queries_attempted": 0}
+    report = {"status": "failed", "queries_attempted": 0,
+              "itinerary_mode": "isolated_legs" if args.isolate_itinerary_legs else "upstream"}
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         try:
-            execute(work, report)
+            execute(work, report, isolate_legs=args.isolate_itinerary_legs)
         except Exception as error:
             report["error"] = f"{type(error).__name__}: {error}"
             traceback.print_exc()

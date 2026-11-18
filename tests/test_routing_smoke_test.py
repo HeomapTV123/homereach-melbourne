@@ -46,6 +46,7 @@ def completed_report():
                end_stop_id="SMOKE_EAST", wait_time_seconds=289)
     return {
         "status": "completed", "queries_attempted": 3,
+        "itinerary_mode": "upstream",
         "engine": {
             "sha256": m.ENGINE_SHA256, "r5py": "1.1.7", "java_version": "21.0.10",
             "jvm_started": True, "max_heap_bytes": 1_073_741_824,
@@ -54,7 +55,7 @@ def completed_report():
         },
         "walking": [leg("WALK", "2026-10-13T08:00:00", 2646, 2646)],
         "transit": [leg("WALK", "2026-10-13T08:00:00", 11, 11), bus,
-                    leg("WALK", "2026-10-13T08:10:00", 11, 11, segment=2)],
+                    leg("WALK", "2026-10-13T08:11:00", 11, 11, segment=2)],
         "no_service": [],
     }
 
@@ -106,6 +107,86 @@ def test_captured_native_engine_failure_cannot_be_relabelled_as_a_pass():
     report["status"] = "completed"
     assert any("chronology failed" in problem for problem in m.validate_outcomes(report))
     assert any("waits failed" in problem for problem in m.validate_outcomes(report))
+    assert m.single_bus_diagnostics(report["transit"]) == {
+        "options_checked": 60, "unexpected_leg_sequences": 0,
+        "egress_padding_mismatches": 53,
+    }
+
+
+def test_late_shared_egress_is_rejected_even_without_an_overlap(completed_report):
+    completed_report["transit"][2]["departure_time"] = "2026-10-13T08:21:00"
+    assert m.timeline_diagnostics(completed_report["transit"])["overlaps"] == 0
+    assert m.timeline_diagnostics(completed_report["transit"])["wait_mismatches"] == 0
+    assert m.single_bus_diagnostics(completed_report["transit"])["egress_padding_mismatches"] == 1
+    assert any("egress failed" in problem for problem in m.validate_outcomes(completed_report))
+
+
+@pytest.mark.parametrize("missing_segment", [0, 1, 2])
+def test_every_option_requires_access_bus_and_egress(completed_report, missing_segment):
+    incomplete = deepcopy(completed_report["transit"])
+    for row in incomplete:
+        row["option"] = 1
+    del incomplete[missing_segment]
+    completed_report["transit"].extend(incomplete)
+    assert any("complete WALK, BUS, WALK" in problem for problem in m.validate_outcomes(completed_report))
+
+
+@pytest.mark.parametrize("egress,expected", [
+    ("2026-10-13T08:10:59", 0), ("2026-10-13T08:11:01", 0),
+    ("2026-10-13T08:10:58", 1), ("2026-10-13T08:11:02", 1),
+])
+def test_pinned_egress_padding_allows_only_one_second_rounding(completed_report, egress, expected):
+    completed_report["transit"][2]["departure_time"] = egress
+    before = deepcopy(completed_report["transit"])
+    assert m.single_bus_diagnostics(before)["egress_padding_mismatches"] == expected
+    assert before == completed_report["transit"]
+
+
+def isolated_report(completed_report):
+    report = deepcopy(completed_report)
+    report["itinerary_mode"] = "isolated_legs"
+    report["itinerary_adapter"] = {
+        "name": m.leg_isolation.ADAPTER_NAME, "version": 1, "r5py": "1.1.7",
+        "source_sha256": dict(m.leg_isolation.SOURCE_SHA256),
+        "applied": True, "restored": True, "legs_snapshotted": 3,
+    }
+    return report
+
+
+@pytest.mark.parametrize("change", ["wrong_mode", "missing_audit", "wrong_source", "not_applied",
+                                   "not_restored", "no_snapshots", "boolean_count",
+                                   "numeric_applied", "numeric_restored", "boolean_version"])
+def test_requested_adapter_requires_a_complete_audit(completed_report, change):
+    report = isolated_report(completed_report)
+    assert m.validate_integration(report, True) == []
+    if change == "wrong_mode":
+        report["itinerary_mode"] = "upstream"
+    elif change == "missing_audit":
+        del report["itinerary_adapter"]
+    elif change == "wrong_source":
+        report["itinerary_adapter"]["source_sha256"]["r5/trip_leg.py"] = "0" * 64
+    elif change == "not_applied":
+        report["itinerary_adapter"]["applied"] = False
+    elif change == "not_restored":
+        report["itinerary_adapter"]["restored"] = False
+    elif change == "no_snapshots":
+        report["itinerary_adapter"]["legs_snapshotted"] = 0
+    elif change == "numeric_applied":
+        report["itinerary_adapter"]["applied"] = 1
+    elif change == "numeric_restored":
+        report["itinerary_adapter"]["restored"] = 1
+    elif change == "boolean_version":
+        report["itinerary_adapter"]["version"] = True
+    else:
+        report["itinerary_adapter"]["legs_snapshotted"] = True
+    assert m.validate_integration(report, True)
+
+
+def test_upstream_mode_refuses_an_undeclared_adapter(completed_report):
+    report = isolated_report(completed_report)
+    report["itinerary_mode"] = "upstream"
+    assert m.validate_integration(completed_report, False) == []
+    assert m.validate_integration(report, False)
 
 
 @pytest.mark.parametrize("change,expected", [
@@ -290,7 +371,8 @@ def test_staging_keeps_inputs_unchanged_and_removes_generated_workspace(fake_inp
     originals = {jar: jar.read_bytes(), street: street.read_bytes()}
     visited = []
 
-    def worker(work):
+    def worker(work, *, isolate_legs):
+        assert isolate_legs is False
         visited.append(work)
         assert work.parent == work_root
         assert work.name.startswith("homereach-smoke-")
@@ -377,6 +459,34 @@ def test_worker_uses_fixed_interpreter_script_and_bounded_subprocess(tmp_path, m
     assert options["env"]["PYTHONDONTWRITEBYTECODE"] == "1"
     assert options["env"]["TMPDIR"] == str(tmp_path / "tmp")
     assert "worker_log_tail" not in report
+
+
+def test_explicit_adapter_flag_reaches_worker_and_raw_rows_are_kept(tmp_path, monkeypatch, completed_report):
+    worker_report = isolated_report(completed_report)
+
+    def run(command, **_):
+        assert command == [sys.executable, "-I", "-B", str(m.WORKER), "--isolate-itinerary-legs"]
+        (tmp_path / "worker-result.json").write_text(json.dumps(worker_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, isolate_legs=True)
+    assert report["status"] == "passed"
+    assert report["transit"] == worker_report["transit"]
+    assert report["single_bus_diagnostics"] == {
+        "options_checked": 1, "unexpected_leg_sequences": 0, "egress_padding_mismatches": 0,
+    }
+
+
+def test_requested_adapter_cannot_silently_run_upstream(tmp_path, monkeypatch, completed_report):
+    def run(command, **_):
+        (tmp_path / "worker-result.json").write_text(json.dumps(completed_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, isolate_legs=True)
+    assert report["status"] == "failed"
+    assert any("integration mode" in problem for problem in report["problems"])
 
 
 def test_nonzero_worker_cannot_pass_with_an_otherwise_valid_report(tmp_path, monkeypatch, completed_report):
@@ -527,18 +637,38 @@ print(json.dumps({'denied': denied}))
 def test_cli_json_has_distinct_status_codes_without_native_output(monkeypatch, capsys, status, code):
     report = {"status": status, "problems": [], "synthetic_fixture_only": True,
               "melbourne_journeys_computed": 0, "temporary_workspace_removed": status == "passed"}
-    monkeypatch.setattr(m, "inspect_smoke", lambda *_: report)
+    monkeypatch.setattr(m, "inspect_smoke", lambda *_, **__: report)
     assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary", "--json"]) == code
     captured = capsys.readouterr()
     assert json.loads(captured.out) == report
     assert captured.err == ""
 
 
+def test_cli_passes_explicit_adapter_choice_to_inspection(monkeypatch, capsys):
+    def inspect(jar, work_root, *, isolate_legs):
+        assert isolate_legs is True
+        return {"status": "blocked", "problems": ["Synthetic prerequisite failure."]}
+
+    monkeypatch.setattr(m, "inspect_smoke", inspect)
+    assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary",
+                   "--isolate-itinerary-legs", "--json"]) == 2
+    assert json.loads(capsys.readouterr().out)["status"] == "blocked"
+
+
+@pytest.mark.parametrize("malformed_audit", [None, 7, []])
+def test_cli_can_display_a_failed_malformed_adapter_report(monkeypatch, capsys, malformed_audit):
+    report = {"status": "failed", "problems": ["Malformed adapter audit."],
+              "temporary_workspace_removed": True, "itinerary_adapter": malformed_audit}
+    monkeypatch.setattr(m, "inspect_smoke", lambda *_, **__: report)
+    assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary"]) == 1
+    assert "Malformed adapter audit." in capsys.readouterr().out
+
+
 def test_fresh_help_uses_only_stdlib_and_does_not_write_checkout(tmp_path):
     checkout = tmp_path / "checkout"
     scripts = checkout / "scripts"
     scripts.mkdir(parents=True)
-    for name in ("run_routing_smoke_test.py", "check_routing_runtime.py", "routing_smoke_fixture.py"):
+    for name in ("run_routing_smoke_test.py", "check_routing_runtime.py", "routing_smoke_fixture.py", "routing_leg_isolation.py"):
         shutil.copyfile(SCRIPT.parent / name, scripts / name)
     before = {path.relative_to(checkout): path.read_bytes() for path in checkout.rglob("*") if path.is_file()}
     runner = """

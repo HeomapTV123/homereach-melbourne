@@ -18,6 +18,7 @@ if __name__ == "__main__":
     sys.dont_write_bytecode = True
 
 import check_routing_runtime as runtime
+import routing_leg_isolation as leg_isolation
 import routing_smoke_fixture as fixture
 
 
@@ -149,6 +150,54 @@ def timeline_diagnostics(rows: list) -> dict:
     return result
 
 
+def single_bus_diagnostics(rows: list) -> dict:
+    """Check this fixture's complete legs and pinned r5py's 60-second egress pad."""
+    groups = {}
+    result = {"options_checked": 0, "unexpected_leg_sequences": 0,
+              "egress_padding_mismatches": 0}
+    for row in rows:
+        if not isinstance(row, dict) or type(row.get("option")) is not int:
+            result["unexpected_leg_sequences"] += 1
+            continue
+        groups.setdefault(row["option"], []).append(row)
+    result["options_checked"] = len(groups)
+    for legs in groups.values():
+        try:
+            legs = sorted(legs, key=lambda row: row["segment"])
+            if [(row["segment"], row["mode"]) for row in legs] != [(0, "WALK"), (1, "BUS"), (2, "WALK")]:
+                raise ValueError("Expected one access walk, bus ride and egress walk.")
+            bus_arrival = datetime.datetime.fromisoformat(legs[1]["departure_time"]) + datetime.timedelta(
+                seconds=legs[1]["travel_time_seconds"])
+            egress_departure = datetime.datetime.fromisoformat(legs[2]["departure_time"])
+            if not math.isclose((egress_departure - bus_arrival).total_seconds(), 60.0,
+                                rel_tol=0.0, abs_tol=1.0):
+                result["egress_padding_mismatches"] += 1
+        except (KeyError, TypeError, ValueError, OverflowError):
+            result["unexpected_leg_sequences"] += 1
+    return result
+
+
+def validate_integration(report: dict, isolate_legs: bool) -> list[str]:
+    """Require the requested integration mode and completed adapter audit."""
+    expected_mode = "isolated_legs" if isolate_legs else "upstream"
+    if report.get("itinerary_mode") != expected_mode:
+        return ["Worker did not report the requested itinerary integration mode."]
+    adapter = report.get("itinerary_adapter")
+    if not isolate_legs:
+        return [] if adapter is None else ["Unexpected adapter in the unmodified upstream run."]
+    if not isinstance(adapter, dict):
+        return ["The requested itinerary adapter did not report its verification."]
+    expected = {"name": leg_isolation.ADAPTER_NAME, "version": leg_isolation.ADAPTER_VERSION,
+                "r5py": leg_isolation.SUPPORTED_R5PY, "source_sha256": leg_isolation.SOURCE_SHA256}
+    if any(adapter.get(key) != value for key, value in expected.items()):
+        return ["The itinerary adapter identity, source checks or restoration were not verified."]
+    if type(adapter.get("version")) is not int or adapter.get("applied") is not True or adapter.get("restored") is not True:
+        return ["The itinerary adapter identity, source checks or restoration were not verified."]
+    if type(adapter.get("legs_snapshotted")) is not int or adapter["legs_snapshotted"] <= 0:
+        return ["The itinerary adapter did not snapshot any legs."]
+    return []
+
+
 def validate_outcomes(report: dict) -> list[str]:
     """Check actual legs, not merely a finite matrix value or successful import."""
     problems = []
@@ -214,6 +263,11 @@ def validate_outcomes(report: dict) -> list[str]:
         problems.append(f"Itinerary waits failed: {timeline['wait_mismatches']} BUS waits disagree with the preceding arrival.")
     if timeline["malformed_options"]:
         problems.append("Some itinerary options have malformed timestamps, durations or segment sequences.")
+    single_bus = single_bus_diagnostics(transit)
+    if single_bus["unexpected_leg_sequences"]:
+        problems.append("Some synthetic options lack the complete WALK, BUS, WALK leg sequence.")
+    if single_bus["egress_padding_mismatches"]:
+        problems.append(f"Itinerary egress failed: {single_bus['egress_padding_mismatches']} final walks differ from their own BUS arrival plus the pinned 60-second padding.")
     return sorted(set(problems))
 
 
@@ -230,12 +284,15 @@ def read_log_tail(path: Path) -> str:
         return handle.read().decode("utf-8", errors="replace")
 
 
-def run_worker(work: Path) -> dict:
+def run_worker(work: Path, *, isolate_legs: bool = False) -> dict:
     log_path = work / "worker.log"
+    command = [sys.executable, "-I", "-B", str(WORKER)]
+    if isolate_legs:
+        command.append("--isolate-itinerary-legs")
     with log_path.open("wb") as log:
         try:
             completed = subprocess.run(
-                [sys.executable, "-I", "-B", str(WORKER)], cwd=work, env=child_environment(work),
+                command, cwd=work, env=child_environment(work),
                 stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
                 shell=False, check=False, timeout=TIMEOUT_SECONDS,
             )
@@ -251,8 +308,10 @@ def run_worker(work: Path) -> dict:
         if not isinstance(report, dict):
             raise ValueError("Worker report must be a JSON object.")
         problems = validate_outcomes(report)
+        problems.extend(validate_integration(report, isolate_legs))
         if isinstance(report.get("transit"), list):
             report["timeline_diagnostics"] = timeline_diagnostics(report["transit"])
+            report["single_bus_diagnostics"] = single_bus_diagnostics(report["transit"])
     except (OSError, ValueError, TypeError, KeyError) as error:
         report = {}
         problems = [f"Cannot validate worker report: {error}"]
@@ -264,9 +323,10 @@ def run_worker(work: Path) -> dict:
     return report
 
 
-def inspect_smoke(jar: Path, work_root: Path) -> dict:
+def inspect_smoke(jar: Path, work_root: Path, *, isolate_legs: bool = False) -> dict:
     started = time.monotonic()
-    report = {"schema_version": 1, "status": "blocked", "synthetic_fixture_only": True,
+    report = {"schema_version": 2, "status": "blocked", "synthetic_fixture_only": True,
+              "requested_itinerary_mode": "isolated_legs" if isolate_legs else "upstream",
               "real_project_datasets_read": 0, "melbourne_journeys_computed": 0,
               "temporary_workspace_removed": False, "problems": [],
               "started_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()}
@@ -299,7 +359,7 @@ def inspect_smoke(jar: Path, work_root: Path) -> dict:
                 "streets.osm.pbf": sha256(work / "streets.osm.pbf"),
                 "synthetic.gtfs.zip": sha256(work / "synthetic.gtfs.zip"),
             }
-            report.update(run_worker(work))
+            report.update(run_worker(work, isolate_legs=isolate_legs))
         report["temporary_workspace_removed"] = True
     except (OSError, ValueError) as error:
         report.update(status="failed", problems=[str(error)])
@@ -312,18 +372,27 @@ def main(argv=None) -> int:
     parser.add_argument("--jar", required=True, type=Path, help="Existing reviewed local R5 JAR; never downloaded here.")
     parser.add_argument("--work-root", required=True, type=Path, help="Existing temporary parent directory outside checkout.")
     parser.add_argument("--json", action="store_true", help="Print the complete machine-readable result.")
+    parser.add_argument("--isolate-itinerary-legs", action="store_true",
+                        help="Opt in to the source-verified r5py 1.1.7 leg-copy adapter for this worker only.")
     args = parser.parse_args(argv)
-    report = inspect_smoke(args.jar, args.work_root)
+    report = inspect_smoke(args.jar, args.work_root, isolate_legs=args.isolate_itinerary_legs)
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False))
     else:
         print("SYNTHETIC ROUTING ENGINE SMOKE TEST:", report["status"].upper())
         print("Fictional street grid and timetable | No Melbourne travel-time claim")
+        print("Itinerary integration:", report.get("requested_itinerary_mode", "unreported"))
         if isinstance(report.get("engine"), dict):
             print("Embedded JVM started:", report["engine"].get("jvm_started", False))
             print("Synthetic queries attempted:", report.get("queries_attempted", 0))
         if "timeline_diagnostics" in report:
             print("Timeline diagnostic:", json.dumps(report["timeline_diagnostics"]))
+        if "single_bus_diagnostics" in report:
+            print("Single-bus diagnostic:", json.dumps(report["single_bus_diagnostics"]))
+        if isinstance(report.get("itinerary_adapter"), dict):
+            adapter = report["itinerary_adapter"]
+            print("Leg snapshots:", adapter.get("legs_snapshotted", 0),
+                  "| Original method restored:", adapter.get("restored", False))
         for problem in report["problems"]:
             print("Detail:", problem)
         if report["status"] == "passed":

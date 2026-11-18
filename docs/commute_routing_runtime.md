@@ -2,7 +2,7 @@
 
 ## Checkpoint and selected environment
 
-The first development pair is recorded in [the station-access review](commute_station_access_review.md) and [its provisional reference manifest](../config/routing_development_references.json). The separate Windows environment now passes the prerequisite inventory. The [synthetic engine experiment](commute_routing_smoke_test.md) subsequently ran on Linux and exposed inconsistent itinerary timestamps; resolving that failure is the next routing checkpoint.
+The first development pair is recorded in [the station-access review](commute_station_access_review.md) and [its provisional reference manifest](../config/routing_development_references.json). The separate Windows environment passes the prerequisite inventory and has run the synthetic engine. The unmodified r5py integration produced the same itinerary-timing failure on Windows and Linux. A scoped leg-copy adapter subsequently passed the unchanged fixture on Linux; [verifying that adapter on Windows](commute_routing_smoke_test.md#verify-the-adapter-on-windows-using-the-existing-environment) is the immediate checkpoint. The existing Windows environment does not need rebuilding.
 
 [`scripts/check_routing_runtime.py`](../scripts/check_routing_runtime.py) inventories the Python interpreter that actually runs it, installed distribution metadata, and the output of a bounded `java -version` subprocess. It uses only Python's standard library. It does not import r5py, JPype or GIS packages, start an embedded JVM, download the engine, load project datasets, or compute journeys.
 
@@ -35,7 +35,9 @@ The maintainer supplied a completed environment-creation log and a successful pr
 | rasterio | 1.5.2 |
 | Java | OpenJDK 21.0.10, Zulu21.48+17-CA, build 21.0.10+7-LTS |
 
-The checker reported `ROUTING RUNTIME PREREQUISITES: PASSED`, with zero project datasets read, project files written or journeys computed. This verifies the reported interpreter, package metadata and Java version probe. Package/native-library imports, the embedded JVM, R5 compatibility, network loading and routing remain for [the controlled synthetic smoke test](commute_routing_smoke_test.md).
+The checker reported `ROUTING RUNTIME PREREQUISITES: PASSED`, with zero project datasets read, project files written or journeys computed. This inventory verifies the reported interpreter, package metadata and Java version probe; package/native-library imports, the embedded JVM, network loading and routing belong to [the separate synthetic smoke test](commute_routing_smoke_test.md).
+
+The maintainer then supplied the Windows smoke-test output from checkout `c03cb4a`. The embedded JVM started and all three synthetic queries ran, but the returned 60 transit alternatives contained 23 chronology overlaps and 59 bus-wait mismatches. The command exited with code 1, removed its temporary workspace, read no real project datasets and computed no Melbourne journeys. This matches the earlier Linux upstream result. The later Linux result with the explicit `--isolate-itinerary-legs` adapter passed; its Windows result remains pending. These distinct checkpoints should not be conflated with a successful real-data routing pilot.
 
 The same supplied session reported 8.98 GiB free on C: and 238.34 GiB on D: after archive cleanup, and `tempfile.gettempdir()` returned `D:\homereach-conda\tmp`. However, `conda config --show pkgs_dirs` still listed three C: cache locations after the D: override command. **The environment and temporary-directory relocation were observed; package-cache relocation was not confirmed.** The cause of that discrepancy is unresolved. Preserve the working environment; use the scoped checks below before future package installations or updates.
 
@@ -175,13 +177,13 @@ If creation fails, retain the full log and inspect its specific error. An existi
 
 [r5py's configuration documentation](https://r5py.readthedocs.io/stable/user-guide/user-manual/configuration.html) describes an automatic compatible-R5 download when no custom classpath is supplied, first-run configuration templates, and a default JVM heap setting of 80% of memory. Therefore importing r5py is a separate execution step from reading its installed metadata.
 
-The separate [synthetic runner](../scripts/run_routing_smoke_test.py) now uses an explicitly identified local R5 JAR, validates its fingerprint before import, bounds the JVM heap, and uses temporary working/cache directories. It writes temporary engine artifacts and has a different contract from this inventory. Its captured Linux execution exercised the engine but failed detailed-itinerary chronology checks; a Windows engine execution remains unverified.
+The separate [synthetic runner](../scripts/run_routing_smoke_test.py) uses an explicitly identified local R5 JAR, validates its fingerprint before import, bounds the JVM heap, and uses temporary working/cache directories. It writes temporary engine artifacts and has a different contract from this inventory. Its unmodified upstream execution failed detailed-itinerary chronology checks on both Linux and Windows. The explicit leg-isolation adapter passed on Linux with the same fixture; see [its scope, evidence and Windows command](commute_routing_smoke_test.md). The adapter makes a temporary in-memory change in the fresh worker and does not alter the installed environment.
 
 ## Validation and next stage
 
 The inventory's focused regression tests cover missing packages, unreadable metadata, version parsing, different baselines, environment mismatch, missing/failing/timed-out Java, executable discovery, and a fresh interpreter that denies imports of all routing/GIS packages. They run without installing r5py or launching an R5 engine.
 
-At the initial 18 November 2026 implementation checkpoint (`fc4a693`), all 30 inventory cases passed and the full Linux suite passed **697 tests in 47.38 seconds**, with no skips. A real inventory of that test environment correctly reported missing r5py, JPype1 and rasterio while detecting OpenJDK 21.0.13. That initial run exercises the blocked path. The later successful Windows inventory is recorded above, and the subsequent engine experiment has its own evidence and failed chronology result.
+At the initial 18 November 2026 implementation checkpoint (`fc4a693`), all 30 inventory cases passed and the full Linux suite passed **697 tests in 47.38 seconds**, with no skips. A real inventory of that test environment correctly reported missing r5py, JPype1 and rasterio while detecting OpenJDK 21.0.13. That initial run exercises the blocked path. The later successful Windows inventory is recorded above. The subsequent engine experiments have separate evidence for the upstream failure and the scoped adapter's Linux pass.
 
 Run them in the existing test environment:
 
@@ -189,8 +191,8 @@ Run them in the existing test environment:
 conda run --no-capture-output -n homereach python -m pytest -o "addopts=" -q tests/test_routing_runtime.py
 ```
 
-The engine diagnostic builds a tiny fictional connected street network and daytime GTFS fixture, checks a walking result and actual transit segments, and exercises a no-service date. These behaviors ran on Linux, but the returned itinerary chronology did not pass. See [the smoke-test checkpoint and raw evidence](commute_routing_smoke_test.md) for the defect and the next resolution step, independently of Melbourne's station-access questions.
+The engine diagnostic builds a tiny fictional connected street network and daytime GTFS fixture, checks a walking result and actual transit segments, and exercises a no-service date. Its preserved upstream failure and the adapter's Linux pass are documented in [the smoke-test checkpoint and raw evidence](commute_routing_smoke_test.md). The next run uses the already installed Windows environment and reviewed JAR with `--isolate-itinerary-legs`; it requires no package upgrade or replacement download. Successful fixture timing remains separate from Melbourne's station-access questions.
 
-Before a Melbourne development itinerary, validate the complete GTFS timing/references and the chosen complete street-network input. In particular, [r5py's advanced-use documentation](https://r5py.readthedocs.io/stable/user-guide/user-manual/advanced-use.html) reports a limitation for GTFS times beyond `24:00:00`; the current small-table preflight does not evaluate that issue. Do not silently transform the frozen timetable to accommodate an engine.
+Before a Melbourne development itinerary, independently check the synthetic walking geometry/length question recorded in the smoke-test guide, then validate the complete GTFS timing/references and the chosen complete street-network input. In particular, [r5py's advanced-use documentation](https://r5py.readthedocs.io/stable/user-guide/user-manual/advanced-use.html) reports a limitation for GTFS times beyond `24:00:00`; the current small-table preflight does not evaluate that issue. Do not silently transform the frozen timetable to accommodate an engine.
 
 The first explicitly labelled development itinerary will then provide evidence about coordinate linkage, walking access, paid barriers, platform access and timing. The provisional coordinates can support that investigation without treating those itinerary-dependent properties as already proved.
