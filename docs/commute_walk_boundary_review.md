@@ -18,9 +18,43 @@ The maintainer's run with the script changes committed as `9d02105` reported the
 | Box Hill | 8317160002 | 215,100 | 894767007 |
 | Dandenong | 13901273237 | 537 | 1413163523 |
 
-There were **394,496 ways**, of which **161,371 were included** and **233,125 excluded**. These are previously reported observations, not new results from the boundary diagnostic. No real-data boundary report has yet been recorded in this guide. The same unchanged derivative should reproduce this strict summary.
+There were **394,496 ways**, of which **161,371 were included** and **233,125 excluded**. The maintainer's subsequent boundary run on `c4e6b13`, received on 18 November 2026, reproduced all of these counts and component sizes. The submitted terminal transcript does not include an execution timestamp; the date here records receipt of the evidence.
 
 The Dandenong node is the alternative candidate on level-0 footway `1413163523`. It is different from node `13830533511`, which was examined earlier on level-1 indoor corridors. The configuration still leaves Flinders Street unresolved.
+
+## Completed real-data boundary checkpoint
+
+The [recorded report](evidence/routing_walk_boundaries_c4e6b13.json) contains the JSON parsed from the maintainer's submitted output, without the terminal prompts or account paths. It is execution evidence supplied by the maintainer, not a separate rerun in CI. Parsing the report confirmed that relationship totals and displayed/omitted counts reconcile, example IDs are unique, the complete Footscray reason counts match its examples, and all examples touching other strict components are present for both locations.
+
+| Boundary result | Footscray | Dandenong |
+| --- | ---: | ---: |
+| Strict component nodes | 17 | 537 |
+| Excluded ways touching the component | 6 | 98 |
+| Touch another strict component | 2 | 10 |
+| Extend only to references outside the strict graph | 4 | 85 |
+| Stay within the same strict component | 0 | 3 |
+| Examples displayed / omitted | 6 / 0 | 20 / 78 |
+
+**Footscray:** bridge footway `1499210381` is excluded solely by `layer_outside_ground` (`layer=1`). It shares node `13728939500` with the 17-node component and node `13728950701` with a 37,081-node strict component. This identifies a mapped structural connection removed by the ground-level policy; it does not certify a public station-to-platform route. McNab Avenue way `28615601` is excluded solely by its `unclassified` highway type despite `foot=yes`, and touches another two-node component. The other four excluded ways involve stairs or elevated footways.
+
+**Dandenong:** 92 of the 98 ways fail the strict highway-type rule; this category includes streets, stairs and other types. All ten ways touching another strict component are included in the displayed sample, so a larger output is not needed to inspect those ten. Cycleway `198584581` is explicitly tagged `foot=no`; structural node sharing is not a reason to admit that way into a pedestrian model. The 78 omitted examples are still represented in the aggregate counts, but their individual tags have not been reviewed.
+
+The submitted run reported matching way streams, an unchanged input, zero project-file writes and zero journeys. Its fingerprints are:
+
+| Item | Observed value |
+| --- | --- |
+| Diagnostic highway PBF size | 23,893,427 bytes |
+| Diagnostic highway PBF SHA-256 | `6d5247f5632a229fae87a1048c2c3675461b98b48d75163bece8513329259361` |
+| Way-stream SHA-256 | `834fdb12e18d4f3632744a8f5938a6cb9c0c1476e828bb272fc5f035f0468931` |
+| Recorded JSON SHA-256 (repository UTF-8/LF bytes) | `024ae50d1d169cbbab566ba4913b23869e5dba39daec38d543821a75173c42ab` |
+
+The JSON hash identifies the repository bytes; a Windows checkout that converts LF to CRLF can have a different text-file hash. This does not alter the binary PBF fingerprint reported by the audit.
+
+The report retains `expected_derived_sha256: null`. This establishes an observed derivative fingerprint and within-run consistency, not an independently verified derivation chain. The highway-only derivative is diagnostic input; it is not approved as the routing engine's street-network source.
+
+**Decision:** the strict-component boundary diagnostic checkpoint is complete. Preserve its policy and stop expanding this audit. Continue with one reviewed Footscray-to-Flinders Street pilot, starting with the [station access evidence review](commute_station_access_review.md), then validate the isolated routing runtime before computing a Melbourne itinerary. The original four candidate origins remain available for later expansion.
+
+The recorded OSM tags and identifiers contain data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), available under the [Open Database License](https://opendatacommons.org/licenses/odbl/1-0/), from the previously documented Geofabrik snapshot.
 
 ## Run on Windows
 
@@ -69,7 +103,7 @@ Synthetic regression cases exercise exact node sharing, multiple exclusion reaso
 
 The result can identify a particular excluded way as a structural explanation worth inspecting. It does not establish that the way is a usable walking connection: stairs, indoor levels, private access, or an area boundary can touch multiple strict components. It does not snap coordinates, follow chains of excluded ways, add edges, inspect node barriers, model vertical transfers, or compute journeys.
 
-Next, review the reported tags and exact shared nodes for Footscray and Dandenong. Keep public entrance identity and routing-engine validation as separate decisions. Flinders Street remains unresolved until its station identity and public access are supported by appropriate evidence. The original OSM snapshot is dated 1 October 2026, while the GTFS service date is 13 October 2026; this diagnostic does not erase that difference.
+The completed boundary review above now supplies those concrete examples. Public entrance identity and routing-engine validation remain separate decisions. Flinders Street remains unresolved until its station identity and public access are supported by appropriate evidence. The original OSM snapshot is dated 1 October 2026, while the GTFS service date is 13 October 2026; this diagnostic does not erase that difference.
 
 ## Format references
 
