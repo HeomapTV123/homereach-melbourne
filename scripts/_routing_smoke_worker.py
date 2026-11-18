@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import argparse
-from contextlib import nullcontext
+from contextlib import ExitStack
 import datetime
 import json
 import os
@@ -48,7 +48,9 @@ def records(frame, *, include_geometry: bool = False) -> list[dict]:
 
 
 def execute(work: Path, report: dict, *, isolate_legs: bool = False,
-            check_walking_geometry: bool = False) -> None:
+            check_walking_geometry: bool = False, correct_walking_paths: bool = False) -> None:
+    if correct_walking_paths and not (isolate_legs and check_walking_geometry):
+        raise ValueError("Walking correction requires leg isolation and independent geometry checks.")
     jar = work / smoke.ENGINE_NAME
     smoke.check_engine(jar)
     if smoke.sha256(work / "streets.osm.pbf") != smoke.STREET_SHA256:
@@ -91,12 +93,21 @@ def execute(work: Path, report: dict, *, isolate_legs: bool = False,
     network = r5py.TransportNetwork(work / "streets.osm.pbf", [work / "synthetic.gtfs.zip"], allow_errors=False)
     origins = gpd.GeoDataFrame({"id": [smoke.ORIGIN_ID]}, geometry=[Point(*fixture.ORIGIN)], crs="EPSG:4326")
     destinations = gpd.GeoDataFrame({"id": [smoke.DESTINATION_ID]}, geometry=[Point(*fixture.DESTINATION)], crs="EPSG:4326")
-    context = isolate_cached_legs(r5py) if isolate_legs else nullcontext()
     if check_walking_geometry:
         report["geometry_crs"] = {}
-    with context as adapter:
+    with ExitStack() as contexts:
         if isolate_legs:
-            report["itinerary_adapter"] = adapter
+            report["itinerary_adapter"] = contexts.enter_context(isolate_cached_legs(r5py))
+        if correct_walking_paths:
+            from routing_street_geometry_correction import correct_street_geometries
+            from routing_street_index_correction import correct_fixture_index
+            from routing_street_origin_correction import correct_street_origins
+
+            correction = {}
+            report["walking_correction"] = correction
+            correction["index"] = contexts.enter_context(correct_fixture_index(network, fixture))
+            correction["origin"] = contexts.enter_context(correct_street_origins(r5py, work, jar))
+            correction["geometry"] = contexts.enter_context(correct_street_geometries(r5py))
         for label, departure, mode in (
             ("walking", fixture.ACTIVE_DEPARTURE, r5py.TransportMode.WALK),
             ("transit", fixture.ACTIVE_DEPARTURE, r5py.TransportMode.BUS),
@@ -109,7 +120,7 @@ def execute(work: Path, report: dict, *, isolate_legs: bool = False,
                 transport_modes=[mode], access_modes=[r5py.TransportMode.WALK],
                 egress_modes=[r5py.TransportMode.WALK], snap_to_network=False,
                 max_time=datetime.timedelta(minutes=90), max_time_walking=datetime.timedelta(minutes=90),
-                max_public_transport_rides=1, speed_walking=3.6,
+                max_public_transport_rides=1, speed_walking=smoke.WALK_SPEED_KMH,
             )
             report[label] = records(frame, include_geometry=check_walking_geometry)
             if check_walking_geometry:
@@ -121,6 +132,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--isolate-itinerary-legs", action="store_true")
     parser.add_argument("--check-walking-geometry", action="store_true")
+    parser.add_argument("--correct-walking-paths", action="store_true")
     args = parser.parse_args()
     work = Path.cwd().resolve()
     # Parent creates the run directory; direct invocation from a checkout is invalid.
@@ -132,7 +144,8 @@ def main() -> int:
         warnings.simplefilter("always")
         try:
             execute(work, report, isolate_legs=args.isolate_itinerary_legs,
-                    check_walking_geometry=args.check_walking_geometry)
+                    check_walking_geometry=args.check_walking_geometry,
+                    correct_walking_paths=args.correct_walking_paths)
         except Exception as error:
             report["error"] = f"{type(error).__name__}: {error}"
             traceback.print_exc()

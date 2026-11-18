@@ -371,9 +371,10 @@ def test_staging_keeps_inputs_unchanged_and_removes_generated_workspace(fake_inp
     originals = {jar: jar.read_bytes(), street: street.read_bytes()}
     visited = []
 
-    def worker(work, *, isolate_legs, check_walking_geometry):
+    def worker(work, *, isolate_legs, check_walking_geometry, correct_walking_paths):
         assert isolate_legs is False
         assert check_walking_geometry is False
+        assert correct_walking_paths is False
         visited.append(work)
         assert work.parent == work_root
         assert work.name.startswith("homereach-smoke-")
@@ -504,6 +505,126 @@ def geometric_report(completed_report):
         "type": "LineString", "coordinates": [[0.006, 0.018], [0.030, 0.018]],
     }
     return report
+
+
+def corrected_report(completed_report):
+    report = geometric_report(isolated_report(completed_report))
+    index_source = hashlib.sha256(Path(m.index_correction.__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    report["walking_correction"] = {
+        "index": {
+            "name": m.index_correction.ADAPTER_NAME, "version": 1,
+            "source_sha256": index_source, "engine_sha256": m.ENGINE_SHA256,
+            "fixture_xml_sha256": m.index_correction.FIXTURE_XML_SHA256,
+            "graph_sha256_before": "a" * 64, "graph_sha256_after": "a" * 64,
+            "street_pairs": 84, "connector_pairs": 2,
+            "linked_stop_vertices": {"SMOKE_WEST": 49, "SMOKE_EAST": 50},
+            "coverage_before": {"edge_points_checked": 420, "missing_edge_candidates": 322},
+            "coverage_after": {"edge_points_checked": 420, "missing_edge_candidates": 0},
+            "applied": True, "restored": True, "network_unchanged": True,
+        },
+        "origin": {
+            "name": m.origin_correction.ADAPTER_NAME, "version": 1, "r5py": "1.1.7",
+            "source_sha256": dict(m.origin_correction.SOURCE_SHA256),
+            "applied": True, "restored": True, "routers_created": 3,
+            "origins_initialized": 3, "reverse_states_rebuilt": 2, "states_registered": 3,
+            "helper_loader_closed": True,
+            "helper": {"java_source_sha256": m.origin_correction.JAVA_SOURCE_SHA256,
+                       "class_sha256": "b" * 64, "compiler_java_version": "21.0.10",
+                       "compiled_in_temporary_workspace": True, "original_jar_sha256": m.ENGINE_SHA256},
+        },
+        "geometry": {
+            "name": m.geometry_correction.ADAPTER_NAME, "version": 1, "r5py": "1.1.7",
+            "source_sha256": dict(m.geometry_correction.SOURCE_SHA256),
+            "applied": True, "restored": True, "segments_constructed": 3,
+            "native_costs_preserved": True,
+        },
+    }
+    return report
+
+
+@pytest.mark.parametrize("change", [
+    "missing_component", "wrong_name", "boolean_version", "numeric_applied", "not_restored",
+    "wrong_source", "wrong_helper_source", "different_compiler", "no_reverse_states",
+    "no_geometry", "changed_graph", "missing_index_candidate", "wrong_stop_link",
+    "wrong_index_source", "boolean_coverage", "geometry_costs_changed",
+])
+def test_walking_correction_requires_verified_used_and_restored_components(completed_report, change):
+    report = corrected_report(completed_report)
+    assert m.validate_walking_correction(report, True) == []
+    audit = report["walking_correction"]
+    if change == "missing_component":
+        del audit["index"]
+    elif change == "wrong_name":
+        audit["origin"]["name"] = "unreviewed"
+    elif change == "boolean_version":
+        audit["geometry"]["version"] = True
+    elif change == "numeric_applied":
+        audit["index"]["applied"] = 1
+    elif change == "not_restored":
+        audit["origin"]["restored"] = False
+    elif change == "wrong_source":
+        audit["origin"]["source_sha256"] = {}
+    elif change == "wrong_helper_source":
+        audit["origin"]["helper"]["java_source_sha256"] = "0" * 64
+    elif change == "different_compiler":
+        audit["origin"]["helper"]["compiler_java_version"] = "17.0.1"
+    elif change == "no_reverse_states":
+        audit["origin"]["reverse_states_rebuilt"] = 0
+    elif change == "no_geometry":
+        audit["geometry"]["segments_constructed"] = 0
+    elif change == "changed_graph":
+        audit["index"]["graph_sha256_after"] = "c" * 64
+    elif change == "missing_index_candidate":
+        audit["index"]["coverage_after"]["missing_edge_candidates"] = 1
+    elif change == "wrong_stop_link":
+        audit["index"]["linked_stop_vertices"]["SMOKE_EAST"] = 49
+    elif change == "wrong_index_source":
+        audit["index"]["source_sha256"] = "0" * 64
+    elif change == "boolean_coverage":
+        audit["index"]["coverage_after"]["missing_edge_candidates"] = False
+    elif change == "geometry_costs_changed":
+        audit["geometry"]["native_costs_preserved"] = False
+    assert m.validate_walking_correction(report, True)
+
+
+def test_baseline_run_rejects_an_undeclared_walking_correction(completed_report):
+    assert m.validate_walking_correction(completed_report, False) == []
+    assert m.validate_walking_correction(corrected_report(completed_report), False)
+
+
+def test_complete_corrected_run_requires_independent_paths_and_retains_raw_rows(tmp_path, monkeypatch, completed_report):
+    worker_report = corrected_report(completed_report)
+
+    def run(command, **_):
+        assert command[-3:] == ["--isolate-itinerary-legs", "--check-walking-geometry", "--correct-walking-paths"]
+        (tmp_path / "worker-result.json").write_text(json.dumps(worker_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, isolate_legs=True, check_walking_geometry=True, correct_walking_paths=True)
+    assert report["status"] == "passed"
+    assert report["walking_geometry_diagnostics"]["status"] == "passed"
+    assert report["walking_duration_diagnostics"]["duration_mismatches"] == 0
+    assert report["walking_duration_diagnostics"]["walking_legs_checked"] == 3
+    assert report["walking"] == worker_report["walking"]
+    assert report["transit"] == worker_report["transit"]
+
+
+def test_correct_geometry_and_distance_cannot_hide_wrong_walking_duration(tmp_path, monkeypatch, completed_report):
+    worker_report = corrected_report(completed_report)
+    worker_report["transit"][2]["travel_time_seconds"] = 678
+
+    def run(command, **_):
+        (tmp_path / "worker-result.json").write_text(json.dumps(worker_report), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(m.subprocess, "run", run)
+    report = m.run_worker(tmp_path, isolate_legs=True, check_walking_geometry=True, correct_walking_paths=True)
+    assert report["status"] == "failed"
+    assert report["walking_geometry_diagnostics"]["status"] == "passed"
+    assert report["timeline_diagnostics"]["overlaps"] == 0
+    assert report["walking_duration_diagnostics"]["duration_mismatches"] == 1
+    assert report["transit"] == worker_report["transit"]
 
 
 def test_geometry_flag_requests_coordinates_and_checks_analytic_paths(tmp_path, monkeypatch, completed_report):
@@ -710,9 +831,10 @@ def test_cli_json_has_distinct_status_codes_without_native_output(monkeypatch, c
 
 
 def test_cli_passes_explicit_adapter_choice_to_inspection(monkeypatch, capsys):
-    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry):
+    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry, correct_walking_paths):
         assert isolate_legs is True
         assert check_walking_geometry is False
+        assert correct_walking_paths is False
         return {"status": "blocked", "problems": ["Synthetic prerequisite failure."]}
 
     monkeypatch.setattr(m, "inspect_smoke", inspect)
@@ -722,14 +844,39 @@ def test_cli_passes_explicit_adapter_choice_to_inspection(monkeypatch, capsys):
 
 
 def test_cli_passes_independent_geometry_choice_to_inspection(monkeypatch, capsys):
-    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry):
+    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry, correct_walking_paths):
         assert isolate_legs is True
         assert check_walking_geometry is True
+        assert correct_walking_paths is False
         return {"status": "blocked", "problems": ["Synthetic prerequisite failure."]}
 
     monkeypatch.setattr(m, "inspect_smoke", inspect)
     assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary", "--isolate-itinerary-legs",
                    "--check-walking-geometry", "--json"]) == 2
+    assert json.loads(capsys.readouterr().out)["status"] == "blocked"
+
+
+@pytest.mark.parametrize("isolate,geometry", [(False, False), (True, False), (False, True)])
+def test_walking_correction_requires_all_independent_checks_before_runtime_access(monkeypatch, isolate, geometry):
+    def unexpected_inventory():
+        raise AssertionError("An invalid correction request must not reach runtime inspection.")
+
+    monkeypatch.setattr(m.runtime, "inspect_runtime", unexpected_inventory)
+    result = m.inspect_smoke(Path("unused.jar"), Path("unused-work"), isolate_legs=isolate,
+                             check_walking_geometry=geometry, correct_walking_paths=True)
+    assert result["status"] == "blocked"
+    assert result["walking_correction_requested"] is True
+    assert "requires --isolate-itinerary-legs and --check-walking-geometry" in result["problems"][0]
+
+
+def test_cli_passes_explicit_walking_correction_with_all_checks(monkeypatch, capsys):
+    def inspect(jar, work_root, *, isolate_legs, check_walking_geometry, correct_walking_paths):
+        assert (isolate_legs, check_walking_geometry, correct_walking_paths) == (True, True, True)
+        return {"status": "blocked", "problems": ["Synthetic prerequisite failure."]}
+
+    monkeypatch.setattr(m, "inspect_smoke", inspect)
+    assert m.main(["--jar", "reviewed.jar", "--work-root", "temporary", "--isolate-itinerary-legs",
+                   "--check-walking-geometry", "--correct-walking-paths", "--json"]) == 2
     assert json.loads(capsys.readouterr().out)["status"] == "blocked"
 
 
@@ -747,7 +894,8 @@ def test_fresh_help_uses_only_stdlib_and_does_not_write_checkout(tmp_path):
     scripts = checkout / "scripts"
     scripts.mkdir(parents=True)
     for name in ("run_routing_smoke_test.py", "check_routing_runtime.py", "routing_smoke_fixture.py",
-                 "routing_leg_isolation.py", "routing_walk_geometry.py"):
+                 "routing_leg_isolation.py", "routing_walk_geometry.py", "routing_street_geometry_correction.py",
+                 "routing_street_index_correction.py", "routing_street_origin_correction.py"):
         shutil.copyfile(SCRIPT.parent / name, scripts / name)
     before = {path.relative_to(checkout): path.read_bytes() for path in checkout.rglob("*") if path.is_file()}
     runner = """

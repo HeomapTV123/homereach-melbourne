@@ -2,9 +2,11 @@
 
 ## Checkpoint
 
+This document preserves the geometry-baseline investigation at `1be659f`. The maintainer's [subsequent Windows output](evidence/routing_geometry_windows_checkpoint_2026-11-18.json) confirms the Linux failure counts below, with zero timing failures and exit code 1. A separate [experimental walking correction](commute_routing_walking_correction.md) now passes the unchanged fixture's timing, geometry, distance and duration checks on Linux. That new mode remains unverified on Windows and is restricted to the reviewed synthetic fixture; the original failed reports and reference oracle are preserved.
+
 The maintainer's Windows run at `73543a8` passed the synthetic timing/integration checks with `--isolate-itinerary-legs`: 60 alternatives, no chronology, wait, sequence or egress-padding failures, 180 leg snapshots, restoration of the original method and exit code 0. The [Windows checkpoint](evidence/routing_smoke_windows_checkpoint_2026-11-18.json) records the supplied console evidence; it does not claim an independently captured Windows raw-leg report.
 
-The new optional `--check-walking-geometry` check tests additional requirements. **It fails on Linux while all previous timing checks continue to pass.** The engine returns walking lines that do not meet the requested endpoints, and the final walk has an excessive distance and duration. These are separate defects from the cached-leg timestamp problem addressed by the existing adapter.
+The optional `--check-walking-geometry` check tests additional requirements. **Its baseline fails on Linux and Windows while all previous timing checks continue to pass.** The engine returns walking lines that do not meet the requested endpoints, and the final walk has an excessive distance and duration. These are separate defects from the cached-leg timestamp problem addressed by the existing adapter.
 
 The [expanded native report](evidence/routing_walk_geometry_linux_2026-11-18.json) retains every raw leg, its GeoJSON geometry and CRS. All preexisting row fields, engine identity and fixture fingerprints match the earlier isolated passing report. The experiment uses the same fictional grid, timetable, coordinates and routing parameters. No Melbourne journey was computed.
 
@@ -26,7 +28,7 @@ These measurements come from the expanded report. The returned egress line goes 
 
 The checker uses longitude/latitude in explicit `EPSG:4326`, a spherical radius of 6,371,000 metres, a two-metre endpoint/path allowance, and a length allowance of `max(2 metres, 0.002 × reference distance)`. Either LineString orientation is accepted and recorded, so reversing an otherwise correct coordinate sequence is not itself a failure. It checks endpoint locations, deviation from the reference path, geometry length against reported distance, and reported distance against the independently established path. It also rejects missing or malformed geometry, unsupported CRS and incomplete leg sequences.
 
-Those tolerances are explicit fixture requirements; they are not a general claim about real-world routing precision. The direct walk's approximately 9.650-metre distance discrepancy exceeds its 5.293-metre allowance. Its cost discrepancy has not been traced as completely as the final walk's reverse-search defect, so they are not assumed to have one cause.
+Those tolerances are explicit fixture requirements; they are not a general claim about real-world routing precision. The direct walk's approximately 9.650-metre distance discrepancy exceeds its 5.293-metre allowance. At this diagnostic checkpoint its cost discrepancy had not been traced as completely as the final walk's reverse-search defect. The subsequent [index investigation](commute_routing_walking_correction.md#1-rebuild-the-fixed-fixtures-derived-street-index) identifies the containing edge's omission from the derived spatial index as a separate cause.
 
 | Expanded diagnostic | Observed count |
 | --- | ---: |
@@ -67,13 +69,13 @@ Correct native costs alone would not correct those lines. Conversely, clipping t
 
 A read-only review on 18 November 2026 found `v1.1.7` as the latest published r5py release. Its [classpath source](https://github.com/r5py/r5py/blob/v1.1.7/src/r5py/util/classpath.py) pins the reviewed `v7.5.1-r5py` JAR. The same vertex-only reverse swap remains in the checked [R5 `v7.5.2-r5py` source](https://github.com/r5py/r5/blob/v7.5.2-r5py/src/main/java/com/conveyal/r5/streets/StreetRouter.java) and [R5 `v7.6-r5py` source](https://github.com/r5py/r5/blob/v7.6-r5py/src/main/java/com/conveyal/r5/streets/StreetRouter.java). The native-state evidence records those checks and release metadata. No newer runtime was installed or executed, and a version change has not been demonstrated to fix this case.
 
-The next engineering milestone is a reviewed correction for reverse-search initialization and partial-edge geometry, followed by the unchanged fixture with both independent timing and geometry checks enabled. The correction must keep each vertex, directional back-edge, endpoint distance and time cost associated correctly. Regression coverage needs forward/reverse cases, both endpoint directions, partial-edge accounting and directional walking behavior. Geometry must begin and end at the actual requested locations and agree with the route's costs within the declared tolerances.
+The repair criteria are to keep each vertex, directional back-edge, endpoint distance and time cost associated correctly, and to construct geometry from the selected partial edges. Regression coverage needs forward/reverse cases, both endpoint directions, partial-edge accounting and directional walking behavior. Geometry must begin and end at the actual requested locations and agree with the route's costs within the declared tolerances. The subsequent [bounded correction](commute_routing_walking_correction.md) meets the unchanged fixture's checks on Linux, adds an independent walking-duration assertion, and retains all returned rows.
 
-This checkpoint implements the diagnostic and records the cause; it does not include a replacement engine or a production routing repair. A successful correction must retain complete raw engine output for validation and keep all existing assertions. Melbourne input compatibility, full GTFS stop-time references, public station access, transfers and accessibility require their own validation afterward.
+This diagnostic checkpoint records the cause and does not replace the engine. The later correction is also not a production routing repair: its index guard permits only the reviewed fixture, its origin override applies only to the Python planner's router calls, and complete route enumeration remains unvalidated. Melbourne input compatibility, full GTFS stop-time references, public station access, transfers and accessibility require their own validation afterward.
 
-## Optional Windows reproduction
+## Verified Windows baseline reproduction
 
-The supplied Windows timing result is complete. The Linux geometry report and native states already establish the next defect; a Windows reproduction is optional platform evidence. Use the existing environment, local JAR and temporary directory in Anaconda Prompt / CMD:
+The supplied Windows timing and geometry-baseline results are complete. The following command reproduces the failing geometry baseline with the existing environment, local JAR and temporary directory in Anaconda Prompt / CMD:
 
 ```bat
 cd /d "D:\My project\homereach_melbourne"
@@ -85,9 +87,9 @@ echo Exit code: %ERRORLEVEL%
 
 For this baseline, expect the expanded test to report **`FAILED` and exit code 1**, with zero timing/sequence failures and the geometry/distance problems shown above. Conda may append its generic failed-command message. This is an intentional detection of the unresolved engine behavior; it does not call for rebuilding the working environment. Omitting `--check-walking-geometry` retains the already verified timing-only mode.
 
-To retain full evidence, add `--json` and redirect standard output to a new report outside the checkout. No changes to the engine, fixture or environment are needed to reproduce this diagnostic.
+To retain full evidence, add `--json` and redirect standard output to a new report outside the checkout. No changes to the engine, fixture or environment are needed to reproduce this diagnostic. For the next corrected Windows experiment, retain both flags and add `--correct-walking-paths` as documented in [the correction guide](commute_routing_walking_correction.md#next-windows-check).
 
-## Verification of this change
+## Verification of the diagnostic checkpoint
 
 The local full regression suite passed **879 tests in 46.98 seconds**, with no skips. The new oracle tests run without Java or geospatial libraries and exercise correct reference results, the observed whole-edge geometries, malformed or incomplete rows, source/reference changes and output immutability. Runner tests check flag forwarding and rejection of missing or inconsistent geometry while preserving the previous timing checks.
 

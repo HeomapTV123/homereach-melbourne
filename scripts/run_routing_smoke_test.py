@@ -20,6 +20,9 @@ if __name__ == "__main__":
 import check_routing_runtime as runtime
 import routing_leg_isolation as leg_isolation
 import routing_smoke_fixture as fixture
+import routing_street_geometry_correction as geometry_correction
+import routing_street_index_correction as index_correction
+import routing_street_origin_correction as origin_correction
 import routing_walk_geometry as walk_geometry
 
 
@@ -35,6 +38,7 @@ HEAP_BYTES = 1_073_741_824
 TIMEOUT_SECONDS = 180
 ORIGIN_ID = "synthetic_origin"
 DESTINATION_ID = "synthetic_destination"
+WALK_SPEED_KMH = 3.6
 
 
 def sha256(path: Path) -> str:
@@ -199,6 +203,109 @@ def validate_integration(report: dict, isolate_legs: bool) -> list[str]:
     return []
 
 
+def _digest(value) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
+
+
+def validate_walking_correction(report: dict, requested: bool) -> list[str]:
+    """Require all correction scopes, source checks, use and restoration."""
+    correction = report.get("walking_correction")
+    if not requested:
+        return [] if correction is None else ["Unexpected walking correction in the baseline run."]
+    if not isinstance(correction, dict) or set(correction) != {"index", "origin", "geometry"}:
+        return ["The requested walking correction did not report all three component audits."]
+    problems = []
+    for key, module in (("index", index_correction), ("origin", origin_correction),
+                        ("geometry", geometry_correction)):
+        audit = correction[key]
+        if (not isinstance(audit, dict) or audit.get("name") != module.ADAPTER_NAME
+                or type(audit.get("version")) is not int or audit["version"] != module.ADAPTER_VERSION
+                or audit.get("applied") is not True or audit.get("restored") is not True):
+            problems.append(f"Walking {key} correction identity, application or restoration was not verified.")
+            continue
+        if key != "index":
+            if audit.get("r5py") != "1.1.7" or audit.get("source_sha256") != module.SOURCE_SHA256:
+                problems.append(f"Walking {key} correction runtime sources were not verified.")
+
+    index, origin, geometry = (correction[k] for k in ("index", "origin", "geometry"))
+    if isinstance(index, dict):
+        expected_source = hashlib.sha256(Path(index_correction.__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        if (index.get("source_sha256") != expected_source or index.get("engine_sha256") != ENGINE_SHA256
+                or index.get("fixture_xml_sha256") != index_correction.FIXTURE_XML_SHA256
+                or index.get("network_unchanged") is not True
+                or not _digest(index.get("graph_sha256_before"))
+                or index.get("graph_sha256_after") != index.get("graph_sha256_before")
+                or type(index.get("street_pairs")) is not int or index["street_pairs"] != 84
+                or type(index.get("connector_pairs")) is not int or index["connector_pairs"] != 2):
+            problems.append("The corrected index did not verify the unchanged reviewed fixture graph.")
+        before, after = index.get("coverage_before"), index.get("coverage_after")
+        for label, coverage in (("before", before), ("after", after)):
+            if (not isinstance(coverage, dict) or type(coverage.get("edge_points_checked")) is not int
+                    or coverage["edge_points_checked"] != 420
+                    or type(coverage.get("missing_edge_candidates")) is not int
+                    or not 0 <= coverage["missing_edge_candidates"] <= 420):
+                problems.append(f"Spatial-index {label} coverage was not completely observed.")
+        if not isinstance(after, dict) or after.get("missing_edge_candidates") != 0:
+            problems.append("The corrected spatial index still omits a required edge candidate.")
+        links = index.get("linked_stop_vertices")
+        if (not isinstance(links, dict) or set(links) != {fixture.START_STOP_ID, fixture.END_STOP_ID}
+                or any(type(v) is not int or not 0 <= v < 51 for v in links.values())
+                or len(set(links.values())) != 2):
+            problems.append("The existing fixture transit-stop links were not verified.")
+    if isinstance(origin, dict):
+        counters = ("routers_created", "origins_initialized", "reverse_states_rebuilt", "states_registered")
+        if (any(type(origin.get(k)) is not int or origin[k] <= 0 for k in counters)
+                or origin.get("helper_loader_closed") is not True):
+            problems.append("The native origin correction did not observe complete use of its search contexts.")
+        helper = origin.get("helper")
+        engine = report.get("engine")
+        java_version = engine.get("java_version") if isinstance(engine, dict) else None
+        if (not isinstance(helper, dict) or helper.get("java_source_sha256") != origin_correction.JAVA_SOURCE_SHA256
+                or not _digest(helper.get("class_sha256"))
+                or helper.get("compiled_in_temporary_workspace") is not True
+                or helper.get("original_jar_sha256") != ENGINE_SHA256
+                or helper.get("compiler_java_version") != java_version):
+            problems.append("The native origin helper source, compilation or engine identity was not verified.")
+    if isinstance(geometry, dict):
+        if (type(geometry.get("segments_constructed")) is not int or geometry["segments_constructed"] <= 0
+                or geometry.get("native_costs_preserved") is not True):
+            problems.append("Walking geometry construction did not retain observed native costs.")
+    return problems
+
+
+def walking_duration_diagnostics(report: dict) -> dict:
+    """Independently check corrected fixture walks at the fixed walking speed."""
+    result = {"walking_legs_checked": 0, "duration_mismatches": 0, "malformed_legs": 0,
+              "speed_kmh": WALK_SPEED_KMH, "problems": []}
+    references, _ = walk_geometry.reference_walks()
+    speed_mps = WALK_SPEED_KMH / 3.6
+    for query in ("walking", "transit"):
+        rows = report.get(query)
+        if not isinstance(rows, list):
+            result["malformed_legs"] += 1
+            result["problems"].append(f"{query}: missing rows for the walking-duration check.")
+            continue
+        for row in rows:
+            if not isinstance(row, dict) or row.get("mode") != "WALK":
+                continue
+            role = "direct" if query == "walking" and row.get("segment") == 0 else None
+            if query == "transit":
+                role = {0: "access", 2: "egress"}.get(row.get("segment"))
+            duration = row.get("travel_time_seconds")
+            if role is None or not positive_number(duration):
+                result["malformed_legs"] += 1
+                result["problems"].append("A walking duration or segment is malformed.")
+                continue
+            result["walking_legs_checked"] += 1
+            reference = references[role]
+            expected_seconds = reference["distance_m"] / speed_mps
+            allowance_seconds = reference["length_tolerance_m"] / speed_mps
+            if abs(duration - expected_seconds) > allowance_seconds:
+                result["duration_mismatches"] += 1
+                result["problems"].append(f"{query} option {row.get('option')} segment {row.get('segment')}: walking duration disagrees with the reference path at the fixed speed.")
+    return result
+
+
 def validate_outcomes(report: dict) -> list[str]:
     """Check actual legs, not merely a finite matrix value or successful import."""
     problems = []
@@ -285,13 +392,16 @@ def read_log_tail(path: Path) -> str:
         return handle.read().decode("utf-8", errors="replace")
 
 
-def run_worker(work: Path, *, isolate_legs: bool = False, check_walking_geometry: bool = False) -> dict:
+def run_worker(work: Path, *, isolate_legs: bool = False, check_walking_geometry: bool = False,
+               correct_walking_paths: bool = False) -> dict:
     log_path = work / "worker.log"
     command = [sys.executable, "-I", "-B", str(WORKER)]
     if isolate_legs:
         command.append("--isolate-itinerary-legs")
     if check_walking_geometry:
         command.append("--check-walking-geometry")
+    if correct_walking_paths:
+        command.append("--correct-walking-paths")
     with log_path.open("wb") as log:
         try:
             completed = subprocess.run(
@@ -312,12 +422,16 @@ def run_worker(work: Path, *, isolate_legs: bool = False, check_walking_geometry
             raise ValueError("Worker report must be a JSON object.")
         problems = validate_outcomes(report)
         problems.extend(validate_integration(report, isolate_legs))
+        problems.extend(validate_walking_correction(report, correct_walking_paths))
         if isinstance(report.get("transit"), list):
             report["timeline_diagnostics"] = timeline_diagnostics(report["transit"])
             report["single_bus_diagnostics"] = single_bus_diagnostics(report["transit"])
         if check_walking_geometry:
             report["walking_geometry_diagnostics"] = walk_geometry.audit_walk_geometry(report)
             problems.extend(report["walking_geometry_diagnostics"]["problems"])
+        if correct_walking_paths:
+            report["walking_duration_diagnostics"] = walking_duration_diagnostics(report)
+            problems.extend(report["walking_duration_diagnostics"]["problems"])
     except (OSError, ValueError, TypeError, KeyError) as error:
         report = {}
         problems = [f"Cannot validate worker report: {error}"]
@@ -330,14 +444,18 @@ def run_worker(work: Path, *, isolate_legs: bool = False, check_walking_geometry
 
 
 def inspect_smoke(jar: Path, work_root: Path, *, isolate_legs: bool = False,
-                  check_walking_geometry: bool = False) -> dict:
+                  check_walking_geometry: bool = False, correct_walking_paths: bool = False) -> dict:
     started = time.monotonic()
-    report = {"schema_version": 3, "status": "blocked", "synthetic_fixture_only": True,
+    report = {"schema_version": 4, "status": "blocked", "synthetic_fixture_only": True,
               "requested_itinerary_mode": "isolated_legs" if isolate_legs else "upstream",
               "walking_geometry_requested": check_walking_geometry,
+              "walking_correction_requested": correct_walking_paths,
               "real_project_datasets_read": 0, "melbourne_journeys_computed": 0,
               "temporary_workspace_removed": False, "problems": [],
               "started_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()}
+    if correct_walking_paths and not (isolate_legs and check_walking_geometry):
+        report["problems"] = ["Walking correction requires --isolate-itinerary-legs and --check-walking-geometry."]
+        return report
     inventory = runtime.inspect_runtime()
     report["runtime_inventory"] = inventory
     if inventory["blockers"]:
@@ -368,7 +486,8 @@ def inspect_smoke(jar: Path, work_root: Path, *, isolate_legs: bool = False,
                 "synthetic.gtfs.zip": sha256(work / "synthetic.gtfs.zip"),
             }
             report.update(run_worker(work, isolate_legs=isolate_legs,
-                                     check_walking_geometry=check_walking_geometry))
+                                     check_walking_geometry=check_walking_geometry,
+                                     correct_walking_paths=correct_walking_paths))
         report["temporary_workspace_removed"] = True
     except (OSError, ValueError) as error:
         report.update(status="failed", problems=[str(error)])
@@ -385,9 +504,12 @@ def main(argv=None) -> int:
                         help="Opt in to the source-verified r5py 1.1.7 leg-copy adapter for this worker only.")
     parser.add_argument("--check-walking-geometry", action="store_true",
                         help="Check returned walking coordinates and distances against the fixed street grid.")
+    parser.add_argument("--correct-walking-paths", action="store_true",
+                        help="Opt in to the guarded experimental walking correction; requires leg isolation and geometry checks.")
     args = parser.parse_args(argv)
     report = inspect_smoke(args.jar, args.work_root, isolate_legs=args.isolate_itinerary_legs,
-                           check_walking_geometry=args.check_walking_geometry)
+                           check_walking_geometry=args.check_walking_geometry,
+                           correct_walking_paths=args.correct_walking_paths)
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False))
     else:
@@ -395,6 +517,7 @@ def main(argv=None) -> int:
         print("Fictional street grid and timetable | No Melbourne travel-time claim")
         print("Itinerary integration:", report.get("requested_itinerary_mode", "unreported"))
         print("Walking geometry check:", "requested" if report.get("walking_geometry_requested") else "not requested")
+        print("Walking correction:", "requested" if report.get("walking_correction_requested") else "not requested")
         if isinstance(report.get("engine"), dict):
             print("Embedded JVM started:", report["engine"].get("jvm_started", False))
             print("Synthetic queries attempted:", report.get("queries_attempted", 0))
@@ -413,6 +536,13 @@ def main(argv=None) -> int:
                 shown.add(role)
                 print("Walk reference:", role, "| reported metres:", observation.get("reported_distance_m"),
                       "| reference metres:", round(observation["reference_distance_m"], 3))
+        if isinstance(report.get("walking_duration_diagnostics"), dict):
+            diagnostic = report["walking_duration_diagnostics"]
+            print("Walking duration diagnostic:", json.dumps({k: v for k, v in diagnostic.items() if k != "problems"}))
+        if isinstance(report.get("walking_correction"), dict):
+            restored = {key: value.get("restored", False) for key, value in report["walking_correction"].items()
+                        if isinstance(value, dict)}
+            print("Walking correction scopes restored:", json.dumps(restored))
         if isinstance(report.get("itinerary_adapter"), dict):
             adapter = report["itinerary_adapter"]
             print("Leg snapshots:", adapter.get("legs_snapshotted", 0),

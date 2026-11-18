@@ -1,12 +1,16 @@
 # Synthetic routing engine smoke test
 
-## Checkpoint — Windows timing passes; walking accuracy check fails
+## Checkpoint — corrected walking experiment passes on Linux
+
+The explicit `--correct-walking-paths` mode now passes the unchanged synthetic fixture's independent timing, walking geometry, distance and duration checks on Linux. It requires both `--isolate-itinerary-legs` and `--check-walking-geometry`. The [corrected walking report](evidence/routing_walk_correction_linux_2026-11-18.json) preserves 53 transit alternatives and 107 walking legs with zero enabled failures, successful restoration of every temporary correction and workspace cleanup. The [correction guide](commute_routing_walking_correction.md) explains the fixed-fixture index repair, native reverse-origin correction and partial-edge geometry construction. **This new mode still needs its Windows verification.** It cannot be applied to arbitrary Melbourne networks.
+
+The preceding timing-only and failing geometry baselines remain available without the new flag. Their evidence below is historical and retains the original observed counts.
 
 The explicit `--isolate-itinerary-legs` adapter passes the unchanged fixture's timing and integration checks on Linux and Windows. The [corrected Linux report](evidence/routing_smoke_isolated_linux_2026-11-18.json) records 60 complete transit alternatives, zero chronology overlaps, zero bus-wait mismatches and zero incorrect egress gaps. The adapter copied 180 legs, restored the original method, and the temporary workspace was removed. That run completed in 11.407 seconds.
 
 The maintainer's [supplied Windows checkpoint from `73543a8`](evidence/routing_smoke_windows_checkpoint_2026-11-18.json) records the same zero timing/sequence failure counts across 60 alternatives, 180 leg snapshots, restoration of the original method, three completed queries, successful cleanup and exit code 0. This is recorded console evidence; a complete Windows raw-leg JSON report was not supplied.
 
-**The next, independent walking-accuracy check fails on Linux with the timing adapter enabled.** The optional `--check-walking-geometry` mode captures raw GeoJSON and CRS and compares the walking legs with an oracle built from the committed OSM XML. The fixture, engine and query settings remain unchanged. Its [separate report](evidence/routing_walk_geometry_linux_2026-11-18.json) records 121 walking legs, 121 endpoint mismatches, 121 disagreements between geometry length and reported distance, 61 reported-shortest-distance mismatches and 121 paths extending outside the direct reference walking path, with zero malformed legs. Timing and single-bus checks still have zero failures. See the [walking-geometry investigation](commute_routing_geometry_check.md) for the confirmed reverse-search cost defect, the separate whole-edge geometry issue and the next engineering step. Melbourne routing remains pending these corrections and its own input/access checks.
+**The independent walking-accuracy baseline fails on Linux and Windows with only the timing adapter enabled.** The optional `--check-walking-geometry` mode captures raw GeoJSON and CRS and compares the walking legs with an oracle built from the committed OSM XML. The fixture, engine and query settings remain unchanged. Its [separate Linux report](evidence/routing_walk_geometry_linux_2026-11-18.json) records 121 walking legs, 121 endpoint mismatches, 121 disagreements between geometry length and reported distance, 61 reported-shortest-distance mismatches and 121 paths extending outside the direct reference walking path, with zero malformed legs. The [supplied Windows result at `1be659f`](evidence/routing_geometry_windows_checkpoint_2026-11-18.json) confirms those same failure counts, successful cleanup and exit code 1. Timing and single-bus checks still have zero failures. See the [walking-geometry investigation](commute_routing_geometry_check.md) for the native reverse-search cost and whole-edge geometry evidence, and the correction guide above for the subsequent bounded experiment.
 
 The original upstream behavior remains reproducible. The [earlier failed Linux report](evidence/routing_smoke_linux_2026-11-18.json) is preserved. The maintainer's supplied Windows terminal output from checkout `c03cb4a` also reports a started JVM, three attempted queries and the same 23 overlaps and 59 bus-wait mismatches across 60 alternatives. It exits with code 1 and reports successful temporary cleanup. This earlier run records the unmodified behavior; the later `73543a8` checkpoint records the timing adapter's success.
 
@@ -22,7 +26,7 @@ The fresh upstream rows exactly match the historical failure. The corrected run 
 | Incorrect egress padding | 53, checked from preserved raw legs | Not measured by that runner version | 0 | 0 |
 | Timing/integration result | Failed | Failed | Passed | Passed |
 
-These are observed counts, not required alternative counts. This table describes the historical timing/integration checks; those runs did not include the later geometry oracle. [`scripts/run_routing_smoke_test.py`](../scripts/run_routing_smoke_test.py) retains its default unmodified-upstream mode. The correction is an explicit, experimental integration option confined to its fresh worker. Both modes retain all returned leg rows and validate them without rewriting timestamps or dropping failing alternatives.
+These are observed counts, not required alternative counts. This table describes the historical timing/integration checks; those runs did not include the later geometry oracle. [`scripts/run_routing_smoke_test.py`](../scripts/run_routing_smoke_test.py) retains its default unmodified-upstream mode. Each correction is an explicit, experimental integration option confined to its fresh worker. All modes retain the returned leg rows and validate them without rewriting serialized timestamps or dropping failing alternatives. The latest walking correction changes the native search result to 53 alternatives; complete route enumeration and the reason for that changed alternative set remain unvalidated.
 
 ## Fixed experiment and execution limits
 
@@ -115,16 +119,18 @@ type "%HOMEREACH_SMOKE_REPORT%"
 
 The supplied isolated Windows run has zero overlaps, wait mismatches, malformed options, unexpected leg sequences and egress-padding mismatches and confirms restoration of the original method. Future runs still need their actual results checked. If an identity/source check or any itinerary assertion fails, retain the detailed report. Conda may append its generic failed-command message. A completed worker and three attempted queries alone are insufficient for a pass.
 
-### Optional Windows reproduction of the walking-geometry failure
+### Verified Windows geometry baseline and next correction check
 
-The Linux geometry and native-state evidence already establishes the next engineering problem. A Windows reproduction can add platform evidence; it is not required to diagnose the defect and does not require reinstalling the environment or changing the engine. After pulling this diagnostic update, add `--check-walking-geometry` to the existing command:
+The maintainer completed the following geometry-baseline command at `1be659f`. It confirmed the Linux failure counts while all timing checks passed. It remains available for reproducing that baseline:
 
 ```bat
 conda run --no-capture-output --prefix "D:\homereach-conda\envs\homereach-routing" python -B scripts/run_routing_smoke_test.py --jar "D:\homereach-conda\r5-engine\r5-v7.5.1-r5py-all.jar" --work-root "D:\homereach-conda\tmp" --isolate-itinerary-legs --check-walking-geometry
 echo Exit code: %ERRORLEVEL%
 ```
 
-For the current baseline, **`FAILED` with exit code 1 is expected from the stronger accuracy checks**, even while the timing and single-bus checks stay at zero failures. This result is evidence of the walking defects, not a reason to rebuild the working environment. Append `--json` and redirect to a new report file when retaining complete raw geometries and diagnostic details. The [geometry guide](commute_routing_geometry_check.md) explains the reference paths, tolerances and repair criteria.
+For this baseline, **`FAILED` with exit code 1 is expected from the accuracy checks**, even while the timing and single-bus checks stay at zero failures. Append `--json` and redirect to a new report file when retaining complete raw geometries and diagnostic details. The [geometry guide](commute_routing_geometry_check.md) explains the reference paths, tolerances and repair criteria.
+
+The next Windows check adds `--correct-walking-paths` to that command. The [correction guide](commute_routing_walking_correction.md#next-windows-check) provides the complete command and expected assertions. It uses the existing environment and JAR; the new mode additionally requires the embedded Java 21 compiler to build a reviewed temporary helper. Its Linux pass does not establish a Windows pass.
 
 ### Preparation for another machine
 
@@ -150,4 +156,6 @@ These tests cover fixture references/calendar semantics, guard/cleanup behavior,
 
 At the leg-isolation implementation checkpoint, before the walking-geometry extension, the local Linux full suite passed **832 tests in 47.24 seconds**, with no skips. Those native reports were captured before two final malformed-audit guards; revalidating their unchanged observations with that checkpoint's final parent code reproduced every saved problem and diagnostic. Those reports record the worker/adapter/fixture fingerprints at execution and the final validator fingerprint used for that recheck. This historical count does not describe the later geometry tests.
 
-The next engineering step is to correct the reverse-search starting cost and walking-geometry construction, then rerun the unchanged fixture with both the timing adapter and independent geometry checks. Before a Melbourne development itinerary, also validate the complete GTFS timing/references and street-network compatibility, then examine walking connections and provisional station access. The completed Windows timing checkpoint does not settle those remaining questions.
+At the subsequent walking-correction checkpoint, the full local suite passed **974 tests in 54.95 seconds**, with no skips. Its three new adapter regression modules cover the fixed-fixture index, native-origin wrapper and partial-edge geometry, while parent/worker regressions check mode prerequisites, audit restoration and independent walking durations. The separate corrected native Linux experiment passed in 13.383 seconds; ordinary CI does not run that engine experiment.
+
+The next platform check is the corrected Windows experiment. A production-capable routing integration still requires work beyond this fixture-bound adapter, followed by complete GTFS timing/reference and street-network validation. Walking connections, provisional station access, transfers and accessibility remain separate questions before a Melbourne development itinerary.
