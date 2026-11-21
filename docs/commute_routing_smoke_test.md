@@ -1,8 +1,8 @@
 # Synthetic routing engine smoke test
 
-## Checkpoint — corrected walking experiment passes on Linux
+## Checkpoint — corrected walking experiment passes on Linux and Windows
 
-The explicit `--correct-walking-paths` mode now passes the unchanged synthetic fixture's independent timing, walking geometry, distance and duration checks on Linux. It requires both `--isolate-itinerary-legs` and `--check-walking-geometry`. The [corrected walking report](evidence/routing_walk_correction_linux_2026-11-18.json) preserves 53 transit alternatives and 107 walking legs with zero enabled failures, successful restoration of every temporary correction and workspace cleanup. The [correction guide](commute_routing_walking_correction.md) explains the fixed-fixture index repair, native reverse-origin correction and partial-edge geometry construction. **This new mode still needs its Windows verification.** It cannot be applied to arbitrary Melbourne networks.
+The explicit `--correct-walking-paths` mode now passes the unchanged synthetic fixture's independent timing, walking geometry, distance and duration checks on Linux and in the maintainer's supplied Windows run. It requires both `--isolate-itinerary-legs` and `--check-walking-geometry`. The [corrected Linux report](evidence/routing_walk_correction_linux_2026-11-18.json) preserves 53 transit alternatives and 107 walking legs with zero enabled failures, successful restoration of every temporary correction and workspace cleanup. The [Windows checkpoint at `219f326`](evidence/routing_walk_correction_windows_checkpoint_2026-11-21.json), supplied on 21 November 2026, reports the same diagnostic counts and displayed distances, restoration, cleanup and exit code 0. It is console evidence, not a complete Windows raw-leg report. The [correction guide](commute_routing_walking_correction.md) explains the fixed-fixture index repair, native reverse-origin correction and partial-edge geometry construction. It cannot be applied to arbitrary Melbourne networks.
 
 The preceding timing-only and failing geometry baselines remain available without the new flag. Their evidence below is historical and retains the original observed counts.
 
@@ -26,7 +26,7 @@ The fresh upstream rows exactly match the historical failure. The corrected run 
 | Incorrect egress padding | 53, checked from preserved raw legs | Not measured by that runner version | 0 | 0 |
 | Timing/integration result | Failed | Failed | Passed | Passed |
 
-These are observed counts, not required alternative counts. This table describes the historical timing/integration checks; those runs did not include the later geometry oracle. [`scripts/run_routing_smoke_test.py`](../scripts/run_routing_smoke_test.py) retains its default unmodified-upstream mode. Each correction is an explicit, experimental integration option confined to its fresh worker. All modes retain the returned leg rows and validate them without rewriting serialized timestamps or dropping failing alternatives. The latest walking correction changes the native search result to 53 alternatives; complete route enumeration and the reason for that changed alternative set remain unvalidated.
+These are observed counts, not required alternative counts. This table describes the historical timing/integration checks; those runs did not include the later geometry oracle. [`scripts/run_routing_smoke_test.py`](../scripts/run_routing_smoke_test.py) retains its default unmodified-upstream mode. Each correction is an explicit, experimental integration option confined to its fresh worker. All modes retain the returned leg rows and validate them without rewriting serialized timestamps or dropping failing alternatives. The walking correction changes the native search result to 53 alternatives. The later [departure-sampling investigation](commute_routing_departure_sampling.md) attributes that fixture-specific change to a target-arrival cutoff retained across sampled departures; a separate diagnostic resetting only that cutoff restores the seven later alternatives without changing the original 53 returned rows. The shipped smoke runner is unchanged, and passing returned-leg checks does not establish complete route enumeration.
 
 ## Fixed experiment and execution limits
 
@@ -119,7 +119,7 @@ type "%HOMEREACH_SMOKE_REPORT%"
 
 The supplied isolated Windows run has zero overlaps, wait mismatches, malformed options, unexpected leg sequences and egress-padding mismatches and confirms restoration of the original method. Future runs still need their actual results checked. If an identity/source check or any itinerary assertion fails, retain the detailed report. Conda may append its generic failed-command message. A completed worker and three attempted queries alone are insufficient for a pass.
 
-### Verified Windows geometry baseline and next correction check
+### Verified Windows geometry baseline and correction
 
 The maintainer completed the following geometry-baseline command at `1be659f`. It confirmed the Linux failure counts while all timing checks passed. It remains available for reproducing that baseline:
 
@@ -130,7 +130,7 @@ echo Exit code: %ERRORLEVEL%
 
 For this baseline, **`FAILED` with exit code 1 is expected from the accuracy checks**, even while the timing and single-bus checks stay at zero failures. Append `--json` and redirect to a new report file when retaining complete raw geometries and diagnostic details. The [geometry guide](commute_routing_geometry_check.md) explains the reference paths, tolerances and repair criteria.
 
-The next Windows check adds `--correct-walking-paths` to that command. The [correction guide](commute_routing_walking_correction.md#next-windows-check) provides the complete command and expected assertions. It uses the existing environment and JAR; the new mode additionally requires the embedded Java 21 compiler to build a reviewed temporary helper. Its Linux pass does not establish a Windows pass.
+The maintainer's later run at `219f326` adds `--correct-walking-paths` to that command and passes with exit code 0. The [correction guide](commute_routing_walking_correction.md#verified-windows-command) records the complete command and assertions. It uses the existing environment and JAR; the mode additionally requires the embedded Java 21 compiler to build a reviewed temporary helper. The [supplied console checkpoint](evidence/routing_walk_correction_windows_checkpoint_2026-11-21.json) records 53 alternatives, 107 walking legs, zero enabled failures, 159 snapshots, all scopes restored and cleanup successful. Raw per-row and coordinate equivalence with Linux is not established.
 
 ### Preparation for another machine
 
@@ -158,4 +158,4 @@ At the leg-isolation implementation checkpoint, before the walking-geometry exte
 
 At the subsequent walking-correction checkpoint, the full local suite passed **974 tests in 54.95 seconds**, with no skips. Its three new adapter regression modules cover the fixed-fixture index, native-origin wrapper and partial-edge geometry, while parent/worker regressions check mode prerequisites, audit restoration and independent walking durations. The separate corrected native Linux experiment passed in 13.383 seconds; ordinary CI does not run that engine experiment.
 
-The next platform check is the corrected Windows experiment. A production-capable routing integration still requires work beyond this fixture-bound adapter, followed by complete GTFS timing/reference and street-network validation. Walking connections, provisional station access, transfers and accessibility remain separate questions before a Melbourne development itinerary.
+The corrected Windows experiment is now recorded. Platform agreement alone did not explain the 60-to-53 change; the separate [paired native investigation](commute_routing_departure_sampling.md) establishes the retained-cutoff mechanism for this fixture. Its diagnostic reset is not a shipped or general routing correction. A production-capable routing integration still requires work beyond this fixture-bound adapter, followed by complete GTFS timing/reference and street-network validation. Walking connections, provisional station access, transfers and accessibility remain separate questions before a Melbourne development itinerary.

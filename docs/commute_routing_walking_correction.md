@@ -2,9 +2,9 @@
 
 ## Checkpoint and scope
 
-The explicit `--correct-walking-paths` mode passes the reviewed synthetic fixture's timing, walking geometry, distance and duration checks on Linux. It requires both `--isolate-itinerary-legs` and `--check-walking-geometry`; the existing modes retain their previous behavior. This is a bounded experiment against r5py 1.1.7 and the SHA-256-verified R5 `v7.5.1-r5py` JAR, not a production routing integration.
+The explicit `--correct-walking-paths` mode passes the reviewed synthetic fixture's timing, walking geometry, distance and duration checks on Linux and in the maintainer's supplied Windows run. It requires both `--isolate-itinerary-legs` and `--check-walking-geometry`; the existing modes retain their previous behavior. This is a bounded experiment against r5py 1.1.7 and the SHA-256-verified R5 `v7.5.1-r5py` JAR, not a production routing integration.
 
-The maintainer's latest Windows run at `1be659f` confirmed the earlier geometry failure: the timing checks passed, but all 121 walking geometries failed the endpoint, path and geometry-versus-distance checks. The [Windows checkpoint](evidence/routing_geometry_windows_checkpoint_2026-11-18.json) records supplied console output rather than a complete raw-leg report. **The new walking correction has not yet been tested on Windows.** The existing Windows environment and JAR can be used for that next check.
+The maintainer's earlier Windows run at `1be659f` confirmed the geometry baseline failure: the timing checks passed, but all 121 walking geometries failed the endpoint, path and geometry-versus-distance checks. That [failed Windows checkpoint](evidence/routing_geometry_windows_checkpoint_2026-11-18.json) is preserved. The later [corrected Windows checkpoint at `219f326`](evidence/routing_walk_correction_windows_checkpoint_2026-11-21.json), supplied on 21 November 2026, records **`PASSED` with exit code 0**: 53 transit alternatives, 107 walking legs, zero enabled failures, 159 leg snapshots, restoration of all correction scopes and successful temporary cleanup. Both Windows checkpoints are supplied console evidence; no complete Windows raw-leg JSON report or execution timestamp was supplied.
 
 The [corrected Linux report](evidence/routing_walk_correction_linux_2026-11-18.json) preserves every returned itinerary row and geometry. Its three queries use the same fictional streets, timetable, coordinates and routing parameters as the [earlier geometry experiment](commute_routing_geometry_check.md). The [saved baseline/correction comparison](evidence/routing_walk_correction_comparison_2026-11-18.json) records the counts below, the walking coordinates and the changed set of observed bus departures.
 
@@ -19,7 +19,7 @@ The [corrected Linux report](evidence/routing_walk_correction_linux_2026-11-18.j
 | Reported-versus-reference-distance failures | 61 | 0 |
 | Independent walking-duration failures | Not separately checked | 0 |
 
-The corrected run also has zero malformed options, unexpected leg sequences, egress-padding mismatches, malformed geometries, incomplete options and unsupported coordinate reference systems. Every correction scope reports successful restoration, and its temporary workspace is removed. No real project datasets are read and no Melbourne journeys are computed.
+The corrected run also has zero malformed options, unexpected leg sequences, egress-padding mismatches, malformed geometries, incomplete options and unsupported coordinate reference systems. The supplied Windows console reports the same timing, geometry, duration and snapshot counts, and the same displayed direct/access/egress distances. This agreement does not establish exact equality of every returned row or coordinate. Both runs report successful restoration and temporary cleanup, no real project datasets read and no Melbourne journeys computed.
 
 ## Three separate corrections
 
@@ -71,7 +71,9 @@ The corrected mode additionally validates every walking duration against referen
 | Access | 11.119 m | 11.100 m | 12 s | 2 s |
 | Egress | 11.119 m | 11.254 m | 12 s | 2 s |
 
-The number of alternatives is an observation, not a required count. The original run contains 23 BUS legs departing at 08:05, 30 at 08:10 and seven at 08:15. The corrected run retains the first two groups and returns no 08:15 group. The project adds no output filter, and all 53 returned alternatives are preserved. The reason for the changed alternative set has not been established, and complete route enumeration is not validated by this smoke test.
+The number of alternatives is an observation, not a required count. The original run contains 23 BUS legs departing at 08:05, 30 at 08:10 and seven at 08:15. The corrected run retains the first two groups and returns no 08:15 group. The project adds no output filter, and all 53 returned alternatives are preserved.
+
+The subsequent [departure-sampling investigation](commute_routing_departure_sampling.md) establishes the mechanism for this fixture. A target-arrival cutoff is retained across sampled departures. The corrected earliest arrival of 08:10:12, plus a five-minute allowance, prunes the seven later samples that require the 08:15 BUS arriving at 08:20. A separate diagnostic resets only that cutoff for each sample and returns 60 alternatives with the same sampled keys, request and access/egress maps; the original 53 native chains and complete itinerary rows remain unchanged. This probe does not change the shipped smoke runner or claim a general engine repair. The passing smoke test validates the returned legs; complete route enumeration and a production-capable routing integration remain unvalidated.
 
 ## Runtime guards and temporary helper
 
@@ -89,13 +91,13 @@ The final local regression run passed **974 tests in 54.95 seconds**. Ordinary t
 
 The final combined Linux native run completed in **13.383 seconds**, reported `PASSED` and exited with code 0. It used r5py 1.1.7, Java 21.0.13, the same pinned R5 JAR and unchanged fixture hashes. The saved report contains all three query results, all 159 transit rows, the direct walking row, and all 107 walking observations. The inactive-service query returned no itinerary. All enabled timing, sequence, geometry and duration checks passed.
 
-The same report confirms 159 independent leg snapshots, successful restoration of all four scoped changes, closure of the temporary helper loader, unchanged graph fingerprints and temporary-workspace removal. Its execution metadata records canonical-LF hashes of the runner, worker, fixture generator, independent oracle, adapters and Java helper source. The comparison confirms identical engine/input fingerprints and an unchanged independent geometry oracle; it also preserves the unresolved 60-to-53 alternative-count change rather than treating the counts as equivalent.
+The same report confirms 159 independent leg snapshots, successful restoration of all four scoped changes, closure of the temporary helper loader, unchanged graph fingerprints and temporary-workspace removal. Its execution metadata records canonical-LF hashes of the runner, worker, fixture generator, independent oracle, adapters and Java helper source. The comparison confirms identical engine/input fingerprints and an unchanged independent geometry oracle. That historical 18 November report records the 60-to-53 change as unresolved at capture; the later [departure-sampling investigation](commute_routing_departure_sampling.md) explains its mechanism without rewriting that evidence or treating the two alternative sets as equivalent.
 
-The [16-case native origin regression report](evidence/routing_native_origin_regressions_linux_2026-11-18.json) and [paired native index probe](evidence/routing_direct_index_correction_linux_2026-11-18.json) provide additional evidence for the two native-search corrections. These Linux observations do not substitute for running the corrected integration on the maintainer's Windows runtime.
+The [16-case native origin regression report](evidence/routing_native_origin_regressions_linux_2026-11-18.json) and [paired native index probe](evidence/routing_direct_index_correction_linux_2026-11-18.json) provide additional evidence for the two native-search corrections. The subsequent [supplied Windows run](evidence/routing_walk_correction_windows_checkpoint_2026-11-21.json) separately verifies the combined fixture command on that runtime; it does not reproduce those additional native probes or supply their internal state traces.
 
-## Next Windows check
+## Verified Windows command
 
-Use the existing D: environment, reviewed JAR and temporary directory in Anaconda Prompt / CMD after pulling the update. No environment rebuild or replacement JAR is required.
+The maintainer completed this command successfully at `219f326` using the existing D: environment, reviewed JAR and temporary directory. The command is retained for reproduction in Anaconda Prompt / CMD; another run is not required merely to establish the supplied checkpoint.
 
 ```bat
 cd /d "D:\My project\homereach_melbourne"
@@ -105,9 +107,9 @@ conda run --no-capture-output --prefix "D:\homereach-conda\envs\homereach-routin
 echo Exit code: %ERRORLEVEL%
 ```
 
-The acceptance result is `PASSED`, exit code 0, zero enabled timing/geometry/duration failures, verified correction restoration and successful workspace cleanup. The observed Linux alternative count is not a Windows pass criterion. Until the actual Windows result is supplied, the new mode remains verified on Linux only.
+The supplied Windows result is `PASSED`, exit code 0, zero enabled timing/geometry/duration failures, verified correction restoration and successful workspace cleanup. Both platforms returned 53 alternatives in these observations; that count remains an observation rather than a pass criterion. Exact raw-leg equivalence between the platforms has not been established from console output.
 
-To retain the complete report, use the following instead of the preceding smoke-test command. It creates a new report outside the checkout:
+For a future run that needs a complete report, use the following instead of the preceding smoke-test command. It creates a new report outside the checkout:
 
 ```bat
 set "HOMEREACH_WALK_REPORT=D:\homereach-conda\tmp\routing-walk-correction-%RANDOM%-%RANDOM%.json"

@@ -2,7 +2,7 @@
 
 ## Checkpoint
 
-This document preserves the geometry-baseline investigation at `1be659f`. The maintainer's [subsequent Windows output](evidence/routing_geometry_windows_checkpoint_2026-11-18.json) confirms the Linux failure counts below, with zero timing failures and exit code 1. A separate [experimental walking correction](commute_routing_walking_correction.md) now passes the unchanged fixture's timing, geometry, distance and duration checks on Linux. That new mode remains unverified on Windows and is restricted to the reviewed synthetic fixture; the original failed reports and reference oracle are preserved.
+This document preserves the geometry-baseline investigation at `1be659f`. The maintainer's [subsequent Windows output](evidence/routing_geometry_windows_checkpoint_2026-11-18.json) confirms the Linux failure counts below, with zero timing failures and exit code 1. A separate [experimental walking correction](commute_routing_walking_correction.md) now passes the unchanged fixture's timing, geometry, distance and duration checks on Linux and in the [supplied Windows run at `219f326`](evidence/routing_walk_correction_windows_checkpoint_2026-11-21.json). The latter reports 53 alternatives, 107 walking legs, zero enabled failures, restoration, cleanup and exit code 0; it is console evidence rather than a complete raw-leg capture. The correction remains restricted to the reviewed synthetic fixture; the original failed reports and reference oracle are preserved.
 
 The maintainer's Windows run at `73543a8` passed the synthetic timing/integration checks with `--isolate-itinerary-legs`: 60 alternatives, no chronology, wait, sequence or egress-padding failures, 180 leg snapshots, restoration of the original method and exit code 0. The [Windows checkpoint](evidence/routing_smoke_windows_checkpoint_2026-11-18.json) records the supplied console evidence; it does not claim an independently captured Windows raw-leg report.
 
@@ -71,7 +71,7 @@ A read-only review on 18 November 2026 found `v1.1.7` as the latest published r5
 
 The repair criteria are to keep each vertex, directional back-edge, endpoint distance and time cost associated correctly, and to construct geometry from the selected partial edges. Regression coverage needs forward/reverse cases, both endpoint directions, partial-edge accounting and directional walking behavior. Geometry must begin and end at the actual requested locations and agree with the route's costs within the declared tolerances. The subsequent [bounded correction](commute_routing_walking_correction.md) meets the unchanged fixture's checks on Linux, adds an independent walking-duration assertion, and retains all returned rows.
 
-This diagnostic checkpoint records the cause and does not replace the engine. The later correction is also not a production routing repair: its index guard permits only the reviewed fixture, its origin override applies only to the Python planner's router calls, and complete route enumeration remains unvalidated. Melbourne input compatibility, full GTFS stop-time references, public station access, transfers and accessibility require their own validation afterward.
+This diagnostic checkpoint records the cause and does not replace the engine. The later correction is also not a production routing repair: its index guard permits only the reviewed fixture and its origin override applies only to the Python planner's router calls. The subsequent [departure-sampling investigation](commute_routing_departure_sampling.md) explains why the corrected fixture returns 53 rather than 60 alternatives: a target-arrival cutoff persists across samples. Its paired diagnostic reset is separate from the shipped runner. Passing geometry and timing checks for returned legs does not establish complete route enumeration. Melbourne input compatibility, full GTFS stop-time references, public station access, transfers and accessibility require their own validation afterward.
 
 ## Verified Windows baseline reproduction
 
@@ -87,7 +87,7 @@ echo Exit code: %ERRORLEVEL%
 
 For this baseline, expect the expanded test to report **`FAILED` and exit code 1**, with zero timing/sequence failures and the geometry/distance problems shown above. Conda may append its generic failed-command message. This is an intentional detection of the unresolved engine behavior; it does not call for rebuilding the working environment. Omitting `--check-walking-geometry` retains the already verified timing-only mode.
 
-To retain full evidence, add `--json` and redirect standard output to a new report outside the checkout. No changes to the engine, fixture or environment are needed to reproduce this diagnostic. For the next corrected Windows experiment, retain both flags and add `--correct-walking-paths` as documented in [the correction guide](commute_routing_walking_correction.md#next-windows-check).
+To retain full evidence, add `--json` and redirect standard output to a new report outside the checkout. No changes to the engine, fixture or environment are needed to reproduce this diagnostic. The later successful Windows experiment retained both flags and added `--correct-walking-paths`, as documented in [the correction guide](commute_routing_walking_correction.md#verified-windows-command).
 
 ## Verification of the diagnostic checkpoint
 

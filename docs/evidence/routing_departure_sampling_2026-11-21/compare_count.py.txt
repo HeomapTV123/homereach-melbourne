@@ -1,0 +1,146 @@
+"""Compare the archived paired native probe without executing a routing query."""
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+ROOT = Path('/workspace/scratch/a83c039c1663/homereach-routing-next')
+raw_path = HERE / 'paired_count_result.json'
+raw = json.loads(raw_path.read_text())
+observed = raw['arms']['observe']
+reset = raw['arms']['reset_per_sample_counterfactual']
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def canonical_sha(value):
+    return sha(json.dumps(value, sort_keys=True, separators=(',', ':')).encode())
+
+def clock(seconds):
+    return f'{seconds//3600:02d}:{seconds//60%60:02d}:{seconds%60:02d}'
+
+def groups(rows):
+    grouped = {}
+    for row in rows:
+        grouped.setdefault(row['option'], []).append({k: v for k, v in row.items() if k != 'option'})
+    return {min(rows, key=lambda row: row['segment'])['departure_time']:
+            sorted(rows, key=lambda row: row['segment']) for rows in grouped.values()}
+
+observed_groups = groups(observed['rows'])
+reset_groups = groups(reset['rows'])
+baseline_path = ROOT / 'docs/evidence/routing_walk_geometry_linux_2026-11-18.json'
+corrected_path = ROOT / 'docs/evidence/routing_walk_correction_linux_2026-11-18.json'
+baseline = json.loads(baseline_path.read_text())
+corrected = json.loads(corrected_path.read_text())
+baseline_groups = groups(baseline['transit'])
+corrected_groups = groups(corrected['transit'])
+all_keys = sorted(observed['native_final_states'], key=int)
+restored_keys = [key for key in all_keys if not observed['native_final_states'][key]]
+sample_order = [sample['departure_seconds'] for sample in observed['samples']]
+before = {sample['departure_seconds']: sample for sample in observed['samples']}
+after = {sample['departure_seconds']: sample for sample in reset['samples']}
+
+def bus(row_group):
+    return next(row for row in row_group if row['mode'] == 'BUS')
+
+checks = {
+    'same_request_parameters': observed['request'] == reset['request'],
+    'same_access_maps': observed['access_times'] == reset['access_times'],
+    'same_egress_maps': observed['egress_times'] == reset['egress_times'],
+    'same_access_iteration': observed['access_iteration'] == reset['access_iteration'],
+    'same_60_native_departure_keys': all_keys == sorted(reset['native_final_states'], key=int) and len(all_keys) == 60,
+    'same_60_callback_order': sample_order == [sample['departure_seconds'] for sample in reset['samples']] and len(sample_order) == 60,
+    'all_first_callbacks_precede_transit_relaxation': all(
+        sample['round'] == 0 and sample['best_state_stop_count'] == 0
+        and sample['first_access_passes_pre_callback_pruning']
+        for arm in raw['arms'].values() for sample in arm['samples']),
+    'observed_bound_preserved_at_callbacks': all(s['bound_before'] == s['bound_after'] for s in observed['samples']),
+    'counterfactual_bound_empty_after_each_reset': all(not s['bound_after'] for s in reset['samples']),
+    'native_states_captured_before_python_assembly': all(arm['native_states_captured_before_python_assembly'] for arm in raw['arms'].values()),
+    'native_states_unchanged_by_python_assembly': all(arm['native_states_unchanged_by_python_assembly'] for arm in raw['arms'].values()),
+    'all_original_53_native_chains_preserved': all(states == reset['native_final_states'][key]
+        for key, states in observed['native_final_states'].items() if states),
+    'all_original_53_full_row_groups_preserved_except_option_number': all(
+        rows == reset_groups[key] for key, rows in observed_groups.items()),
+    'observed_rows_match_committed_corrected_checkpoint_except_option_number': observed_groups == corrected_groups,
+    'seven_restored_keys': len(restored_keys) == 7 and all(reset['native_final_states'][key] for key in restored_keys),
+    'all_restored_bus_rows_match_baseline_except_option_number': all(
+        bus(reset_groups['2026-10-13T'+clock(int(key))]) == bus(baseline_groups['2026-10-13T'+clock(int(key))])
+        for key in restored_keys),
+    'namespace_scopes_restored': all(arm['namespace_restored'] for arm in raw['arms'].values()),
+    'all_shipping_correction_scopes_restored': all(audit['restored'] for audit in raw['audits'].values()),
+    'immutable_inputs': raw['input_hashes_unchanged_after_pair'],
+    'immutable_shipping_sources': raw['source_hashes_unchanged_after_pair'],
+    'temporary_workspace_removed': raw['temporary_workspace_removed'],
+    'executed_script_hash_matches': raw['script_sha256_canonical_lf'] == sha((HERE/'probe_count.py').read_bytes().replace(b'\r\n', b'\n')),
+}
+for name, check in checks.items():
+    assert check, name
+
+state_keys = set(raw['source_sha256_canonical_lf'])
+head_source_matches = {}
+for relative in state_keys:
+    committed = subprocess.run(['git','-C',str(ROOT),'show','219f326:'+relative],
+                               capture_output=True, check=True).stdout
+    head_source_matches[relative] = sha(committed.replace(b'\r\n', b'\n')) == raw['source_sha256_canonical_lf'][relative]
+assert all(head_source_matches.values())
+
+summary = {
+    'schema_version': 1,
+    'scope': 'Fictional synthetic fixture only; diagnostic counterfactual, not a production correction.',
+    'raw_evidence': {'filename': raw_path.name, 'sha256': sha(raw_path.read_bytes()),
+                     'all_returned_rows_retained': True},
+    'executed_probe': {'filename': 'probe_count.py', 'canonical_lf_sha256': raw['script_sha256_canonical_lf'],
+                       'contains_hardcoded_research_workspace_paths': True},
+    'executed_at_utc': raw['started_at_utc'],
+    'checks': checks,
+    'source_hashes_match_shipping_commit_219f326': head_source_matches,
+    'request': observed['request'],
+    'access_iteration': observed['access_iteration'],
+    'access_times': observed['access_times'], 'egress_times': observed['egress_times'],
+    'observed_counts': {'native_departure_keys': len(all_keys), 'nonempty_keys': len(observed_groups),
+                        'raw_leg_rows': len(observed['rows']),
+                        'bus_boardings': dict(Counter(bus(rows)['departure_time'] for rows in observed_groups.values()))},
+    'counterfactual_counts': {'native_departure_keys': len(reset['native_final_states']), 'nonempty_keys': len(reset_groups),
+                              'raw_leg_rows': len(reset['rows']),
+                              'bus_boardings': dict(Counter(bus(rows)['departure_time'] for rows in reset_groups.values()))},
+    'native_bound_mechanism': {
+        'observed_bound_after_earliest_route_seconds': 29412, 'observed_bound_after_earliest_route_clock': '08:10:12',
+        'suboptimal_seconds': 300, 'latest_allowed_native_state_seconds': 29712,
+        'latest_allowed_native_state_clock': '08:15:12',
+        'third_bus_alighting_state_seconds': 30000, 'third_bus_alighting_state_clock': '08:20:00',
+        'pruning_test': '30000 - 300 > 29412',
+        'interpretation': 'The retained target bound accounts for the seven empty late sample collections in this fixed fixture.'},
+    'all_60_samples': [
+        {'departure_seconds': int(key), 'departure_clock': clock(int(key)),
+         'observed_native_states': len(observed['native_final_states'][key]),
+         'counterfactual_native_states': len(reset['native_final_states'][key]),
+         'observed_bound_before_callback': before[int(key)]['bound_before'],
+         'counterfactual_bound_before_callback': after[int(key)]['bound_before'],
+         'first_access_arrival_seconds': before[int(key)]['first_access_arrival_seconds'],
+         'observed_callback_round': before[int(key)]['round'],
+         'counterfactual_callback_round': after[int(key)]['round']}
+        for key in all_keys],
+    'seven_restored_alternatives': [
+        {'departure_seconds': int(key), 'departure_clock': clock(int(key)),
+         'native_state_chains': reset['native_final_states'][key],
+         'all_three_legs': reset_groups['2026-10-13T'+clock(int(key))]}
+        for key in restored_keys],
+    'retained_53_row_groups_canonical_sha256': canonical_sha(observed_groups),
+    'unchanged_53_native_chains_canonical_sha256': canonical_sha(
+        {key: states for key, states in observed['native_final_states'].items() if states}),
+    'limitations': [
+        'No production policy change is proposed. This establishes the count mechanism, not whether profile-wide pruning is universally inappropriate.',
+        'The callback occurs after addState duration and target-bound tests. The recorded native map traversal and conditions prove the first access state reaches it for all 60 samples here; this is not guaranteed for other inputs.',
+        'There are 60 sampled departure alternatives, not 60 distinct bus services: the counterfactual uses three bus boardings.',
+        'The observation arm reproduces the already-passing corrected checkpoint; all shipping scripts and their success criteria remain unchanged.',
+        'This Linux diagnostic uses Java 21.0.13; it is not a new Windows run.',
+        'No real Melbourne input compatibility, station access, transfers, accessibility, or journey timing has been tested.'],
+}
+output = HERE / 'paired_count_comparison.json'
+output.write_text(json.dumps(summary, indent=2, allow_nan=False))
+print('Comparison:', output)
+print('Checks passed:', len(checks), 'shipping source matches:', len(head_source_matches))
+print('Bytes:', output.stat().st_size, 'SHA256:', sha(output.read_bytes()))
