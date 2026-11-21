@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "evidence_type": "maintainer_supplied_terminal_output",
+  "date_supplied": "2026-11-18",
+  "checkout": "73543a89af3936fbfc407f1ff417f28158e958a9",
+  "branch": "feat/commute-location-review",
+  "environment_prefix": "D:\\homereach-conda\\envs\\homereach-routing",
+  "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_smoke_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --isolate-itinerary-legs",
+  "observed": {
+    "status": "passed",
+    "itinerary_mode": "isolated_legs",
+    "embedded_jvm_started": true,
+    "queries_attempted": 3,
+    "queries_completed": 3,
+    "timeline_diagnostics": {
+      "options_checked": 60,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "single_bus_diagnostics": {
+      "options_checked": 60,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    },
+    "leg_snapshots": 180,
+    "original_method_restored": true,
+    "r5py": "1.1.7",
+    "r5_engine": "v7.5.1-r5py",
+    "engine_sha256_reported_verified": true,
+    "java_heap_limit_bytes": 1073741824,
+    "python_routing_jobs": 1,
+    "positive_walking_itinerary_verified": true,
+    "synthetic_bus_route_stops_departure_and_five_minute_ride_verified": true,
+    "inactive_service_returned_no_itinerary": true,
+    "temporary_workspace_removed": true,
+    "real_project_datasets_read": 0,
+    "melbourne_journeys_computed": 0,
+    "exit_code": 0
+  },
+  "scope": [
+    "This records supplied Windows console observations; the assistant did not execute on the maintainer computer.",
+    "No Windows raw-leg JSON report was supplied, so its complete rows and geometry were not independently compared.",
+    "This confirms the timing/integration checkpoint. Walking geometry and expected distances were not checked by this command.",
+    "Melbourne input compatibility, station access, transfers, accessibility and real journey timing remain unvalidated."
+  ]
+}

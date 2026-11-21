@@ -10,10 +10,13 @@ public entrance to Flinders Street Station; its exact coordinates and the origin
 sample still need source checks. These points will illustrate journeys, rather
 than represent all residents or rental properties in an LGA.
 
-This change implements **input preflight only**. It checks the existing audited
-timetable, reports missing prerequisites, and adds regression tests using small
-fictional feeds. It produces no journey times, suitability scores or app output.
-No real Melbourne journey has been calculated or validated at this checkpoint.
+The original **input preflight** checks the existing audited archive and small
+tables and reports missing prerequisites. A separate
+[complete timetable audit](commute_gtfs_timetable_audit.md) now checks every
+stop-time row using a temporary disk index; its real local archive run is pending.
+Both commands have regression tests with fictional feeds. They produce no journey
+times, suitability scores or app output. No real Melbourne journey has been
+calculated or validated at this checkpoint.
 
 ## Fixed timetable context
 

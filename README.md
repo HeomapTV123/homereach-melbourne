@@ -432,6 +432,14 @@ original local GTFS archive against the audited snapshot and reports missing
 routing prerequisites. Street-network data and verified origin/destination
 coordinates are not yet configured; no journey times have been produced.
 
+The next input check is the [complete GTFS timetable audit](docs/commute_gtfs_timetable_audit.md):
+`python -B scripts/audit_routing_timetable.py --work-root <external-temp-directory>`.
+It checks every stop-time row in the three pinned feeds, including inactive trips
+and overnight times, with a temporary disk index. Its regression fixtures pass;
+the full local archive run is pending. A timetable pass establishes only the
+documented source checks; engine compatibility and real journeys need separate
+validation. The guide includes the Windows command using the existing D: workspace.
+
 ## Sources, attribution and project ownership
 
 Source publishers are **Homes Victoria / DFFH**, **Transport Victoria / Department

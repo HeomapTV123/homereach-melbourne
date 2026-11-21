@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "evidence_type": "maintainer_supplied_terminal_output",
+  "date_supplied": "2026-11-18",
+  "checkout": "1be659fadcb83417f5b229d40c26c04abe126ab1",
+  "branch": "feat/commute-location-review",
+  "environment_prefix": "D:\\homereach-conda\\envs\\homereach-routing",
+  "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_smoke_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --isolate-itinerary-legs --check-walking-geometry",
+  "observed": {
+    "status": "failed",
+    "itinerary_mode": "isolated_legs",
+    "walking_geometry_requested": true,
+    "embedded_jvm_started": true,
+    "queries_attempted": 3,
+    "timeline_diagnostics": {
+      "options_checked": 60,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "single_bus_diagnostics": {
+      "options_checked": 60,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    },
+    "walking_geometry_diagnostics": {
+      "walking_legs_checked": 121,
+      "endpoint_mismatches": 121,
+      "geometry_distance_mismatches": 121,
+      "shortest_distance_mismatches": 61,
+      "off_reference_path": 121,
+      "malformed_rows": 0,
+      "malformed_geometries": 0,
+      "incomplete_options": 0,
+      "unsupported_crs": 0
+    },
+    "printed_walk_references": [
+      {"role": "direct", "reported_distance_m": 2656.089, "reference_distance_m_printed": 2646.439},
+      {"role": "access", "reported_distance_m": 11.1, "reference_distance_m_printed": 11.119},
+      {"role": "egress", "reported_distance_m": 677.897, "reference_distance_m_printed": 11.119}
+    ],
+    "leg_snapshots": 180,
+    "original_method_restored": true,
+    "diagnostic_problems_printed": 8,
+    "additional_diagnostic_problems": 416,
+    "temporary_workspace_removed": true,
+    "real_project_datasets_read": 0,
+    "melbourne_journeys_computed": 0,
+    "exit_code": 1
+  },
+  "comparison": {
+    "linux_report": "routing_walk_geometry_linux_2026-11-18.json",
+    "printed_timing_and_geometry_counts_match_linux": true,
+    "printed_reference_distances_match_linux_after_display_rounding": true,
+    "previous_windows_timing_pass": "routing_smoke_windows_checkpoint_2026-11-18.json"
+  },
+  "scope": [
+    "This records the supplied Windows console observations; the assistant did not execute on the maintainer computer.",
+    "No complete Windows raw-leg JSON report was supplied, so raw coordinate and per-row equality are not established.",
+    "The stronger geometry check reproduces the expected failure while all printed timing and sequence checks still pass.",
+    "This is evidence for the uncorrected walking baseline, not evidence that a walking correction has passed on Windows.",
+    "Melbourne inputs, station access, transfers, accessibility and real journey timing remain unvalidated."
+  ]
+}

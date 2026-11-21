@@ -1,0 +1,2027 @@
+{
+  "schema_version": 1,
+  "scope": "Fictional synthetic fixture only; diagnostic counterfactual, not a production correction.",
+  "raw_evidence": {
+    "filename": "paired_count_result.json",
+    "sha256": "f8eb58f79c5177d7ade8e5caa2bf99c90eb8389228e5020d2add2e269b294e76",
+    "all_returned_rows_retained": true
+  },
+  "executed_probe": {
+    "filename": "probe_count.py",
+    "canonical_lf_sha256": "f0e1d8b117bcf770f42f1352f5776a7bc86c26c1031bdcbd226e0ea2a1874472",
+    "contains_hardcoded_research_workspace_paths": true
+  },
+  "executed_at_utc": "2026-11-21T15:00:20.105970+00:00",
+  "checks": {
+    "same_request_parameters": true,
+    "same_access_maps": true,
+    "same_egress_maps": true,
+    "same_access_iteration": true,
+    "same_60_native_departure_keys": true,
+    "same_60_callback_order": true,
+    "all_first_callbacks_precede_transit_relaxation": true,
+    "observed_bound_preserved_at_callbacks": true,
+    "counterfactual_bound_empty_after_each_reset": true,
+    "native_states_captured_before_python_assembly": true,
+    "native_states_unchanged_by_python_assembly": true,
+    "all_original_53_native_chains_preserved": true,
+    "all_original_53_full_row_groups_preserved_except_option_number": true,
+    "observed_rows_match_committed_corrected_checkpoint_except_option_number": true,
+    "seven_restored_keys": true,
+    "all_restored_bus_rows_match_baseline_except_option_number": true,
+    "namespace_scopes_restored": true,
+    "all_shipping_correction_scopes_restored": true,
+    "immutable_inputs": true,
+    "immutable_shipping_sources": true,
+    "temporary_workspace_removed": true,
+    "executed_script_hash_matches": true
+  },
+  "source_hashes_match_shipping_commit_219f326": {
+    "scripts/run_routing_smoke_test.py": true,
+    "scripts/_routing_smoke_worker.py": true,
+    "scripts/routing_leg_isolation.py": true,
+    "scripts/routing_native/HomeReachStreetOrigins.java": true,
+    "scripts/routing_street_origin_correction.py": true,
+    "scripts/routing_street_geometry_correction.py": true,
+    "scripts/routing_smoke_fixture.py": true,
+    "scripts/routing_street_index_correction.py": true
+  },
+  "request": {
+    "fromTime": "28800",
+    "toTime": "29400",
+    "date": "2026-10-13",
+    "fromLat": "0.018",
+    "fromLon": "0.0061",
+    "toLat": "0.018",
+    "toLon": "0.0299",
+    "monteCarloDraws": "60",
+    "suboptimalMinutes": "5",
+    "maxFare": "-1",
+    "maxRides": "1",
+    "maxTripDurationMinutes": "90",
+    "maxWalkTime": "90",
+    "walkSpeed": "1.0",
+    "accessModes": "[WALK]",
+    "egressModes": "[WALK]",
+    "directModes": "[WALK]",
+    "transitModes": "[BUS]"
+  },
+  "access_iteration": [
+    {
+      "mode": "WALK",
+      "stop": 1,
+      "seconds": 12
+    },
+    {
+      "mode": "WALK",
+      "stop": 0,
+      "seconds": 2657
+    }
+  ],
+  "access_times": {
+    "WALK": {
+      "1": 12,
+      "0": 2657
+    }
+  },
+  "egress_times": {
+    "WALK": {
+      "1": 2657,
+      "0": 12
+    }
+  },
+  "observed_counts": {
+    "native_departure_keys": 60,
+    "nonempty_keys": 53,
+    "raw_leg_rows": 159,
+    "bus_boardings": {
+      "2026-10-13T08:05:00": 23,
+      "2026-10-13T08:10:00": 30
+    }
+  },
+  "counterfactual_counts": {
+    "native_departure_keys": 60,
+    "nonempty_keys": 60,
+    "raw_leg_rows": 180,
+    "bus_boardings": {
+      "2026-10-13T08:05:00": 23,
+      "2026-10-13T08:15:00": 7,
+      "2026-10-13T08:10:00": 30
+    }
+  },
+  "native_bound_mechanism": {
+    "observed_bound_after_earliest_route_seconds": 29412,
+    "observed_bound_after_earliest_route_clock": "08:10:12",
+    "suboptimal_seconds": 300,
+    "latest_allowed_native_state_seconds": 29712,
+    "latest_allowed_native_state_clock": "08:15:12",
+    "third_bus_alighting_state_seconds": 30000,
+    "third_bus_alighting_state_clock": "08:20:00",
+    "pruning_test": "30000 - 300 > 29412",
+    "interpretation": "The retained target bound accounts for the seven empty late sample collections in this fixed fixture."
+  },
+  "all_60_samples": [
+    {
+      "departure_seconds": 28805,
+      "departure_clock": "08:00:05",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {},
+      "counterfactual_bound_before_callback": {},
+      "first_access_arrival_seconds": 28817,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28817,
+      "departure_clock": "08:00:17",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28829,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28824,
+      "departure_clock": "08:00:24",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28836,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28830,
+      "departure_clock": "08:00:30",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28842,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28844,
+      "departure_clock": "08:00:44",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28856,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28850,
+      "departure_clock": "08:00:50",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28862,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28857,
+      "departure_clock": "08:00:57",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28869,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28871,
+      "departure_clock": "08:01:11",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28883,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28882,
+      "departure_clock": "08:01:22",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28894,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28894,
+      "departure_clock": "08:01:34",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28906,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28901,
+      "departure_clock": "08:01:41",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28913,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28915,
+      "departure_clock": "08:01:55",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28927,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28926,
+      "departure_clock": "08:02:06",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28938,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28931,
+      "departure_clock": "08:02:11",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28943,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28943,
+      "departure_clock": "08:02:23",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28955,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28954,
+      "departure_clock": "08:02:34",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28966,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28966,
+      "departure_clock": "08:02:46",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28978,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28977,
+      "departure_clock": "08:02:57",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28989,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28985,
+      "departure_clock": "08:03:05",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 28997,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 28999,
+      "departure_clock": "08:03:19",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 29011,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29004,
+      "departure_clock": "08:03:24",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 29016,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29017,
+      "departure_clock": "08:03:37",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 29029,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29026,
+      "departure_clock": "08:03:46",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 29038,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29034,
+      "departure_clock": "08:03:54",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29412
+      },
+      "first_access_arrival_seconds": 29046,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29044,
+      "departure_clock": "08:04:04",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29056,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29053,
+      "departure_clock": "08:04:13",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29065,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29059,
+      "departure_clock": "08:04:19",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29071,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29069,
+      "departure_clock": "08:04:29",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29081,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29082,
+      "departure_clock": "08:04:42",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29094,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29090,
+      "departure_clock": "08:04:50",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29102,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29100,
+      "departure_clock": "08:05:00",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29112,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29110,
+      "departure_clock": "08:05:10",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29122,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29117,
+      "departure_clock": "08:05:17",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29129,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29126,
+      "departure_clock": "08:05:26",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29138,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29140,
+      "departure_clock": "08:05:40",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29152,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29146,
+      "departure_clock": "08:05:46",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29158,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29157,
+      "departure_clock": "08:05:57",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29169,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29165,
+      "departure_clock": "08:06:05",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29177,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29172,
+      "departure_clock": "08:06:12",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29184,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29183,
+      "departure_clock": "08:06:23",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29195,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29196,
+      "departure_clock": "08:06:36",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29208,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29210,
+      "departure_clock": "08:06:50",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29222,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29222,
+      "departure_clock": "08:07:02",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29234,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29228,
+      "departure_clock": "08:07:08",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29240,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29241,
+      "departure_clock": "08:07:21",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29253,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29254,
+      "departure_clock": "08:07:34",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29266,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29260,
+      "departure_clock": "08:07:40",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29272,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29273,
+      "departure_clock": "08:07:53",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29285,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29283,
+      "departure_clock": "08:08:03",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29295,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29292,
+      "departure_clock": "08:08:12",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29304,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29301,
+      "departure_clock": "08:08:21",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29313,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29311,
+      "departure_clock": "08:08:31",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29323,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29325,
+      "departure_clock": "08:08:45",
+      "observed_native_states": 1,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29337,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29332,
+      "departure_clock": "08:08:52",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 29712
+      },
+      "first_access_arrival_seconds": 29344,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29344,
+      "departure_clock": "08:09:04",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 30012
+      },
+      "first_access_arrival_seconds": 29356,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29353,
+      "departure_clock": "08:09:13",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 30012
+      },
+      "first_access_arrival_seconds": 29365,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29363,
+      "departure_clock": "08:09:23",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 30012
+      },
+      "first_access_arrival_seconds": 29375,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29375,
+      "departure_clock": "08:09:35",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 30012
+      },
+      "first_access_arrival_seconds": 29387,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29383,
+      "departure_clock": "08:09:43",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 30012
+      },
+      "first_access_arrival_seconds": 29395,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    },
+    {
+      "departure_seconds": 29389,
+      "departure_clock": "08:09:49",
+      "observed_native_states": 0,
+      "counterfactual_native_states": 1,
+      "observed_bound_before_callback": {
+        "WALK": 29412
+      },
+      "counterfactual_bound_before_callback": {
+        "WALK": 30012
+      },
+      "first_access_arrival_seconds": 29401,
+      "observed_callback_round": 0,
+      "counterfactual_callback_round": 0
+    }
+  ],
+  "seven_restored_alternatives": [
+    {
+      "departure_seconds": 29332,
+      "departure_clock": "08:08:52",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29344,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:08:52",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 356.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "departure_seconds": 29344,
+      "departure_clock": "08:09:04",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29356,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:09:04",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 344.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "departure_seconds": 29353,
+      "departure_clock": "08:09:13",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29365,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:09:13",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 335.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "departure_seconds": 29363,
+      "departure_clock": "08:09:23",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29375,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:09:23",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 325.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "departure_seconds": 29375,
+      "departure_clock": "08:09:35",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29387,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:09:35",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 313.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "departure_seconds": 29383,
+      "departure_clock": "08:09:43",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29395,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:09:43",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 305.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "departure_seconds": 29389,
+      "departure_clock": "08:09:49",
+      "native_state_chains": [
+        [
+          {
+            "stop": -1,
+            "time": 30012,
+            "boardTime": 0,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": 0,
+            "alightStopPosition": 0,
+            "accessMode": "WALK",
+            "egressMode": "WALK"
+          },
+          {
+            "stop": 0,
+            "time": 30000,
+            "boardTime": 29700,
+            "pattern": 0,
+            "trip": 2,
+            "round": 1,
+            "boardStopPosition": 0,
+            "alightStopPosition": 1,
+            "accessMode": "WALK",
+            "egressMode": null
+          },
+          {
+            "stop": 1,
+            "time": 29401,
+            "boardTime": -1,
+            "pattern": -1,
+            "trip": -1,
+            "round": 0,
+            "boardStopPosition": -1,
+            "alightStopPosition": -1,
+            "accessMode": "WALK",
+            "egressMode": null
+          }
+        ]
+      ],
+      "all_three_legs": [
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 0,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:09:49",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.1,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.0061,
+                0.018
+              ],
+              [
+                0.006,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 1,
+          "mode": "BUS",
+          "departure_time": "2026-10-13T08:15:00",
+          "travel_time_seconds": 300.0,
+          "wait_time_seconds": 299.0,
+          "distance_m": 2674.2445432959166,
+          "geometry_nonempty": true,
+          "agency_id": "SMOKE",
+          "route_id": "SMOKE_BUS",
+          "start_stop_id": "SMOKE_WEST",
+          "end_stop_id": "SMOKE_EAST",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.006,
+                0.018
+              ],
+              [
+                0.012,
+                0.018
+              ],
+              [
+                0.018,
+                0.018
+              ],
+              [
+                0.024,
+                0.018
+              ],
+              [
+                0.03,
+                0.018
+              ]
+            ]
+          }
+        },
+        {
+          "from_id": "synthetic_origin",
+          "to_id": "synthetic_destination",
+          "segment": 2,
+          "mode": "WALK",
+          "departure_time": "2026-10-13T08:21:00",
+          "travel_time_seconds": 12.0,
+          "wait_time_seconds": 0.0,
+          "distance_m": 11.254,
+          "geometry_nonempty": true,
+          "agency_id": null,
+          "route_id": null,
+          "start_stop_id": null,
+          "end_stop_id": null,
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                0.03,
+                0.018
+              ],
+              [
+                0.0299,
+                0.018
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "retained_53_row_groups_canonical_sha256": "28334b8c3a0db7fd52cb01896a01957aa1e25498544eaed0c03b3545618ba311",
+  "unchanged_53_native_chains_canonical_sha256": "5b51f9ed0263b97b785189a99900c4f15108eefe37f638cccb62be5a0e56255d",
+  "limitations": [
+    "No production policy change is proposed. This establishes the count mechanism, not whether profile-wide pruning is universally inappropriate.",
+    "The callback occurs after addState duration and target-bound tests. The recorded native map traversal and conditions prove the first access state reaches it for all 60 samples here; this is not guaranteed for other inputs.",
+    "There are 60 sampled departure alternatives, not 60 distinct bus services: the counterfactual uses three bus boardings.",
+    "The observation arm reproduces the already-passing corrected checkpoint; all shipping scripts and their success criteria remain unchanged.",
+    "This Linux diagnostic uses Java 21.0.13; it is not a new Windows run.",
+    "No real Melbourne input compatibility, station access, transfers, accessibility, or journey timing has been tested."
+  ]
+}

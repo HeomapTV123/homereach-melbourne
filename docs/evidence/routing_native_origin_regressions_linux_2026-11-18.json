@@ -1,0 +1,1159 @@
+{
+  "schema_version": 1,
+  "evidence_type": "native_origin_state_regression_observations",
+  "date": "2026-11-18",
+  "capture_file_modified_at_utc": "2026-11-18T13:36:31.918917+00:00",
+  "base_commit": "1be659fadcb83417f5b229d40c26c04abe126ab1",
+  "provenance": {
+    "execution_host": "assistant Linux environment",
+    "method": "A separate native probe loaded the unchanged fictional street/GTFS fixture and original verified R5 JAR. It temporarily rebuilt the reviewed fixture index, compiled the fixed WALK-origin helper, and inspected fresh native origin states before and after the helper. It did not invoke route() or compute journeys.",
+    "implementation_at_capture": "Working implementation on the base commit, identified by canonical-LF source fingerprints below.",
+    "source_sha256_canonical_lf": {
+      "scripts/routing_street_origin_correction.py": "aa3aa3bfd3ab285784a2cd75fb1858e3d478210d43b1b6cc81943767d483d40c",
+      "scripts/routing_native/HomeReachStreetOrigins.java": "f35f65457ba7dfeb976c50d874ffcbf0be4b4187f8bc55e88e62f31a72a6d5f5",
+      "scripts/routing_street_index_correction.py": "b2f89f7151bc992eada33c0749c7bb42cd93f2da1c56385f7cb78bfd01b515dd",
+      "scripts/routing_smoke_fixture.py": "2acb1be2583ebc09633e0bd202c21a4874f905762aba16d96c4269ff02bb59ec"
+    },
+    "probe_source_file": "native_origin_regression_probe.py (scratch instrumentation)",
+    "probe_source_sha256_canonical_lf": "14612ebb2a83335f020c1295464cae42aebb605cf4c2e11748000bd2f353b9a6",
+    "raw_probe_report_sha256": "541b3b46a352aa7bf0c3885cc5e59758029787a06552f4b56bf55cff83b9626b",
+    "probe_process_exit_code": 0,
+    "new_environment_or_engine_downloads": false,
+    "installed_sources_and_original_jar_modified": false,
+    "additional_native_initializations": 16,
+    "routing_searches": 0,
+    "journeys_computed": 0,
+    "temporary_workspace_removed": true
+  },
+  "requirements": {
+    "cases": "Four requested positions (near both endpoints, middle, and a nonzero off-street offset), two walking speeds, and forward/reverse initialization.",
+    "expected_associations": "Each vertex keeps its actual split distance and off-street offset. A forward initial state uses the edge arriving at that vertex; a reverse initial state uses the directed edge leaving that vertex toward the requested point.",
+    "time_check": "The expected time uses the corresponding edge.calculateSpeed return value and the pinned integer conversion and off-street walking time.",
+    "queue_check": "The priority queue contains exactly two initial states and its minimum has the minimum observed duration. The edge-state map points to exactly those same native State objects.",
+    "identity_check": "Reverse correction replaces both original queued state objects; forward mode preserves their identity. No costs are mutated while their states remain in the queue."
+  },
+  "helper": {
+    "java_source_sha256": "f35f65457ba7dfeb976c50d874ffcbf0be4b4187f8bc55e88e62f31a72a6d5f5",
+    "class_sha256": "093ddfa98e0e22484bdc8fdb533e494b22350784b948109b94dde13742811755",
+    "compiler_java_version": "21.0.13",
+    "compiled_in_temporary_workspace": true,
+    "original_jar_sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7"
+  },
+  "original_jar_sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+  "index": {
+    "name": "homereach_fixed_fixture_spatial_index",
+    "version": 1,
+    "source_sha256": "b2f89f7151bc992eada33c0749c7bb42cd93f2da1c56385f7cb78bfd01b515dd",
+    "engine_sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+    "fixture_xml_sha256": "d6244955cb3a5e85fce78833749350bce47cf657b963374c74eb23ab78c64f3c",
+    "graph_sha256_before": "d29986459bd596eaf4b5bb77817ba9b0cf91ccce69a82ec9d656db1ea2b16890",
+    "graph_sha256_after": "d29986459bd596eaf4b5bb77817ba9b0cf91ccce69a82ec9d656db1ea2b16890",
+    "street_pairs": 84,
+    "connector_pairs": 2,
+    "linked_stop_vertices": {
+      "SMOKE_EAST": 49,
+      "SMOKE_WEST": 50
+    },
+    "coverage_before": {
+      "edge_points_checked": 420,
+      "missing_edge_candidates": 322
+    },
+    "coverage_after": {
+      "edge_points_checked": 420,
+      "missing_edge_candidates": 0
+    },
+    "applied": true,
+    "restored": true,
+    "network_unchanged": true
+  },
+  "cases": [
+    {
+      "case": "near-west",
+      "origin_lon_lat": [
+        0.0061,
+        0.018
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 11099,
+        "distance1_mm": 655698,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 13,
+          "identity": 458890629
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 818,
+          "identity": 836841663
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 13,
+          "identity": 458890629
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 818,
+          "identity": 836841663
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 13
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 818
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "near-west",
+      "origin_lon_lat": [
+        0.0061,
+        0.018
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 11099,
+        "distance1_mm": 655698,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 13,
+          "identity": 1416977881
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 818,
+          "identity": 253722034
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 11099,
+          "duration_seconds": 13,
+          "identity": 2084457242
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 655698,
+          "duration_seconds": 818,
+          "identity": 47925969
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 11099,
+          "duration_seconds": 13
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 655698,
+          "duration_seconds": 818
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "near-west",
+      "origin_lon_lat": [
+        0.0061,
+        0.018
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 11099,
+        "distance1_mm": 655698,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 6,
+          "identity": 1985828309
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 385,
+          "identity": 622043416
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 6,
+          "identity": 1985828309
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 385,
+          "identity": 622043416
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 6
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 385
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "near-west",
+      "origin_lon_lat": [
+        0.0061,
+        0.018
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 11099,
+        "distance1_mm": 655698,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 11099,
+          "duration_seconds": 6,
+          "identity": 737892411
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 385,
+          "identity": 1940783703
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 11099,
+          "duration_seconds": 6,
+          "identity": 1874919946
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 655698,
+          "duration_seconds": 385,
+          "identity": 1466066315
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 11099,
+          "duration_seconds": 6
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 655698,
+          "duration_seconds": 385
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "middle",
+      "origin_lon_lat": [
+        0.009,
+        0.018
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 416,
+          "identity": 640275932
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 416,
+          "identity": 630642676
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 416,
+          "identity": 640275932
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 416,
+          "identity": 630642676
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 416
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 416
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "middle",
+      "origin_lon_lat": [
+        0.009,
+        0.018
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 416,
+          "identity": 1117802526
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 416,
+          "identity": 111819772
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 333322,
+          "duration_seconds": 416,
+          "identity": 1850055104
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 333475,
+          "duration_seconds": 416,
+          "identity": 2113919627
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 333322,
+          "duration_seconds": 416
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 333475,
+          "duration_seconds": 416
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "middle",
+      "origin_lon_lat": [
+        0.009,
+        0.018
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 195,
+          "identity": 1025463690
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 195,
+          "identity": 1790831630
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 195,
+          "identity": 1025463690
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 195,
+          "identity": 1790831630
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 195
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 195
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "middle",
+      "origin_lon_lat": [
+        0.009,
+        0.018
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 333322,
+          "duration_seconds": 195,
+          "identity": 687141632
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 333475,
+          "duration_seconds": 195,
+          "identity": 727469847
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 333322,
+          "duration_seconds": 195,
+          "identity": 1823014131
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 333475,
+          "duration_seconds": 195,
+          "identity": 1777381620
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 333322,
+          "duration_seconds": 195
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 333475,
+          "duration_seconds": 195
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "near-east",
+      "origin_lon_lat": [
+        0.0119,
+        0.018
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 655544,
+        "distance1_mm": 11253,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 13,
+          "identity": 1720922681
+        },
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 818,
+          "identity": 796851467
+        }
+      ],
+      "after": [
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 13,
+          "identity": 1720922681
+        },
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 818,
+          "identity": 796851467
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 818
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 13
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "near-east",
+      "origin_lon_lat": [
+        0.0119,
+        0.018
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 655544,
+        "distance1_mm": 11253,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 13,
+          "identity": 68866931
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 818,
+          "identity": 1744942100
+        }
+      ],
+      "after": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 11253,
+          "duration_seconds": 13,
+          "identity": 394019287
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 655544,
+          "duration_seconds": 818,
+          "identity": 1328705686
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 655544,
+          "duration_seconds": 818
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 11253,
+          "duration_seconds": 13
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "near-east",
+      "origin_lon_lat": [
+        0.0119,
+        0.018
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 655544,
+        "distance1_mm": 11253,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 6,
+          "identity": 492938056
+        },
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 385,
+          "identity": 2024084964
+        }
+      ],
+      "after": [
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 6,
+          "identity": 492938056
+        },
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 385,
+          "identity": 2024084964
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 385
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 6
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "near-east",
+      "origin_lon_lat": [
+        0.0119,
+        0.018
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 655544,
+        "distance1_mm": 11253,
+        "offset_mm": 0
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 11253,
+          "duration_seconds": 6,
+          "identity": 220369374
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 655544,
+          "duration_seconds": 385,
+          "identity": 1372124716
+        }
+      ],
+      "after": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 11253,
+          "duration_seconds": 6,
+          "identity": 1101231294
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 655544,
+          "duration_seconds": 385,
+          "identity": 301552475
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 655544,
+          "duration_seconds": 385
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 11253,
+          "duration_seconds": 6
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "off-street",
+      "origin_lon_lat": [
+        0.009,
+        0.0182
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 22222
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 443,
+          "identity": 147623131
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 443,
+          "identity": 505635448
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 443,
+          "identity": 147623131
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 443,
+          "identity": 505635448
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 443
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 443
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "off-street",
+      "origin_lon_lat": [
+        0.009,
+        0.0182
+      ],
+      "walk_speed_m_per_s": 0.800000011920929,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 22222
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 443,
+          "identity": 1157624710
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 443,
+          "identity": 533140425
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 355544,
+          "duration_seconds": 443,
+          "identity": 1929506494
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 355697,
+          "duration_seconds": 443,
+          "identity": 1991537156
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 355544,
+          "duration_seconds": 443
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 355697,
+          "duration_seconds": 443
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    },
+    {
+      "case": "off-street",
+      "origin_lon_lat": [
+        0.009,
+        0.0182
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": false,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 22222
+      },
+      "before": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 208,
+          "identity": 1298975895
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 208,
+          "identity": 1779615656
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 208,
+          "identity": 1298975895
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 208,
+          "identity": 1779615656
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 208
+        },
+        {
+          "vertex": 23,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 208
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": false,
+      "forward_state_identity_preserved": true
+    },
+    {
+      "case": "off-street",
+      "origin_lon_lat": [
+        0.009,
+        0.0182
+      ],
+      "walk_speed_m_per_s": 1.7000000476837158,
+      "reverse": true,
+      "split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "distance0_mm": 333322,
+        "distance1_mm": 333475,
+        "offset_mm": 22222
+      },
+      "before": [
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 355544,
+          "duration_seconds": 208,
+          "identity": 370843722
+        },
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 355697,
+          "duration_seconds": 208,
+          "identity": 1131140319
+        }
+      ],
+      "after": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 355544,
+          "duration_seconds": 208,
+          "identity": 1749590097
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 355697,
+          "duration_seconds": 208,
+          "identity": 345703799
+        }
+      ],
+      "expected": [
+        {
+          "vertex": 22,
+          "back_edge": 82,
+          "distance_mm": 355544,
+          "duration_seconds": 208
+        },
+        {
+          "vertex": 23,
+          "back_edge": 83,
+          "distance_mm": 355697,
+          "duration_seconds": 208
+        }
+      ],
+      "queue_minimum_correct": true,
+      "queue_map_identity_consistent": true,
+      "old_queued_states_replaced": true,
+      "forward_state_identity_preserved": false
+    }
+  ],
+  "summary": {
+    "cases_checked": 16,
+    "forward_cases": 8,
+    "reverse_cases": 8,
+    "failures": 0,
+    "nonzero_offset_cases": 4,
+    "queue_and_map_checks_passed": true,
+    "original_index_restored": true,
+    "fixture_graph_unchanged": true
+  },
+  "limits": [
+    "This validates initial native state association and queue/map invariants on the fixed fictional graph; the separate combined smoke report validates complete returned itineraries.",
+    "The pinned WALK speed is request-wide, so different per-direction walking speeds are not a configurable native case. The helper still obtains each associated edge speed separately; unsupported CAR/BICYCLE modes are refused.",
+    "Reverse point-to-point destinations remain unsupported by this experimental adapter.",
+    "No Melbourne network, access restriction, transfer, accessibility or real travel time is validated."
+  ]
+}

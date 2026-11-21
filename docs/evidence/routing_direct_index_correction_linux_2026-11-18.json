@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "evidence_type": "paired_native_direct_route_and_spatial_index_probe",
+  "started_at_utc": "2026-11-18T13:33:03.879694+00:00",
+  "baseline_commit": "1be659fadcb83417f5b229d40c26c04abe126ab1",
+  "provenance": {
+    "platform": "Linux",
+    "fixture_queries": 3,
+    "additional_diagnostic_queries": 2,
+    "probe_method": "After obtaining the original direct result, two fresh native direct routers use identical requests. The first uses the original index; the second uses correct_fixture_index(network, fixture), which restores the original index after its query. Original smoke-query rows are retained unchanged.",
+    "raw_scratch_report_sha256": "14121b352f0446877df2368ce66d7096f46b37588428749fe98f5f539d5eaa7d",
+    "probe_worker_source_sha256": "41dff193788b1b1fef835be009377909e5fc4b61e94c3e927a6bdf946743512d",
+    "implementation": "scripts/routing_street_index_correction.py",
+    "implementation_source_sha256": "b2f89f7151bc992eada33c0749c7bb42cd93f2da1c56385f7cb78bfd01b515dd"
+  },
+  "engine": {
+    "r5py": "1.1.7",
+    "sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+    "jvm_started": true,
+    "java_version": "21.0.13",
+    "max_heap_bytes": 1073741824,
+    "classpath_verified": true,
+    "temporary_directory_verified": true,
+    "python_routing_jobs": 1,
+    "rasterio_imported": "1.5.2",
+    "default_configuration_files": [],
+    "python_guard_scope": "Python file mutations and socket operations; not a Java/native sandbox"
+  },
+  "fixture_sha256": {
+    "streets.osm.pbf": "5d8eee5ad473e362142887d9ea41f135d804b6d1fba42576e9a66fc56cf12879",
+    "synthetic.gtfs.zip": "66d4d61eca2b10edfd4930f8b74c8e572e4509f5e3959118d1df93cd4d745127"
+  },
+  "original_geometry_smoke_rows_unchanged": {
+    "walking": true,
+    "transit": true,
+    "no_service": true
+  },
+  "observations": [
+    {
+      "index_rebuilt_using_fixed_envelopes": false,
+      "origin": [
+        0.0061,
+        0.018
+      ],
+      "destination": [
+        0.0299,
+        0.018
+      ],
+      "origin_split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "fixedLon": 61000,
+        "fixedLat": 180000,
+        "distance0_mm": 11099,
+        "distance1_mm": 655698,
+        "distanceToEdge_mm": 0
+      },
+      "destination_split": {
+        "edge": 98,
+        "vertex0": 26,
+        "vertex1": 27,
+        "fixedLon": 300000,
+        "fixedLat": 180000,
+        "distance0_mm": 0,
+        "distance1_mm": 666797,
+        "distanceToEdge_mm": 11099
+      },
+      "candidate_edge_ids": [
+        98,
+        100,
+        126
+      ],
+      "correct_west_edge": {
+        "index": 94,
+        "from": {
+          "index": 25,
+          "lon": 0.024,
+          "lat": 0.018
+        },
+        "to": {
+          "index": 26,
+          "lon": 0.03,
+          "lat": 0.018
+        },
+        "length_mm": 666797,
+        "geometry": "LINESTRING (0.024 0.018, 0.03 0.018)",
+        "linkable": true,
+        "link": false,
+        "walk": true
+      },
+      "terminal_state": {
+        "vertex": {
+          "index": -1
+        },
+        "back_edge": 98,
+        "distance_mm": 2656089,
+        "duration_seconds": 2656
+      },
+      "state_chain": [
+        {
+          "vertex": {
+            "index": -1
+          },
+          "back_edge": 98,
+          "distance_mm": 2656089,
+          "duration_seconds": 2656
+        },
+        {
+          "vertex": {
+            "index": 26,
+            "lon": 0.03,
+            "lat": 0.018
+          },
+          "back_edge": 94,
+          "distance_mm": 2656089,
+          "duration_seconds": 2656
+        },
+        {
+          "vertex": {
+            "index": 25,
+            "lon": 0.024,
+            "lat": 0.018
+          },
+          "back_edge": 90,
+          "distance_mm": 1989292,
+          "duration_seconds": 1989
+        },
+        {
+          "vertex": {
+            "index": 24,
+            "lon": 0.018,
+            "lat": 0.018
+          },
+          "back_edge": 86,
+          "distance_mm": 1322495,
+          "duration_seconds": 1322
+        },
+        {
+          "vertex": {
+            "index": 23,
+            "lon": 0.012,
+            "lat": 0.018
+          },
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 655
+        }
+      ]
+    },
+    {
+      "index_rebuilt_using_fixed_envelopes": true,
+      "origin": [
+        0.0061,
+        0.018
+      ],
+      "destination": [
+        0.0299,
+        0.018
+      ],
+      "origin_split": {
+        "edge": 82,
+        "vertex0": 22,
+        "vertex1": 23,
+        "fixedLon": 61000,
+        "fixedLat": 180000,
+        "distance0_mm": 11099,
+        "distance1_mm": 655698,
+        "distanceToEdge_mm": 0
+      },
+      "destination_split": {
+        "edge": 94,
+        "vertex0": 25,
+        "vertex1": 26,
+        "fixedLon": 299000,
+        "fixedLat": 180000,
+        "distance0_mm": 655544,
+        "distance1_mm": 11253,
+        "distanceToEdge_mm": 0
+      },
+      "candidate_edge_ids": [
+        74,
+        94,
+        98,
+        100
+      ],
+      "correct_west_edge": {
+        "index": 94,
+        "from": {
+          "index": 25,
+          "lon": 0.024,
+          "lat": 0.018
+        },
+        "to": {
+          "index": 26,
+          "lon": 0.03,
+          "lat": 0.018
+        },
+        "length_mm": 666797,
+        "geometry": "LINESTRING (0.024 0.018, 0.03 0.018)",
+        "linkable": true,
+        "link": false,
+        "walk": true
+      },
+      "terminal_state": {
+        "vertex": {
+          "index": -1
+        },
+        "back_edge": 94,
+        "distance_mm": 2644836,
+        "duration_seconds": 2645
+      },
+      "state_chain": [
+        {
+          "vertex": {
+            "index": -1
+          },
+          "back_edge": 94,
+          "distance_mm": 2644836,
+          "duration_seconds": 2645
+        },
+        {
+          "vertex": {
+            "index": 25,
+            "lon": 0.024,
+            "lat": 0.018
+          },
+          "back_edge": 90,
+          "distance_mm": 1989292,
+          "duration_seconds": 1989
+        },
+        {
+          "vertex": {
+            "index": 24,
+            "lon": 0.018,
+            "lat": 0.018
+          },
+          "back_edge": 86,
+          "distance_mm": 1322495,
+          "duration_seconds": 1322
+        },
+        {
+          "vertex": {
+            "index": 23,
+            "lon": 0.012,
+            "lat": 0.018
+          },
+          "back_edge": 82,
+          "distance_mm": 655698,
+          "duration_seconds": 655
+        }
+      ],
+      "index_adapter_audit": {
+        "name": "homereach_fixed_fixture_spatial_index",
+        "version": 1,
+        "source_sha256": "b2f89f7151bc992eada33c0749c7bb42cd93f2da1c56385f7cb78bfd01b515dd",
+        "engine_sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+        "fixture_xml_sha256": "d6244955cb3a5e85fce78833749350bce47cf657b963374c74eb23ab78c64f3c",
+        "graph_sha256_before": "d29986459bd596eaf4b5bb77817ba9b0cf91ccce69a82ec9d656db1ea2b16890",
+        "graph_sha256_after": "d29986459bd596eaf4b5bb77817ba9b0cf91ccce69a82ec9d656db1ea2b16890",
+        "street_pairs": 84,
+        "connector_pairs": 2,
+        "linked_stop_vertices": {
+          "SMOKE_EAST": 49,
+          "SMOKE_WEST": 50
+        },
+        "coverage_before": {
+          "edge_points_checked": 420,
+          "missing_edge_candidates": 322
+        },
+        "coverage_after": {
+          "edge_points_checked": 420,
+          "missing_edge_candidates": 0
+        },
+        "applied": true,
+        "restored": true,
+        "network_unchanged": true
+      }
+    }
+  ],
+  "interpretation": {
+    "index_defect": "IntHashGrid.insert(LineString) calculates dX and dY as first minus second, then adds those differences to the first coordinate during interpolation. The reflected segment is indexed instead of the supplied segment. Native lookup near longitude 0.0299 consequently omits the containing edge94 and selects eastward edge98.",
+    "index_correction": "Rebuild the derived index for the strictly verified fixture using fixed-coordinate Edge.getEnvelope() and IntHashGrid.insert(Envelope, edgeID). All street/stop/connector graph values remain identical and the original index is restored.",
+    "direct_cost_before_m": 2656.089,
+    "direct_cost_after_m": 2644.836,
+    "independent_reference_m": 2646.439123543956,
+    "reference_tolerance_m": 5.292878247087913,
+    "distance_within_reference_tolerance_after_index_correction": true,
+    "remaining_limit": "The envelope index correction does not repair reverse-origin costs or full-edge output geometries. Both require their separate corrections. This scoped repair is applied only after verifying existing fixture stop links; it does not correct arbitrary transit links created with the original index."
+  },
+  "source_evidence": [
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/streets/IntHashGrid.java",
+      "finding": "LineString insertion uses a reflected displacement; the Envelope overload visits its actual bounds."
+    },
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/streets/EdgeStore.java",
+      "finding": "Edge.getEnvelope uses fixed-coordinate points, matching IntHashGrid Envelope inputs."
+    },
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/streets/StreetLayer.java",
+      "finding": "indexStreets calls the affected LineString overload. findSplit queries candidates through the derived index."
+    },
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/streets/StreetRouter.java",
+      "finding": "Destination getState(Split) adds the along-edge partial distance but omits distanceToEdge_mm. The corrected index makes the fixed destination lie on the selected edge, with zero off-edge offset."
+    }
+  ],
+  "temporary_workspace_removed": true,
+  "real_project_datasets_read": 0,
+  "melbourne_journeys_computed": 0
+}
