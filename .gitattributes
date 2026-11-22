@@ -1,0 +1,3 @@
+# Preserve the evidence reports' exact bytes and recorded SHA-256 values.
+docs/evidence/routing_timetable_windows_2026-11-22.json -text whitespace=cr-at-eol
+docs/evidence/routing_service_day_linux_2026-11-22.json -text

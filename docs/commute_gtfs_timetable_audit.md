@@ -4,13 +4,15 @@
 
 [`scripts/audit_routing_timetable.py`](../scripts/audit_routing_timetable.py) reads every stop-time record in the three selected feeds of the pinned local GTFS archive. It checks source identity, references, numeric stop sequences and supported timetable semantics before any Melbourne routing experiment. It complements the existing input preflight, which checks small tables and stop-time headers.
 
-The focused regression checks passed: **119 tests in 2.21 seconds**. The full project suite then passed: **1,093 tests in 27.95 seconds, with no skips**, using the pandas compatibility environment and third-party pytest plugin autoload disabled. These checks include controlled fixtures for malformed inputs and cleanup after failures.
+At the `d5bc9a5` implementation checkpoint, the focused regression checks passed: **119 tests in 2.21 seconds**. The full project suite then passed: **1,093 tests in 27.95 seconds, with no skips**, using the pandas compatibility environment and third-party pytest plugin autoload disabled. These checks include controlled fixtures for malformed inputs and cleanup after failures.
 
-The real GTFS archive is unavailable in the development checkout, so **the complete source audit and its Windows result are still pending**. A CLI run against that checkout returned `blocked` with exit code 2, verified the available protected inputs unchanged, and created no temporary workspace or downloaded dataset. The expected counts below are existing snapshot requirements, not measurements from a completed new run.
+**The supplied Windows audit passed.** On 22 November 2026 the maintainer supplied the [complete JSON report](evidence/routing_timetable_windows_2026-11-22.json), following a terminal transcript that associates the run with Windows, the `homereach` environment, checkout `d5bc9a5` and exit code 0. The report records completed source scans and logical trip checks for all three feeds, no issues/errors/blockers, matching aggregate counts, unchanged protected inputs and successful temporary cleanup.
+
+The [checkpoint record](evidence/routing_timetable_windows_checkpoint_2026-11-22.json) preserves provenance and independently derived reconciliations. The raw report is retained byte for byte: **5,188 bytes**, SHA-256 `eea15e02ba4b255939a4be7c20954323d43436e629bd53218a4f60bf13a2ab49`. The receipt date is not an execution timestamp. The JSON contains no execution timestamp, source revision, runtime versions, duration or peak-memory measurement; the platform, environment and checkout association comes from the preceding terminal transcript. This review did not rerun the local archive.
 
 A passed audit establishes only the checks described here. It does not certify the whole GTFS specification, load an engine network, validate transfers or station access, or establish travel times. Every audit report keeps `routing_ready` false and `journeys_computed` zero.
 
-## Pinned source and expected coverage
+## Pinned source and verified coverage
 
 The audit uses [`config/routing_pilot.json`](../config/routing_pilot.json) and [`config/gtfs_snapshot.json`](../config/gtfs_snapshot.json), with service date **2026-10-13** in **Australia/Melbourne**. The archive is `data/raw/transport/gtfs.zip`, with SHA-256:
 
@@ -18,16 +20,35 @@ The audit uses [`config/routing_pilot.json`](../config/routing_pilot.json) and [
 c88af3abcaf0872e45196dcc1d5af9bc20a82c54a00a9dfef46c809ec2e34814
 ```
 
-| Nested feed | Scope recorded in the snapshot | Expected stop-time rows |
-| --- | --- | ---: |
-| 2 | Metropolitan train operational feed | 688,380 |
-| 3 | Metropolitan tram | 2,568,892 |
-| 4 | Myki bus, including regional town services | 8,589,911 |
-| **Total** | **All three selected feeds** | **11,847,183** |
+The recorded source and active-row totals match the existing snapshot requirements:
 
-The expected number of rows belonging to active trips on the selected service date is **1,311,746**. Activity is determined from calendar rules and calendar exceptions. Active-trip, labelled-replacement, location and platform counts are also reconciled with the snapshot.
+| Nested feed | Scope recorded in the snapshot | Source rows | Active-date rows |
+| --- | --- | ---: | ---: |
+| 2 | Metropolitan train operational feed | 688,380 | 49,389 |
+| 3 | Metropolitan tram | 2,568,892 | 232,760 |
+| 4 | Myki bus, including regional town services | 8,589,911 | 1,029,597 |
+| **Total** | **All three selected feeds** | **11,847,183** | **1,311,746** |
+
+Activity is determined from calendar rules and calendar exceptions. All **311,483 declared trips** have stop-time records, including all **35,580 active trips**. The number of distinct indexed sequence rows and ordered rows checked both equals the complete source-row count. Active-trip, labelled-replacement, location and platform counts passed their snapshot checks. The report records 52 labelled replacement trips in feed 2.
 
 All source rows are inspected, including inactive trips, events outside the morning window and stops outside the comparison LGAs. No geographic or morning-window filter runs before the timetable checks. The archive's complete outer-member inventory is checked, while timetable validation is limited to feeds 2, 3 and 4.
+
+### Extended service-day times
+
+| Feed | Source rows with times at/after 24:00:00 | Active-date rows with times at/after 24:00:00 | Maximum time across all source rows |
+| --- | ---: | ---: | --- |
+| 2 | 30,652 | 1,064 | 27:49:00 |
+| 3 | 106,899 | 4,897 | 28:32:00 |
+| 4 | 113,381 | 2,469 | 32:47:00 |
+| **Total** | **250,932** | **8,430** | **32:47:00 overall** |
+
+These counts describe stop-time rows, not distinct overnight trips or available journeys. The maxima include inactive trips. The report does not separately give active-trip time extrema, so it does not establish that an active trip reaches `32:47:00`. No unresolved-time, arrangement-required, flexible-service or effective continuous-service rows were recorded within the audit's supported scope.
+
+The separate [service-day compatibility experiment](commute_routing_service_day_check.md) now tests those boundaries with a fictional timetable and independent date/time expectations. Its Linux run completes all twelve BUS queries: ordinary daytime, same-day exception and midnight-crossing cases pass, but four expected previous-service-day trips are missing. The command correctly fails that new gate. The Windows source audit remains a completed source-validation checkpoint; it does not change the frozen timetable or establish engine compatibility.
+
+### Configuration fingerprint and Windows line endings
+
+The report's pilot-configuration hash differs from the earlier Linux inventory because of line endings. The exact `routing_pilot.json` at `d5bc9a5` has 417 bytes with LF line endings and SHA-256 `0858fd0a8a36c7fad5f592bf243cc8e160b5c04dbf4df107c33ea8d1f6a4a473`. Replacing only its 13 LF endings with CRLF yields 430 bytes and SHA-256 `e6b23abed998e1fd17dcf8505056f07f4bdf17a13ad2ec5945592800ad051595`, exactly the uploaded report's value. This explains the fingerprint without a semantic configuration change. The snapshot hash matches the file at that revision, and the report records unchanged protected inputs during the run.
 
 ## How the audit works
 
@@ -63,9 +84,9 @@ Fixed-stop references must identify boarding stops with location type `0` or bla
 
 Unsupported rows interrupt known chronology anchors. Trips with unsupported or unorderable records do not receive a complete endpoint claim. Values beyond the index's integer storage range are also reported as unsupported rather than silently truncated.
 
-## Run once on Windows and retain the report
+## Reproduce the Windows audit
 
-Use Anaconda Prompt / CMD with the existing **`homereach`** environment. The audit uses installed Python, NumPy and pandas; it installs no packages, downloads no inputs and starts no JVM. The separate routing and Osmium environments are not needed for this command.
+The following commands document how to reproduce the completed checkpoint. Use Anaconda Prompt / CMD with the existing **`homereach`** environment. The audit uses installed Python, NumPy and pandas; it installs no packages, downloads no inputs and starts no JVM. The separate routing and Osmium environments are not needed for this command.
 
 After pulling the updated feature branch, use the external temporary directory `D:\homereach-conda\tmp`. The following captures JSON outside the project while leaving progress visible on stderr. The JSON report is emitted at completion or a handled failure. Echo the exit code immediately after the command, before another command changes it:
 
