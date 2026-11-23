@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "stage": "supplied_windows_service_day_evidence_review",
+  "review_date": "2026-11-23",
+  "review_scope": "Read-only comparison and replay of validators against the supplied Windows and recorded Linux JSON; no native engine rerun.",
+  "reports": {
+    "windows": {
+      "path": "docs/evidence/routing_service_day_windows_2026-11-23.json",
+      "uploaded_filename": "routing-service-day-22692-22001.json",
+      "bytes": 880208,
+      "sha256": "fb89fed7237120de28f0055ac5a7ebd960df591373398bbb904a2352f54a35a7",
+      "crlf_line_endings": 30244,
+      "byte_order_mark": false,
+      "started_at_utc": "2026-11-23T11:59:17.731036+00:00",
+      "elapsed_seconds": 42.813,
+      "preserved_byte_for_byte": true
+    },
+    "linux": {
+      "path": "docs/evidence/routing_service_day_linux_2026-11-22.json",
+      "bytes": 849939,
+      "sha256": "c2dca7b07f2a1c33e5ebc63cb8e54db2b75b286b8760c5faabc0d8d409d99dcd",
+      "crlf_line_endings": 0,
+      "byte_order_mark": false,
+      "started_at_utc": "2026-11-22T12:19:32.199226+00:00",
+      "elapsed_seconds": 5.33
+    }
+  },
+  "checkout_association": {
+    "source": "Maintainer terminal transcript, not a git field in the raw report",
+    "reported_commit": "3dab578c3f39b4787e04012e6b5b98fce51d6c8c",
+    "normalized_execution_source_files_checked_against_commit": 13,
+    "all_match": true,
+    "normalization": "CRLF replaced with LF, following the runner source-fingerprint protocol"
+  },
+  "fingerprint_comparison": {
+    "execution_source_files": 13,
+    "normalized_execution_source_hashes_equal": true,
+    "staged_input_hashes_equal": true,
+    "staged_inputs": {
+      "r5-v7.5.1-r5py-all.jar": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+      "streets.osm.pbf": "5d8eee5ad473e362142887d9ea41f135d804b6d1fba42576e9a66fc56cf12879",
+      "service-day.gtfs.zip": "581f81b650f152e21a03a89f50714e9a330e55110d552a5bb641cc3552bafd33"
+    },
+    "gtfs_regenerated_locally_and_fingerprint_matches": true,
+    "source_fingerprints_equal_does_not_imply_complete_environment_equivalence": true
+  },
+  "case_results": [
+    {
+      "id": "daytime_control",
+      "status": "passed",
+      "options_checked": 38,
+      "row_count": 114,
+      "query_errors": false
+    },
+    {
+      "id": "next_date_daytime_control",
+      "status": "passed",
+      "options_checked": 38,
+      "row_count": 114,
+      "query_errors": false
+    },
+    {
+      "id": "daytime_calendar_addition",
+      "status": "passed",
+      "options_checked": 38,
+      "row_count": 114,
+      "query_errors": false
+    },
+    {
+      "id": "daytime_calendar_removal",
+      "status": "passed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "midnight_crossing",
+      "status": "passed",
+      "options_checked": 60,
+      "row_count": 180,
+      "query_errors": false
+    },
+    {
+      "id": "previous_service_24h",
+      "status": "failed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "previous_service_25h",
+      "status": "failed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "previous_service_32h",
+      "status": "failed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "calendar_addition",
+      "status": "failed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "calendar_removal",
+      "status": "passed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "same_date_must_not_wrap",
+      "status": "passed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    },
+    {
+      "id": "inactive_date",
+      "status": "passed",
+      "options_checked": 0,
+      "row_count": 0,
+      "query_errors": false
+    }
+  ],
+  "findings": {
+    "overall_status": "failed",
+    "positive_cases_passed": 4,
+    "positive_cases_total": 8,
+    "negative_cases_passed": 4,
+    "negative_cases_total": 4,
+    "queries_attempted": 12,
+    "walking_queries_attempted": 1,
+    "query_exceptions": 0,
+    "top_level_problems": [
+      "calendar_addition: The expected active bus itinerary is missing.",
+      "previous_service_24h: The expected active bus itinerary is missing.",
+      "previous_service_25h: The expected active bus itinerary is missing.",
+      "previous_service_32h: The expected active bus itinerary is missing."
+    ],
+    "case_diagnostics_exactly_equal": true,
+    "additional_global_problem_messages": 0
+  },
+  "returned_rows": {
+    "query_observations_metadata_exactly_equal": true,
+    "transit_itinerary_rows": 522,
+    "sampled_alternatives": 174,
+    "bus_legs": 174,
+    "walking_legs_within_transit_itineraries": 348,
+    "independent_walking_control_rows": 1,
+    "exactly_equal_transit_rows": 348,
+    "raw_transit_rows_exactly_equal": false,
+    "differing_row_count": 174,
+    "only_differing_field": "BUS distance_m",
+    "windows_bus_distance_m": 2674.2445432960913,
+    "linux_bus_distance_m": 2674.2445432959166,
+    "maximum_absolute_difference_m": 1.7462298274040222e-10,
+    "all_other_row_fields_equal": true,
+    "all_query_identities_clocks_waits_durations_ordering_and_geometries_equal": true,
+    "independent_walking_control_exactly_equal": true,
+    "raw_values_were_not_modified": true
+  },
+  "validator_replay": {
+    "function": "scripts/run_routing_service_day_test.py:validate_result",
+    "input_preparation": "Deep-copy the saved parent report and restore status=completed, the worker status expected before parent validation; leave raw observations unchanged.",
+    "results": {
+      "windows": {
+        "top_level_problems_reproduced_exactly": true,
+        "case_diagnostics_reproduced_exactly": true,
+        "positive_cases_passed": 4,
+        "negative_cases_passed": 4
+      },
+      "linux": {
+        "top_level_problems_reproduced_exactly": true,
+        "case_diagnostics_reproduced_exactly": true,
+        "positive_cases_passed": 4,
+        "negative_cases_passed": 4
+      }
+    },
+    "engine_imported_or_run": false,
+    "source_revision": "d5a304d041b0482446a6230213f83a02f772b9af (same validator source as reported checkout 3dab578)"
+  },
+  "runtime_comparison": {
+    "same": {
+      "r5py": "1.1.7",
+      "jpype1": "1.7.1",
+      "geopandas": "1.2.0",
+      "shapely": "2.2.0",
+      "pyproj": "3.8.0",
+      "rasterio": "1.5.2",
+      "python_bits": 64,
+      "native_jar_sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+      "heap_limit_bytes": 1073741824,
+      "python_routing_jobs": 1,
+      "network_timezone": "Australia/Melbourne"
+    },
+    "different": {
+      "python": {
+        "windows": "3.12.16",
+        "linux": "3.12.14"
+      },
+      "java": {
+        "windows": "21.0.10",
+        "linux": "21.0.13"
+      },
+      "pandas": {
+        "windows": "3.0.3",
+        "linux": "3.1.1"
+      },
+      "numpy": {
+        "windows": "2.3.5",
+        "linux": "2.5.4"
+      },
+      "platform": {
+        "windows": "Windows-11-10.0.26300-SP0",
+        "linux": "Linux-6.18.57-x86_64-with-glibc2.41"
+      }
+    },
+    "actual_embedded_jvm_started_both": true,
+    "inventory_scope_note": "runtime_inventory records the preflight before engine import, so its embedded_jvm_started=false is distinct from the worker engine.jvm_started=true."
+  },
+  "restoration_and_preservation": {
+    "leg_adapter_identical_and_restored": true,
+    "leg_snapshots_each": 522,
+    "walking_correction_scopes_restored_each": {
+      "index": true,
+      "origin": true,
+      "geometry": true
+    },
+    "native_graph_unchanged_each": true,
+    "helper_class_sha256_equal": true,
+    "helper_source_sha256_equal": true,
+    "only_walking_correction_metadata_difference": "origin.helper.compiler_java_version: Windows 21.0.10, Linux 21.0.13",
+    "protected_inputs_unchanged_each": true,
+    "temporary_workspace_removed_each": true
+  },
+  "warnings_exactly_equal": [
+    "The 'shapely.ops.transform()' function is deprecated. Use 'shapely.transform()' or 'shapely.transform_coordseq()' instead. See https://shapely.readthedocs.io/en/latest/manual.html#shapely.ops.transform for more details.",
+    "The currently loaded GTFS data sets do not define any services on 2026-10-15."
+  ],
+  "limitations": [
+    "The assistant reviewed the supplied file and replayed validators locally; it did not execute the original Windows command or independently attest the maintainer filesystem/runtime.",
+    "The source commit association comes from the terminal transcript and matching normalized execution hashes; the raw report has no git commit field.",
+    "The reports and environments are not byte-for-byte identical. All query row differences are retained, including the recorded BUS-distance rounding difference.",
+    "Matching sampled alternatives does not establish exhaustive departure coverage, general network correctness, transfer correctness, DST behavior or real Melbourne routing readiness.",
+    "Elapsed times describe separate runs on different machines/environments and are not a controlled performance benchmark."
+  ],
+  "real_project_datasets_read_each": 0,
+  "melbourne_journeys_computed_each": 0,
+  "routing_ready_each": false
+}

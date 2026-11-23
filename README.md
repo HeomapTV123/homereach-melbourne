@@ -443,11 +443,17 @@ checks midnight crossings, previous-service-day trips and calendar exceptions
 while retaining the existing walking and timing checks. Its Linux run completes
 all twelve BUS queries but misses four expected previous-service-day trips.
 The ordinary daytime, same-day exception and midnight-crossing controls pass;
-the overall compatibility gate correctly fails. The supplied Windows terminal
-summary at `3dab578` reproduces all twelve case outcomes and alternative counts,
-with unchanged inputs and successful cleanup. Its saved full JSON still needs
-review. A [review of service-day selection](docs/commute_service_day_selection_review.md)
-identifies the date-selection mechanism and defines the next controlled experiment.
+the overall compatibility gate correctly fails. The complete supplied Windows
+report at `3dab578` confirms all twelve outcomes, matching execution-source and
+fixture hashes, unchanged inputs and successful cleanup. Returned clocks,
+identities and geometry match Linux; the only row difference is negligible BUS
+distance rounding. A [review of service-day selection](docs/commute_service_day_selection_review.md)
+identifies the mechanism. The [paired native anchor experiment](docs/commute_service_day_anchor_probe.md)
+recovers all four missing trips under their previous service date, while that
+same change excludes the ordinary current-day control. Its seven Linux pairs
+pass with identical civil sample times and unchanged walking costs. This
+diagnostic result preserves the failed compatibility baseline; a general
+integration still needs coherent service instances and transfers across dates.
 
 ## Sources, attribution and project ownership
 

@@ -1,13 +1,14 @@
-# Service-day selection: source review and next experiment
+# Service-day selection: source review and native comparison
 
 ## Decision at this checkpoint
 
-The supplied Windows summary at `3dab578` reproduces the Linux service-day case
-pattern: eight cases pass and four previous-service positive cases fail. The
-[Windows evidence record](evidence/routing_service_day_windows_checkpoint_2026-11-23.json)
-preserves the printed observations. The complete saved Windows JSON remains
-unreviewed; its per-case problem details, additional global findings, runtime
-identity and fingerprints cannot be inferred from the short summary.
+The complete supplied Windows report at `3dab578` confirms the Linux service-day
+case pattern: eight cases pass and four previous-service positive cases fail.
+The [Windows evidence record](evidence/routing_service_day_windows_checkpoint_2026-11-23.json)
+now includes review of the raw file. The four missing itineraries are the only
+global problems; no query exceptions occurred. Execution-source/fixture hashes
+and all returned clocks, identities and geometry match Linux. The [comparison](evidence/routing_service_day_platform_comparison_2026-11-23.json)
+retains the small BUS-distance rounding difference and actual runtime differences.
 
 Source inspection of the pinned integration identifies a mechanism consistent
 with the retained Linux results: the request selects active services for one
@@ -15,11 +16,12 @@ calendar date, while timetable times retain their service-day seconds. A
 following-calendar-day request therefore excludes a preceding-date-only service
 before the search can use its extended-hour departures.
 
-Keep the existing twelve-case diagnostic and its failed baseline. The next
-engineering experiment should test that date selection directly with paired
-native requests. That probe is specified below; it has **not been implemented or
-run at this checkpoint**. No replacement engine, timetable transformation,
-installed-package patch or production routing correction is introduced here.
+The existing twelve-case diagnostic and its failed baseline are preserved. The
+[paired native request probe](commute_service_day_anchor_probe.md) now implements
+the experiment below and passes its seven Linux pair checks. The previous-date
+representation recovers the four missing trips, but also excludes the valid
+current-day control. No replacement engine, timetable transformation,
+installed-package patch or production service-day correction is introduced.
 
 ## Reviewed sources
 
@@ -39,8 +41,9 @@ The corresponding file hashes are:
 | `r5py/r5/regional_task.py` | `2cb5729eb461fc66d7e482f833373121e87e8b21cc68f81f46cc4d5ea8be6876` |
 | `r5py/r5/trip_planner.py` | `541bcf3ec644bb717195518699ad540d1c448330539e26b1f36cd850ff7674a7` |
 
-These are source-review fingerprints, not fresh measurements of the maintainer's
-installed Windows files. The official [advanced-use guide](https://r5py.readthedocs.io/stable/user-guide/user-manual/advanced-use.html#route-with-gtfs-data-sets-that-have-trips-after-24-00-00)
+The Windows baseline records the matching TripPlanner fingerprint through its
+adapters; it does not fingerprint RegionalTask. The new native probe checks both
+installed files against these source-review hashes. The official [advanced-use guide](https://r5py.readthedocs.io/stable/user-guide/user-manual/advanced-use.html#route-with-gtfs-data-sets-that-have-trips-after-24-00-00)
 and [upstream report #508](https://github.com/r5py/r5py/issues/508) describe related
 extended-time limitations. That issue used a different r5py version and API;
 this project's retained experiment supplies the specific evidence for its
@@ -63,11 +66,11 @@ found on Tuesday, while the removed one is absent. The previous-day removal's
 empty result alone would not establish correct exception handling, because a
 search excluding every preceding-day service would also return empty.
 
-The Linux report establishes missing results without query exceptions. The
-Windows summary establishes matching displayed outcomes and counts; the full
-Windows report is still required to check the detailed reasons and metadata.
+Both complete baseline reports establish the same missing results without query
+exceptions. The new native comparison isolates the effect of the service-date
+selection before Python constructs transit itinerary timestamps.
 
-## Next controlled native experiment
+## Controlled native experiment
 
 Use the unchanged fictional network and reviewed JAR, with the existing scoped
 walking corrections, six-minute sampling window and resource limits. Start with
@@ -93,12 +96,15 @@ first, retain their service-date association, and compare those fields with the
 independent fixture timetable. A diagnostic civil-time derivation must stay
 separate from any claimed engine-returned itinerary.
 
-If the expected native trip is recovered, that would isolate the role of the
-selected service date. Include ordinary-current-day and removed/inactive
-controls so the experiment also exposes what the prior-date view excludes.
-Preserve the unmodified baseline and report unchanged original inputs, restored
-temporary scopes and cleanup. A missing trip, exception, changed cost map or
-mismatched sampled interval must remain a failed or inconclusive probe.
+The implemented probe includes all four missing cases, the ordinary-current-day
+control and removed/inactive controls. All seven pairs have equal normalized
+sample times and unchanged costs. The four previous-service cases recover the
+expected native trips, while the current-day control switches from found to
+absent under the prior-date representation. The [raw evidence and Windows
+command](commute_service_day_anchor_probe.md) are recorded separately. Original
+inputs remain unchanged, scopes are restored and cleanup succeeds. Missing
+expected trips, query exceptions, changed cost maps or mismatched sampled
+intervals fail the probe.
 
 ## Why this is not yet a general repair
 
@@ -114,15 +120,10 @@ midnight-spanning query windows, date boundaries, DST and the complete range of
 source times. Selecting or implementing that integration is a later decision.
 The original GTFS archive and the completed source audit remain the reference.
 
-## Immediate evidence handoff
+## Next verification
 
-Provide the JSON already saved by the Windows run:
-
-```text
-D:\homereach-conda\tmp\routing-service-day-22692-22001.json
-```
-
-There is no need to rerun the engine to supply it. Review its runtime identity,
-source/fixture hashes, per-case reasons, complete global findings and raw returned
-rows before declaring complete cross-platform report equivalence. This
-documentation checkpoint adds no code and does not clear the compatibility gate.
+The original Windows JSON is reviewed and preserved. The next platform check is
+the new paired native probe using the existing Windows environment and JAR, as
+described in [the probe guide](commute_service_day_anchor_probe.md#run-on-windows).
+A passing probe supports this fixed experiment's causal explanation; it does not
+clear the failed compatibility gate or establish mixed-service-day transfers.

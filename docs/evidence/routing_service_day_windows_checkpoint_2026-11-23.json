@@ -1,19 +1,20 @@
 {
   "schema_version": 1,
   "stage": "supplied_windows_service_day_checkpoint",
-  "evidence_type": "maintainer_supplied_terminal_summary",
+  "evidence_type": "maintainer_supplied_terminal_summary_and_reviewed_raw_report",
   "received_date": "2026-11-23",
-  "execution_timestamp_supplied": false,
+  "execution_timestamp_supplied": true,
   "checkout": {
     "reported_short_sha": "3dab578",
     "resolved_commit_sha": "3dab578c3f39b4787e04012e6b5b98fce51d6c8c",
-    "branch": "feat/commute-location-review"
+    "branch": "feat/commute-location-review",
+    "association_source": "Maintainer terminal transcript plus matching normalized execution-source fingerprints; the raw report does not contain a Git commit field."
   },
   "windows_version_printed": "10.0.26300.9974",
   "environment_prefix_requested": "D:\\homereach-conda\\envs\\homereach-routing",
   "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_service_day_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --json > \"%HOMEREACH_SERVICE_DAY_REPORT%\"",
   "reported_output_path": "D:\\homereach-conda\\tmp\\routing-service-day-22692-22001.json",
-  "full_windows_json_received": false,
+  "full_windows_json_received": true,
   "observed": {
     "overall_status": "failed",
     "exit_code": 1,
@@ -101,19 +102,102 @@
   "comparison": {
     "linux_report": "docs/evidence/routing_service_day_linux_2026-11-22.json",
     "fixture_source": "scripts/routing_service_day_fixture.py",
+    "detailed_review_report": "docs/evidence/routing_service_day_platform_comparison_2026-11-23.json",
     "displayed_case_id_status_and_option_counts_match_linux": true,
     "displayed_overall_status_input_preservation_and_cleanup_match_linux": true,
-    "windows_raw_itinerary_equivalence_verified": false,
-    "windows_runtime_or_fingerprint_equivalence_verified": false
+    "full_case_diagnostics_match_linux": true,
+    "raw_transit_rows_exactly_equal": false,
+    "all_query_identities_clocks_waits_durations_ordering_and_geometries_equal": true,
+    "differing_transit_row_count": 174,
+    "only_differing_row_field": "BUS distance_m",
+    "windows_bus_distance_m": 2674.2445432960913,
+    "linux_bus_distance_m": 2674.2445432959166,
+    "maximum_absolute_difference_m": 1.7462298274040222e-10,
+    "independent_walking_control_exactly_equal": true,
+    "execution_source_files_checked": 13,
+    "normalized_execution_source_hashes_equal": true,
+    "staged_input_hashes_equal": true,
+    "complete_runtime_equivalence": false,
+    "runtime_differences": {
+      "python": {
+        "windows": "3.12.16",
+        "linux": "3.12.14"
+      },
+      "java": {
+        "windows": "21.0.10",
+        "linux": "21.0.13"
+      },
+      "pandas": {
+        "windows": "3.0.3",
+        "linux": "3.1.1"
+      },
+      "numpy": {
+        "windows": "2.3.5",
+        "linux": "2.5.4"
+      },
+      "platform": {
+        "windows": "Windows-11-10.0.26300-SP0",
+        "linux": "Linux-6.18.57-x86_64-with-glibc2.41"
+      }
+    }
   },
   "limitations": [
-    "This records the supplied terminal summary; the assistant did not execute the command on the maintainer computer.",
-    "The receipt date is not an independently established execution timestamp.",
-    "Twelve case diagnostics were printed. The full Windows JSON was not supplied, so complete worker metadata, query-attempt counts and additional top-level problems have not been inspected.",
-    "The summary does not expose individual problem messages or returned itinerary rows. It reproduces the Linux case failure pattern and alternative counts, but does not independently prove raw-row, clock, geometry or duration equivalence.",
-    "The requested environment and JAR paths are visible, but actual runtime versions, JAR/source/fixture fingerprints, heap limit, scope restoration and elapsed time were not printed in this summary.",
-    "An empty previous-day removal result alone cannot establish correct exception processing. The same-day addition/removal controls supply separate printed pass evidence.",
-    "This fictional-fixture result does not validate real Melbourne inputs, station access, transfers, accessibility or travel-time estimates."
+    "The assistant reviewed the supplied terminal output and raw JSON and replayed validators locally; it did not execute the original Windows command or independently attest the maintainer filesystem/runtime.",
+    "The execution timestamp and elapsed time are reported by the raw file. The receipt date is not an independent execution timestamp.",
+    "The source-commit association comes from the terminal transcript and matching normalized execution-source fingerprints; the raw JSON contains no Git commit field.",
+    "The raw reports are not byte-for-byte identical. The Windows report preserves the BUS-distance rounding difference, and Python, Java, pandas and NumPy versions differ between the runs.",
+    "The preflight runtime inventory precedes engine import; its embedded_jvm_started=false differs from the actual worker engine JVM-started result without contradiction.",
+    "An empty previous-day removal result alone cannot establish correct exception processing. The same-day addition/removal controls provide separate evidence.",
+    "The original compatibility test remains failed. Matching sampled alternatives does not establish exhaustive departure coverage, mixed-service-day transfers, DST behavior, real Melbourne inputs, station access, accessibility or travel-time estimates.",
+    "The observed elapsed times describe separate machines/environments and are not a controlled performance benchmark."
   ],
-  "next_evidence": "Provide the existing routing-service-day-22692-22001.json file; rerunning the engine is not required to supply that report."
+  "next_evidence": "Run the paired native service-date anchor probe described in docs/commute_service_day_anchor_probe.md using the existing Windows environment and reviewed JAR; the original baseline report does not need to be rerun.",
+  "raw_report_review": {
+    "review_date": "2026-11-23",
+    "scope": "Read-only comparison and replay of validators against the supplied Windows and recorded Linux JSON; no native engine rerun.",
+    "path": "docs/evidence/routing_service_day_windows_2026-11-23.json",
+    "uploaded_filename": "routing-service-day-22692-22001.json",
+    "bytes": 880208,
+    "sha256": "fb89fed7237120de28f0055ac5a7ebd960df591373398bbb904a2352f54a35a7",
+    "crlf_line_endings": 30244,
+    "byte_order_mark": false,
+    "preserved_byte_for_byte": true,
+    "started_at_utc_reported": "2026-11-23T11:59:17.731036+00:00",
+    "elapsed_seconds_reported": 42.813,
+    "queries_attempted": 12,
+    "walking_queries_attempted": 1,
+    "query_exceptions": 0,
+    "top_level_problems": [
+      "calendar_addition: The expected active bus itinerary is missing.",
+      "previous_service_24h: The expected active bus itinerary is missing.",
+      "previous_service_25h: The expected active bus itinerary is missing.",
+      "previous_service_32h: The expected active bus itinerary is missing."
+    ],
+    "additional_global_problem_messages": 0,
+    "transit_itinerary_rows": 522,
+    "sampled_alternatives": 174,
+    "independent_walking_control_rows": 1,
+    "validator_replay": {
+      "top_level_problems_reproduced_exactly": true,
+      "case_diagnostics_reproduced_exactly": true,
+      "positive_cases_passed": 4,
+      "negative_cases_passed": 4
+    },
+    "actual_embedded_jvm_started": true,
+    "heap_limit_bytes": 1073741824,
+    "python_routing_jobs": 1,
+    "leg_snapshots": 522,
+    "leg_adapter_restored": true,
+    "walking_correction_scopes_restored": {
+      "index": true,
+      "origin": true,
+      "geometry": true
+    },
+    "native_graph_unchanged": true,
+    "protected_inputs_unchanged": true,
+    "temporary_workspace_removed": true,
+    "real_project_datasets_read": 0,
+    "melbourne_journeys_computed": 0,
+    "routing_ready": false
+  }
 }

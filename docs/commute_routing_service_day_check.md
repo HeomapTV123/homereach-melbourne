@@ -8,11 +8,15 @@ addition/removal controls, and a Tuesday trip crossing midnight behave as
 expected. This isolates a service-day compatibility problem after the successful
 [Windows source-timetable audit](commute_gtfs_timetable_audit.md).
 
-The maintainer's Windows terminal summary, supplied on **23 November 2026**,
-reproduces the same twelve per-case outcomes and alternative counts. The
-[Windows checkpoint](evidence/routing_service_day_windows_checkpoint_2026-11-23.json)
-records that supplied evidence. The complete Windows JSON remains to be reviewed;
-the summary does not establish raw-row or runtime-fingerprint equivalence.
+The maintainer supplied both the Windows terminal summary and the complete JSON
+on **23 November 2026**. The [raw Windows
+report](evidence/routing_service_day_windows_2026-11-23.json), [checkpoint
+record](evidence/routing_service_day_windows_checkpoint_2026-11-23.json) and
+[platform comparison](evidence/routing_service_day_platform_comparison_2026-11-23.json)
+confirm the same twelve case outcomes and exactly four missing-itinerary
+findings. Execution-source and fixture hashes match; runtime versions differ.
+Every raw query-row field matches except a **1.7462298274040222e-10 metre**
+difference in each of the 174 BUS distance values. Those raw values are preserved.
 
 The [complete native report](evidence/routing_service_day_linux_2026-11-22.json)
 records **12 completed BUS queries**, one independent walking control,
@@ -25,8 +29,8 @@ The report is 849,939 bytes, SHA-256
 `c2dca7b07f2a1c33e5ebc63cb8e54db2b75b286b8760c5faabc0d8d409d99dcd`.
 It records the start timestamp, runtime, staged input hashes and normalized
 execution-source hashes. All original and staged input checks succeeded, and the
-temporary workspace was removed. These full-report details describe the Linux
-run; the supplied Windows summary is recorded separately below.
+temporary workspace was removed. These timestamp and size details describe the
+Linux run; the supplied Windows report is reviewed separately below.
 
 ## Why this follows the timetable audit
 
@@ -112,7 +116,7 @@ All query times below are local to Australia/Melbourne. `D` is Tuesday,
 distinct engine request; the counts are observed alternatives, not exhaustive
 departure coverage.
 
-| Case | Query start | Expected BUS result | Linux observation |
+| Case | Query start | Expected BUS result | Linux and Windows observation |
 |---|---|---|---|
 | Ordinary Tuesday | D 08:00 | D 08:05–08:10 | Pass; 38 alternatives |
 | Ordinary Wednesday | D+1 09:00 | D+1 09:05–09:10 | Pass; 38 alternatives |
@@ -134,7 +138,7 @@ controls pass. The previous-day removal result alone would be weak evidence,
 because an engine missing every previous-day service would also return empty.
 The same-day controls address that ambiguity.
 
-Recorded runtime: Python **3.12.14**, r5py **1.1.7**, JPype **1.7.1**, OpenJDK
+Recorded Linux runtime: Python **3.12.14**, r5py **1.1.7**, JPype **1.7.1**, OpenJDK
 **21.0.13**, pandas **3.1.1**, NumPy **2.5.4** and GeoPandas **1.2.0**. The reviewed
 R5 `v7.5.1-r5py` JAR has SHA-256
 `d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7`.
@@ -142,12 +146,18 @@ All three walking-correction scopes and the leg adapter were restored; the
 adapter recorded **522 leg snapshots**. The report retains the expected inactive
 date warning and the third-party Shapely deprecation warning.
 
-## Supplied Windows checkpoint
+## Supplied Windows report review
 
 The supplied terminal transcript shows checkout **`3dab578`** on
 `feat/commute-location-review`, execution through the existing D: routing
-environment, overall status **`failed`** and exit code **1**. Its twelve printed
-case diagnostics match the Linux status and option-count pairs:
+environment, overall status **`failed`** and exit code **1**. The subsequently
+uploaded `routing-service-day-22692-22001.json` is preserved byte for byte as
+[`routing_service_day_windows_2026-11-23.json`](evidence/routing_service_day_windows_2026-11-23.json).
+It is **880,208 bytes**, has **30,244 CRLF line endings**, and has SHA-256
+`fb89fed7237120de28f0055ac5a7ebd960df591373398bbb904a2352f54a35a7`.
+An exact-path `.gitattributes` rule prevents Git line-ending conversion of this
+evidence. Its twelve case diagnostics match the Linux status and option-count
+pairs:
 
 - Ordinary Tuesday, ordinary Wednesday and same-day calendar addition pass with
   **38 alternatives each**; the midnight-crossing case passes with **60**.
@@ -157,32 +167,61 @@ case diagnostics match the Linux status and option-count pairs:
 - The summary reports **inputs unchanged: `True`** and **temporary workspace
   removed: `True`**.
 
-This supplies the Windows reproduction of the displayed case pattern. The Conda
-error line accompanies the command's nonzero exit; it does not by itself identify
-a runtime-initialization error. The printed passing controls provide evidence
-that the experiment reached those checks.
+The full report records **12 BUS queries**, **one walking control**, **174
+alternatives / 522 transit-itinerary rows**, and no query exceptions. Its complete
+top-level problem list contains exactly the four missing expected itineraries;
+there are no additional global problem messages. Replaying the existing parent
+validator locally against each saved report reproduces both the original problem
+lists and every stored case diagnostic exactly. This replay uses an in-memory
+copy with the worker's pre-validation `completed` status restored; it neither
+changes raw observations nor launches the engine.
 
-Only the terminal summary has been supplied. It does not print the per-case
-problem messages, complete top-level findings, raw itinerary rows, actual runtime
-versions, fingerprints, adapter-restoration details or elapsed time. Those facts
-must be checked in the saved JSON before making stronger cross-platform claims.
-The 23 November date records receipt of the transcript, not an execution timestamp.
+All **13 normalized execution-source hashes** match Linux and the source at the
+transcript's `3dab578` checkout. The fingerprint protocol normalizes CRLF to LF.
+The JAR, street fixture and deterministic GTFS ZIP hashes match exactly, and
+regenerating the GTFS locally reproduces its recorded hash. The raw JSON does not
+embed a Git commit: the checkout association comes from the transcript and the
+matching source hashes.
 
-The existing report is:
+The 522 transit rows contain 174 BUS legs and 348 walking legs. Every query
+setting, row identity, sample ordering, clock, wait, duration and geometry agrees
+between platforms. The only differing row field is each BUS `distance_m`:
+**2674.2445432960913** on Windows versus **2674.2445432959166** on Linux. The
+independent walking control is exactly equal. This is a measured numerical
+difference, not byte-for-byte report or environment equivalence.
 
-```text
-D:\homereach-conda\tmp\routing-service-day-22692-22001.json
-```
+| Runtime component | Windows | Linux |
+|---|---|---|
+| Python | 3.12.16 | 3.12.14 |
+| Embedded Java | 21.0.10 | 21.0.13 |
+| pandas | 3.0.3 | 3.1.1 |
+| NumPy | 2.3.5 | 2.5.4 |
+| r5py / JPype | 1.1.7 / 1.7.1 | 1.1.7 / 1.7.1 |
+| GeoPandas / Shapely / pyproj / rasterio | 1.2.0 / 2.2.0 / 3.8.0 / 1.5.2 | 1.2.0 / 2.2.0 / 3.8.0 / 1.5.2 |
 
-Provide that saved file for full review; **no engine rerun is required** to supply
-it. The [checkpoint record](evidence/routing_service_day_windows_checkpoint_2026-11-23.json)
-retains the exact printed case summaries and separates observations from derived
-totals and unverified details.
+The Windows report's start time is **2026-11-23T11:59:17.731036+00:00**, and its
+recorded elapsed time is **42.813 seconds**. These are report values; the assistant
+did not execute or independently time the original Windows run. Comparing this
+elapsed time with Linux's 5.330 seconds is not a controlled performance benchmark.
+
+The embedded JVM started with the reviewed JAR, the 1 GiB heap limit and one
+routing job. All walking scopes and the leg adapter were restored; 522 leg
+snapshots were recorded. The native graph and protected inputs remained unchanged,
+and cleanup succeeded. The nested `runtime_inventory` is the preflight captured
+before engine initialization, so its `embedded_jvm_started: false` is consistent
+with the later worker's `engine.jvm_started: true`. The two recorded warnings
+(inactive service date and the Shapely deprecation) are identical across platforms.
+
+The complete Windows baseline is now reviewed. No rerun of this unchanged
+experiment is needed. The [source-selection
+review](commute_service_day_selection_review.md) describes the next controlled
+service-date investigation; this baseline remains failed and `routing_ready`
+remains `false`.
 
 ## Reproduce on Windows
 
 The command below is retained for future reproduction. The maintainer has
-already supplied the terminal summary described above. Use the existing routing
+already supplied the full report reviewed above. Use the existing routing
 environment and reviewed JAR; the completed real timetable audit does not need
 to be repeated. In Anaconda Command Prompt:
 
