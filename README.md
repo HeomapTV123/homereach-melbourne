@@ -443,7 +443,11 @@ checks midnight crossings, previous-service-day trips and calendar exceptions
 while retaining the existing walking and timing checks. Its Linux run completes
 all twelve BUS queries but misses four expected previous-service-day trips.
 The ordinary daytime, same-day exception and midnight-crossing controls pass;
-the overall compatibility gate correctly fails. Windows reproduction is pending.
+the overall compatibility gate correctly fails. The supplied Windows terminal
+summary at `3dab578` reproduces all twelve case outcomes and alternative counts,
+with unchanged inputs and successful cleanup. Its saved full JSON still needs
+review. A [review of service-day selection](docs/commute_service_day_selection_review.md)
+identifies the date-selection mechanism and defines the next controlled experiment.
 
 ## Sources, attribution and project ownership
 

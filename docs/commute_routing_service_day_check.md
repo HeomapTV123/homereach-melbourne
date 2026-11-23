@@ -2,11 +2,17 @@
 
 ## Result and decision
 
-The pinned engine misses four expected previous-service-day trips in the new
+The pinned engine misses four expected previous-service-day trips in the
 Linux experiment. The ordinary Tuesday and Wednesday services, same-day calendar
 addition/removal controls, and a Tuesday trip crossing midnight behave as
 expected. This isolates a service-day compatibility problem after the successful
 [Windows source-timetable audit](commute_gtfs_timetable_audit.md).
+
+The maintainer's Windows terminal summary, supplied on **23 November 2026**,
+reproduces the same twelve per-case outcomes and alternative counts. The
+[Windows checkpoint](evidence/routing_service_day_windows_checkpoint_2026-11-23.json)
+records that supplied evidence. The complete Windows JSON remains to be reviewed;
+the summary does not establish raw-row or runtime-fingerprint equivalence.
 
 The [complete native report](evidence/routing_service_day_linux_2026-11-22.json)
 records **12 completed BUS queries**, one independent walking control,
@@ -19,8 +25,8 @@ The report is 849,939 bytes, SHA-256
 `c2dca7b07f2a1c33e5ebc63cb8e54db2b75b286b8760c5faabc0d8d409d99dcd`.
 It records the start timestamp, runtime, staged input hashes and normalized
 execution-source hashes. All original and staged input checks succeeded, and the
-temporary workspace was removed. This is a Linux observation; the corresponding
-Windows service-day experiment has not yet been supplied.
+temporary workspace was removed. These full-report details describe the Linux
+run; the supplied Windows summary is recorded separately below.
 
 ## Why this follows the timetable audit
 
@@ -136,10 +142,49 @@ All three walking-correction scopes and the leg adapter were restored; the
 adapter recorded **522 leg snapshots**. The report retains the expected inactive
 date warning and the third-party Shapely deprecation warning.
 
+## Supplied Windows checkpoint
+
+The supplied terminal transcript shows checkout **`3dab578`** on
+`feat/commute-location-review`, execution through the existing D: routing
+environment, overall status **`failed`** and exit code **1**. Its twelve printed
+case diagnostics match the Linux status and option-count pairs:
+
+- Ordinary Tuesday, ordinary Wednesday and same-day calendar addition pass with
+  **38 alternatives each**; the midnight-crossing case passes with **60**.
+- `previous_service_24h`, `previous_service_25h`, `previous_service_32h` and
+  `calendar_addition` fail with **0 alternatives**.
+- The four negative controls pass with **0 alternatives**.
+- The summary reports **inputs unchanged: `True`** and **temporary workspace
+  removed: `True`**.
+
+This supplies the Windows reproduction of the displayed case pattern. The Conda
+error line accompanies the command's nonzero exit; it does not by itself identify
+a runtime-initialization error. The printed passing controls provide evidence
+that the experiment reached those checks.
+
+Only the terminal summary has been supplied. It does not print the per-case
+problem messages, complete top-level findings, raw itinerary rows, actual runtime
+versions, fingerprints, adapter-restoration details or elapsed time. Those facts
+must be checked in the saved JSON before making stronger cross-platform claims.
+The 23 November date records receipt of the transcript, not an execution timestamp.
+
+The existing report is:
+
+```text
+D:\homereach-conda\tmp\routing-service-day-22692-22001.json
+```
+
+Provide that saved file for full review; **no engine rerun is required** to supply
+it. The [checkpoint record](evidence/routing_service_day_windows_checkpoint_2026-11-23.json)
+retains the exact printed case summaries and separates observations from derived
+totals and unverified details.
+
 ## Reproduce on Windows
 
-Use the existing routing environment and reviewed JAR. The completed real
-timetable audit does not need to be repeated. In Anaconda Command Prompt:
+The command below is retained for future reproduction. The maintainer has
+already supplied the terminal summary described above. Use the existing routing
+environment and reviewed JAR; the completed real timetable audit does not need
+to be repeated. In Anaconda Command Prompt:
 
 ```bat
 cd /d "D:\My project\homereach_melbourne"
@@ -156,7 +201,7 @@ This saves the full report outside the repository. Inspect or share that JSON;
 it contains the per-case results and original returned rows. The default command
 without `--json` instead prints a short per-case summary.
 
-Expected if Windows reproduces Linux: overall `failed`, exit **1**, all twelve
+The expected reproduction pattern is overall `failed`, exit **1**, all twelve
 queries completed, the four previous-service positive cases missing, all other
 cases passing, inputs unchanged and cleanup successful. An unavailable runtime
 or rejected prerequisite instead reports `blocked` with exit **2**. Only a

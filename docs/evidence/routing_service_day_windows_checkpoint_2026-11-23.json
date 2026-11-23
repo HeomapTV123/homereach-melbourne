@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "stage": "supplied_windows_service_day_checkpoint",
+  "evidence_type": "maintainer_supplied_terminal_summary",
+  "received_date": "2026-11-23",
+  "execution_timestamp_supplied": false,
+  "checkout": {
+    "reported_short_sha": "3dab578",
+    "resolved_commit_sha": "3dab578c3f39b4787e04012e6b5b98fce51d6c8c",
+    "branch": "feat/commute-location-review"
+  },
+  "windows_version_printed": "10.0.26300.9974",
+  "environment_prefix_requested": "D:\\homereach-conda\\envs\\homereach-routing",
+  "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_service_day_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --json > \"%HOMEREACH_SERVICE_DAY_REPORT%\"",
+  "reported_output_path": "D:\\homereach-conda\\tmp\\routing-service-day-22692-22001.json",
+  "full_windows_json_received": false,
+  "observed": {
+    "overall_status": "failed",
+    "exit_code": 1,
+    "case_diagnostics_printed": [
+      {
+        "id": "daytime_control",
+        "status": "passed",
+        "options_checked": 38
+      },
+      {
+        "id": "next_date_daytime_control",
+        "status": "passed",
+        "options_checked": 38
+      },
+      {
+        "id": "daytime_calendar_addition",
+        "status": "passed",
+        "options_checked": 38
+      },
+      {
+        "id": "daytime_calendar_removal",
+        "status": "passed",
+        "options_checked": 0
+      },
+      {
+        "id": "midnight_crossing",
+        "status": "passed",
+        "options_checked": 60
+      },
+      {
+        "id": "previous_service_24h",
+        "status": "failed",
+        "options_checked": 0
+      },
+      {
+        "id": "previous_service_25h",
+        "status": "failed",
+        "options_checked": 0
+      },
+      {
+        "id": "previous_service_32h",
+        "status": "failed",
+        "options_checked": 0
+      },
+      {
+        "id": "calendar_addition",
+        "status": "failed",
+        "options_checked": 0
+      },
+      {
+        "id": "calendar_removal",
+        "status": "passed",
+        "options_checked": 0
+      },
+      {
+        "id": "same_date_must_not_wrap",
+        "status": "passed",
+        "options_checked": 0
+      },
+      {
+        "id": "inactive_date",
+        "status": "passed",
+        "options_checked": 0
+      }
+    ],
+    "protected_inputs_unchanged": true,
+    "temporary_workspace_removed": true
+  },
+  "derived_from_printed_case_summaries": {
+    "case_summaries_count": 12,
+    "passed_case_summaries": 8,
+    "failed_case_summaries": 4,
+    "positive_cases_passed": 4,
+    "positive_cases_total": 8,
+    "negative_cases_passed": 4,
+    "negative_cases_total": 4,
+    "positive_alternatives_count": 174,
+    "failed_case_ids": [
+      "previous_service_24h",
+      "previous_service_25h",
+      "previous_service_32h",
+      "calendar_addition"
+    ]
+  },
+  "comparison": {
+    "linux_report": "docs/evidence/routing_service_day_linux_2026-11-22.json",
+    "fixture_source": "scripts/routing_service_day_fixture.py",
+    "displayed_case_id_status_and_option_counts_match_linux": true,
+    "displayed_overall_status_input_preservation_and_cleanup_match_linux": true,
+    "windows_raw_itinerary_equivalence_verified": false,
+    "windows_runtime_or_fingerprint_equivalence_verified": false
+  },
+  "limitations": [
+    "This records the supplied terminal summary; the assistant did not execute the command on the maintainer computer.",
+    "The receipt date is not an independently established execution timestamp.",
+    "Twelve case diagnostics were printed. The full Windows JSON was not supplied, so complete worker metadata, query-attempt counts and additional top-level problems have not been inspected.",
+    "The summary does not expose individual problem messages or returned itinerary rows. It reproduces the Linux case failure pattern and alternative counts, but does not independently prove raw-row, clock, geometry or duration equivalence.",
+    "The requested environment and JAR paths are visible, but actual runtime versions, JAR/source/fixture fingerprints, heap limit, scope restoration and elapsed time were not printed in this summary.",
+    "An empty previous-day removal result alone cannot establish correct exception processing. The same-day addition/removal controls supply separate printed pass evidence.",
+    "This fictional-fixture result does not validate real Melbourne inputs, station access, transfers, accessibility or travel-time estimates."
+  ],
+  "next_evidence": "Provide the existing routing-service-day-22692-22001.json file; rerunning the engine is not required to supply that report."
+}
