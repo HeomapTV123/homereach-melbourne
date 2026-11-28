@@ -122,8 +122,16 @@ The original GTFS archive and the completed source audit remain the reference.
 
 ## Next verification
 
-The original Windows JSON is reviewed and preserved. The next platform check is
-the new paired native probe using the existing Windows environment and JAR, as
-described in [the probe guide](commute_service_day_anchor_probe.md#run-on-windows).
-A passing probe supports this fixed experiment's causal explanation; it does not
-clear the failed compatibility gate or establish mixed-service-day transfers.
+The original Windows baseline JSON is reviewed and preserved. The maintainer
+has now supplied a successful seven-pair anchor-probe terminal summary at
+`c8f8130`; see [the recorded checkpoint](commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint).
+The existing `routing-anchor-32043-5851.json` still needs full review; no rerun is
+required to supply it. The summary does not expose detailed native states,
+fingerprints or actual runtime versions.
+
+The [next regression contract](commute_service_day_combined_contract.md) requires
+a journey that transfers from a previous-service-day trip to a current-day trip.
+It uses a distinct three-stop fixture because the existing two-stop, one-ride
+guards cannot prove transfer correctness. The passing anchor probe supports the
+fixed experiment's causal explanation; it does not clear the failed
+compatibility gate or establish mixed-service-day transfers.

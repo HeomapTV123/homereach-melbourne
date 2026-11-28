@@ -451,9 +451,13 @@ distance rounding. A [review of service-day selection](docs/commute_service_day_
 identifies the mechanism. The [paired native anchor experiment](docs/commute_service_day_anchor_probe.md)
 recovers all four missing trips under their previous service date, while that
 same change excludes the ordinary current-day control. Its seven Linux pairs
-pass with identical civil sample times and unchanged walking costs. This
-diagnostic result preserves the failed compatibility baseline; a general
-integration still needs coherent service instances and transfers across dates.
+pass with identical civil sample times and unchanged walking costs. The supplied
+[Windows terminal checkpoint](docs/commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint)
+at `c8f8130` also reports seven passing pairs, unchanged inputs and successful
+cleanup; detailed review of its complete JSON remains pending. This diagnostic
+result preserves the failed compatibility baseline. The [next regression contract](docs/commute_service_day_combined_contract.md)
+requires a continuous journey transferring between previous-day and current-day
+services in a separate three-stop fixture.
 
 ## Sources, attribution and project ownership
 

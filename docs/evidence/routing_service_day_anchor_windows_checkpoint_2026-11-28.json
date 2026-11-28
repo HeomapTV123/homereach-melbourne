@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "stage": "supplied_windows_service_day_anchor_checkpoint",
+  "evidence_type": "maintainer_supplied_terminal_summary",
+  "received_date": "2026-11-28",
+  "execution_timestamp_supplied": false,
+  "checkout": {
+    "reported_short_sha": "c8f8130",
+    "resolved_commit_sha": "c8f813095e99564b2d86ff6ebeec8dc7d92f4f83",
+    "branch": "feat/commute-location-review",
+    "association_source": "Supplied git log and command transcript; full report and its execution-source fingerprints have not yet been reviewed."
+  },
+  "windows_version_printed": "10.0.26300.9974",
+  "environment_prefix_requested": "D:\\homereach-conda\\envs\\homereach-routing",
+  "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_service_day_anchor_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --json > \"%HOMEREACH_ANCHOR_REPORT%\"",
+  "reported_output_path": "D:\\homereach-conda\\tmp\\routing-anchor-32043-5851.json",
+  "full_windows_json_received": false,
+  "raw_report_sha256": null,
+  "observed": {
+    "exit_code": 0,
+    "overall_status": "passed",
+    "pairs_passed": 7,
+    "pair_summaries_printed": [
+      {
+        "id": "previous_service_24h",
+        "status": "passed"
+      },
+      {
+        "id": "previous_service_25h",
+        "status": "passed"
+      },
+      {
+        "id": "previous_service_32h",
+        "status": "passed"
+      },
+      {
+        "id": "calendar_addition",
+        "status": "passed"
+      },
+      {
+        "id": "next_date_daytime_control",
+        "status": "passed"
+      },
+      {
+        "id": "calendar_removal",
+        "status": "passed"
+      },
+      {
+        "id": "inactive_date",
+        "status": "passed"
+      }
+    ],
+    "protected_inputs_unchanged": true,
+    "temporary_workspace_removed": true,
+    "problems_printed": []
+  },
+  "comparison": {
+    "linux_report": "docs/evidence/routing_service_day_anchor_linux_2026-11-23.json",
+    "printed_overall_status_and_named_pair_outcomes_match_linux": true,
+    "printed_input_preservation_and_cleanup_match_linux": true,
+    "full_report_comparison_completed": false,
+    "runtime_equivalence_established": false
+  },
+  "limitations": [
+    "This records supplied terminal output; the assistant did not run the command on the maintainer computer.",
+    "The receipt date does not establish when the command executed.",
+    "The full Windows probe JSON has not been supplied. Its actual runtime versions, source/JAR/fixture fingerprints, active services, samples, native paths, costs, correction-restoration details and elapsed time have not been independently reviewed.",
+    "Seven passing pairs establish the displayed probe result, not detailed raw-state equivalence with Linux or exhaustive departure coverage.",
+    "The original twelve-case compatibility failure remains preserved. This paired experiment does not implement combined-service-day search, transfers, production itinerary serialization or a general DST policy."
+  ],
+  "next_evidence": {
+    "existing_filename": "routing-anchor-32043-5851.json",
+    "action": "Supply the existing complete JSON for read-only fingerprint, native-state and validator review.",
+    "rerun_required": false
+  },
+  "next_implementation_contract": "docs/commute_service_day_combined_contract.md"
+}

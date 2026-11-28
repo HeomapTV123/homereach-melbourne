@@ -113,8 +113,14 @@ actual native report above.
 
 ## Run on Windows
 
-The full Windows baseline JSON is already reviewed. Run only the new probe using
-the existing D: routing environment and reviewed JAR. In Anaconda Command Prompt:
+The full Windows baseline JSON is already reviewed. The maintainer has now also
+supplied a successful terminal summary for this probe at `c8f8130`, recorded in
+[the Windows checkpoint](evidence/routing_service_day_anchor_windows_checkpoint_2026-11-28.json).
+The existing `routing-anchor-32043-5851.json` is the next evidence to review;
+no rerun or environment reinstall is needed to supply it.
+
+The following command is retained for reproducibility. It uses the existing D:
+routing environment and reviewed JAR in Anaconda Command Prompt:
 
 ```bat
 cd /d "D:\My project\homereach_melbourne"
@@ -129,7 +135,26 @@ echo Report saved at: "%HOMEREACH_ANCHOR_REPORT%"
 Expected: exit **0**, overall **`passed`**, **seven passing pairs**, unchanged
 protected inputs and successful cleanup. An exit of 1 means a probe assertion
 failed; 2 means prerequisites blocked execution. Preserve and review the complete
-JSON in either case. A supplied Windows probe report is still pending.
+JSON in either case.
+
+## Supplied Windows terminal checkpoint
+
+The terminal evidence received on **28 November 2026** associates the run with
+checkout `c8f813095e99564b2d86ff6ebeec8dc7d92f4f83` and reports exit **0**,
+overall **passed**, all **seven named pairs passed**, unchanged protected inputs,
+successful temporary cleanup and an empty problem list. These printed fields
+match the recorded Linux probe. The receipt date is not an independently
+established execution timestamp.
+
+The full Windows probe JSON is still pending. Actual runtime versions,
+source/JAR/fixture fingerprints, service bitsets, samples, path counts, native
+state chains, costs and correction-restoration details were not printed in the
+supplied summary and have not yet been independently compared. The prior
+Windows baseline report is a separate, already-reviewed file.
+
+Next, review the existing complete JSON and replay the validators before
+recording any detailed platform comparison. The next implementation boundary is
+defined in the [combined-service-day transfer contract](commute_service_day_combined_contract.md).
 
 ## Remaining integration decision
 
