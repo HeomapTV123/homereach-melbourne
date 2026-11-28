@@ -98,7 +98,7 @@ the original and staged inputs plus normalized execution-source hashes, protects
 parent-owned report metadata, and checks cleanup. The Python mutation/socket
 guard is not a Java/native sandbox.
 
-## Retained native Linux evidence
+## Initial native Linux evidence
 
 [Full report](evidence/routing_service_day_transfer_linux_2026-11-28.json):
 **204,238 bytes**, SHA-256
@@ -132,9 +132,44 @@ R5 `v7.5.1-r5py` JAR SHA-256 remains
 The two new suites pass **195 regression tests** covering fixture members and
 calendars, deterministic archives, native-chain mutations, missing positives,
 unexpected negative paths, process bounds, input preservation and restoration
-on error. The full local suite passes **1,578 tests in 24.78 seconds**, with no
+on error. After the shared-runner refactor below, the full local suite passes
+**1,578 tests in 25.81 seconds**, with no
 skips reported. These tests do not launch the native engine; the actual run
 above is separate evidence. Test counts are not a measured coverage percentage.
+
+## Shared runner and repeated native checks
+
+The initial implementation at `03e3c4c` duplicated process and workspace
+management from the original service-day command. Both parents now use
+[shared diagnostic infrastructure](../scripts/routing_diagnostic_runner.py),
+with explicit worker, validator, fixture-writer and source-hash callbacks. Their
+scientific validators and CLI behavior are unchanged. The helper preserves
+timeout/report-size bounds, finite JSON validation, protected parent metadata,
+staged and original input checks, source fingerprints and cleanup. Each caller
+includes the helper in its execution-source manifest.
+
+The [transfer rerun](evidence/routing_service_day_transfer_refactored_linux_2026-11-28.json)
+started at `2026-11-28T13:24:51.215870+00:00` and took **10.175 seconds**. It
+contains the exact same parsed cases, sample keys, native states and diagnostics
+as the initial report: **seven cases passed, mixed-day positive failed, 480
+samples, 38 paths and 152 states**. All ten staged-input fingerprints match.
+Its eighteen execution-source hashes match the refactored sources, and its
+preservation/cleanup checks pass. File size is **204,351 bytes**, SHA-256
+`e4eaf3725ffa3599af26bdcad26d54c4bfca3d32f2bdce4c4b9c1d765b891116`.
+
+The [original twelve-case runner was also re-executed](evidence/routing_service_day_runner_refactor_linux_2026-11-28.json)
+to check the other caller. It retains exactly the prior diagnostics and staged
+input hashes: **eight cases pass, four previous-service-day cases fail**, with
+no additional problems. It starts at `2026-11-28T13:24:51.217636+00:00`, takes
+**6.412 seconds**, records fourteen execution-source hashes, and passes
+preservation/cleanup checks. File size is **850,256 bytes**, SHA-256
+`205e8e832c3a6e1ad11bd2cd0f3cb92b2f7cf903110d16fcd899a13b44003321`.
+
+Both native reruns exit **1**, faithfully preserving the known compatibility
+failures. Parent-validator replay reproduces both reports. All fifteen anchor
+execution dependencies remain unchanged, so the reviewed Windows anchor
+comparison remains valid. These runs used the runtime listed above; elapsed
+times are observations, not a controlled performance comparison.
 
 ## Windows continuation
 

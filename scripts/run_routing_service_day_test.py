@@ -2,19 +2,15 @@
 from __future__ import annotations
 
 import argparse
-import datetime
 import json
 from pathlib import Path
-import shutil
-import subprocess
 import sys
-import tempfile
-import time
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
 
 import check_routing_runtime as runtime
+import routing_diagnostic_runner as runner
 import routing_service_day_fixture as fixture
 import routing_walk_geometry as geometry
 import run_routing_smoke_test as smoke
@@ -25,6 +21,7 @@ WORKER = ROOT / "scripts" / "_routing_service_day_worker.py"
 TIMEOUT_SECONDS = 180
 REPORT_LIMIT_BYTES = 2_000_000
 SOURCE_PATHS = (
+    "scripts/routing_diagnostic_runner.py",
     "scripts/run_routing_service_day_test.py", "scripts/_routing_service_day_worker.py",
     "scripts/routing_service_day_fixture.py", "scripts/run_routing_smoke_test.py",
     "scripts/_routing_smoke_worker.py", "scripts/routing_smoke_fixture.py",
@@ -36,9 +33,7 @@ SOURCE_PATHS = (
 
 
 def _source_hashes() -> dict:
-    import hashlib
-    return {relative: hashlib.sha256((ROOT / relative).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
-            for relative in SOURCE_PATHS}
+    return runner.execution_source_hashes(ROOT, SOURCE_PATHS)
 
 
 def validate_result(report: dict) -> list[str]:
@@ -114,113 +109,25 @@ def validate_result(report: dict) -> list[str]:
 
 
 def run_worker(work: Path) -> dict:
-    log_path = work / "worker.log"
-    with log_path.open("xb") as log:
-        try:
-            completed = subprocess.run(
-                [sys.executable, "-I", "-B", str(WORKER)], cwd=work,
-                env=smoke.child_environment(work), stdin=subprocess.DEVNULL,
-                stdout=log, stderr=subprocess.STDOUT, shell=False, check=False,
-                timeout=TIMEOUT_SECONDS,
-            )
-        except subprocess.TimeoutExpired:
-            return {"status": "failed", "problems": [f"Worker exceeded {TIMEOUT_SECONDS} seconds."],
-                    "worker_log_tail": smoke.read_log_tail(log_path)}
-    report = {}
-    try:
-        path = work / "worker-result.json"
-        if path.stat().st_size > REPORT_LIMIT_BYTES:
-            raise ValueError("Worker report exceeds the fixed experiment limit.")
-        report = json.loads(path.read_text(encoding="utf-8"), parse_constant=smoke.finite_json_number,
-                            parse_float=smoke.finite_json_number)
-        if not isinstance(report, dict):
-            raise ValueError("Worker report must be an object.")
-        problems = validate_result(report)
-    except (OSError, ValueError, TypeError, KeyError, OverflowError) as error:
-        report = {}
-        problems = [f"Cannot validate worker report: {error}"]
-    if completed.returncode:
-        problems.append(f"Worker exited with code {completed.returncode}.")
-    report.update(status="failed" if problems else "passed", problems=problems)
-    if problems:
-        report["worker_log_tail"] = smoke.read_log_tail(log_path)
-    return report
+    return runner.run_worker(work, worker_path=WORKER, timeout_seconds=TIMEOUT_SECONDS,
+                             report_limit_bytes=REPORT_LIMIT_BYTES, validator=validate_result)
+
+
+def _write_fixtures(work: Path) -> tuple[str, ...]:
+    fixture.write_gtfs(work / "service-day.gtfs.zip")
+    return ("service-day.gtfs.zip",)
 
 
 def inspect_service_days(jar: Path, work_root: Path) -> dict:
-    started = time.monotonic()
-    report = {"schema_version": 1, "stage": "synthetic_service_day_compatibility",
-              "status": "blocked", "synthetic_fixture_only": True,
-              "requested_itinerary_mode": "isolated_legs",
-              "fixed_fixture_walking_correction": True,
-              "real_project_datasets_read": 0, "melbourne_journeys_computed": 0,
-              "routing_ready": False, "temporary_workspace_created": False,
-              "temporary_workspace_removed": True, "protected_inputs_unchanged": None,
-              "problems": [], "cases": list(fixture.CASES),
-              "started_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()}
-    inventory = runtime.inspect_runtime()
-    report["runtime_inventory"] = inventory
-    if inventory["blockers"]:
-        report["problems"] = inventory["blockers"]
-        return report
-    protected = {}
-    sources = None
-    work = None
-    try:
-        jar = jar.resolve()
-        smoke.check_engine(jar)
-        work_root = smoke.check_work_root(work_root)
-        if smoke.sha256(smoke.STREET_FIXTURE) != smoke.STREET_SHA256:
-            raise ValueError("Reviewed street fixture fingerprint mismatch.")
-        protected = {jar: smoke.sha256(jar), smoke.STREET_FIXTURE: smoke.STREET_SHA256}
-        sources = _source_hashes()
-        report["execution_source_sha256"] = sources
-        with tempfile.TemporaryDirectory(prefix="homereach-service-day-", dir=work_root) as directory:
-            work = Path(directory).resolve()
-            report["temporary_workspace_created"] = True
-            for name in ("config", "cache", "tmp"):
-                (work / name).mkdir()
-            shutil.copyfile(jar, work / smoke.ENGINE_NAME)
-            smoke.check_engine(work / smoke.ENGINE_NAME)
-            shutil.copyfile(smoke.STREET_FIXTURE, work / "streets.osm.pbf")
-            fixture.write_gtfs(work / "service-day.gtfs.zip")
-            fixture_hashes = {name: smoke.sha256(work / name) for name in
-                              (smoke.ENGINE_NAME, "streets.osm.pbf", "service-day.gtfs.zip")}
-            report["fixture_sha256"] = fixture_hashes
-            worker_report = run_worker(work)
-            # The parent owns scope, provenance and cleanup statements. A worker
-            # result cannot replace those facts, even if its itineraries pass.
-            reserved = set(report) - {"status", "problems"}
-            conflicts = sorted(reserved.intersection(worker_report))
-            report.update({key: value for key, value in worker_report.items() if key not in reserved})
-            if conflicts:
-                report["status"] = "failed"
-                report["problems"].append("Worker attempted to replace parent metadata: " + ", ".join(conflicts))
-            if any(smoke.sha256(work / name) != digest for name, digest in fixture_hashes.items()):
-                report["status"] = "failed"
-                report["problems"].append("A staged input changed during the experiment.")
-    except (OSError, ValueError) as error:
-        report["status"] = "failed" if report["temporary_workspace_created"] else "blocked"
-        report["problems"].append(str(error))
-    finally:
-        if work is not None:
-            report["temporary_workspace_removed"] = not work.exists()
-            if not report["temporary_workspace_removed"]:
-                report["status"] = "failed"
-                report["problems"].append("Temporary workspace cleanup did not complete.")
-        if protected:
-            try:
-                unchanged = all(smoke.sha256(path) == digest for path, digest in protected.items())
-                unchanged = unchanged and _source_hashes() == sources
-                report["protected_inputs_unchanged"] = unchanged
-                if not unchanged:
-                    report["status"] = "failed"
-                    report["problems"].append("An original input or execution source changed.")
-            except OSError as error:
-                report["status"] = "failed"
-                report["problems"].append(f"Cannot recheck original inputs: {error}")
-        report["elapsed_seconds"] = round(time.monotonic() - started, 3)
-    return report
+    metadata = {"stage": "synthetic_service_day_compatibility",
+                "requested_itinerary_mode": "isolated_legs",
+                "fixed_fixture_walking_correction": True,
+                "cases": list(fixture.CASES)}
+    return runner.inspect_diagnostic(
+        jar, work_root, metadata=metadata, runtime_inventory=runtime.inspect_runtime,
+        workspace_prefix="homereach-service-day-", fixture_writer=_write_fixtures,
+        source_hashes=_source_hashes, execute_worker=run_worker,
+    )
 
 
 def main(argv=None) -> int:

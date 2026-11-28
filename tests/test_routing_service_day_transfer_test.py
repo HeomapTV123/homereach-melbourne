@@ -176,7 +176,7 @@ def test_worker_uses_isolated_bounded_child_and_parent_validates_result(monkeypa
         validated.append(report.copy())
         return ["Independent oracle rejected the native result"]
 
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     monkeypatch.setattr(m, "validate_result", reject)
     report = m.run_worker(tmp_path)
     assert validated == [payload]
@@ -189,7 +189,7 @@ def test_missing_mixed_chain_exits_as_failure_even_with_successful_worker(monkey
         (tmp_path / "worker-result.json").write_text(json.dumps(complete_baseline_report), encoding="utf-8")
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     result = m.run_worker(tmp_path)
     assert result["status"] == "failed"
     assert result["cases_passed"] == 7
@@ -203,7 +203,7 @@ def test_malformed_nonfinite_or_missing_worker_json_is_rejected(monkeypatch, tmp
             (tmp_path / "worker-result.json").write_text(payload, encoding="utf-8")
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     result = m.run_worker(tmp_path)
     assert result["status"] == "failed"
     assert result["problems"]
@@ -216,7 +216,7 @@ def test_oversized_worker_json_is_rejected_before_decode(monkeypatch, tmp_path):
         (tmp_path / "worker-result.json").write_bytes(b" " * 17)
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     report = m.run_worker(tmp_path)
     assert report["status"] == "failed"
     assert "exceeds" in " ".join(report["problems"])
@@ -227,7 +227,7 @@ def test_nonzero_exit_and_timeout_cannot_be_reported_as_passed(monkeypatch, tmp_
         (tmp_path / "worker-result.json").write_text('{"status":"completed"}', encoding="utf-8")
         return subprocess.CompletedProcess(command, 7)
 
-    monkeypatch.setattr(m.subprocess, "run", failed_run)
+    monkeypatch.setattr(m.runner.subprocess, "run", failed_run)
     monkeypatch.setattr(m, "validate_result", lambda report: [])
     report = m.run_worker(tmp_path)
     assert report["status"] == "failed"
@@ -239,7 +239,7 @@ def test_nonzero_exit_and_timeout_cannot_be_reported_as_passed(monkeypatch, tmp_
         kwargs["stdout"].flush()
         raise subprocess.TimeoutExpired(command, kwargs["timeout"])
 
-    monkeypatch.setattr(m.subprocess, "run", timed_out)
+    monkeypatch.setattr(m.runner.subprocess, "run", timed_out)
     report = m.run_worker(tmp_path)
     assert report["status"] == "failed"
     assert "exceeded" in " ".join(report["problems"])
@@ -352,7 +352,7 @@ def test_cleanup_failure_remains_failed(monkeypatch, fake_inputs):
         def __exit__(self, *args):
             return False
 
-    monkeypatch.setattr(m.tempfile, "TemporaryDirectory", LeakyWorkspace)
+    monkeypatch.setattr(m.runner.tempfile, "TemporaryDirectory", LeakyWorkspace)
     monkeypatch.setattr(m, "run_worker", accepted_process_stub)
     try:
         report = m.inspect_service_day_transfers(fake_inputs.jar, fake_inputs.work_root)

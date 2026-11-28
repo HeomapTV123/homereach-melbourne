@@ -280,7 +280,7 @@ def test_worker_launch_uses_isolated_python_and_bounded_subprocess(monkeypatch, 
         assert kwargs["env"]["TEMP"] == str(tmp_path / "tmp")
         (tmp_path / "worker-result.json").write_text(json.dumps(complete_report), encoding="utf-8")
         return subprocess.CompletedProcess(command, 0)
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     report = m.run_worker(tmp_path)
     assert report["status"] == "passed", report["problems"]
     assert report["positive_cases_passed"] == 8
@@ -292,7 +292,7 @@ def test_malformed_or_nonfinite_worker_json_is_rejected(monkeypatch, tmp_path, p
         if payload is not None:
             (tmp_path / "worker-result.json").write_text(payload, encoding="utf-8")
         return subprocess.CompletedProcess(command, 0)
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     result = m.run_worker(tmp_path)
     assert result["status"] == "failed"
     assert any("Cannot validate worker report" in problem for problem in result["problems"])
@@ -303,7 +303,7 @@ def test_oversized_worker_report_is_rejected_before_decoding(monkeypatch, tmp_pa
     def run(command, **kwargs):
         (tmp_path / "worker-result.json").write_bytes(b" " * 33)
         return subprocess.CompletedProcess(command, 0)
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     result = m.run_worker(tmp_path)
     assert result["status"] == "failed"
     assert "exceeds" in " ".join(result["problems"])
@@ -313,7 +313,7 @@ def test_nonzero_worker_exit_cannot_be_hidden_by_valid_results(monkeypatch, tmp_
     def run(command, **kwargs):
         (tmp_path / "worker-result.json").write_text(json.dumps(complete_report), encoding="utf-8")
         return subprocess.CompletedProcess(command, 7)
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     result = m.run_worker(tmp_path)
     assert result["status"] == "failed"
     assert any("code 7" in problem for problem in result["problems"])
@@ -324,7 +324,7 @@ def test_timeout_keeps_failure_and_log_evidence(monkeypatch, tmp_path):
         kwargs["stdout"].write(b"native search did not finish\n")
         kwargs["stdout"].flush()
         raise subprocess.TimeoutExpired(command, kwargs["timeout"])
-    monkeypatch.setattr(m.subprocess, "run", run)
+    monkeypatch.setattr(m.runner.subprocess, "run", run)
     result = m.run_worker(tmp_path)
     assert result["status"] == "failed"
     assert "native search did not finish" in result["worker_log_tail"]
@@ -412,7 +412,7 @@ def test_original_recheck_read_error_is_not_reported_as_unchanged(monkeypatch, f
 def test_io_error_after_workspace_creation_is_failed_and_cleaned(monkeypatch, fake_inputs, failure_point):
     def fail(*args, **kwargs):
         raise OSError("controlled IO failure")
-    monkeypatch.setattr(m.shutil if failure_point == "copy" else m,
+    monkeypatch.setattr(m.runner.shutil if failure_point == "copy" else m,
                         "copyfile" if failure_point == "copy" else "run_worker", fail)
     result = m.inspect_service_days(fake_inputs.jar, fake_inputs.work_root)
     assert result["status"] == "failed"
@@ -432,7 +432,7 @@ def test_cleanup_failure_prevents_success(monkeypatch, fake_inputs):
             return str(self.path)
         def __exit__(self, *args):
             return False
-    monkeypatch.setattr(m.tempfile, "TemporaryDirectory", LeakyDirectory)
+    monkeypatch.setattr(m.runner.tempfile, "TemporaryDirectory", LeakyDirectory)
     monkeypatch.setattr(m, "run_worker", successful_worker)
     try:
         result = m.inspect_service_days(fake_inputs.jar, fake_inputs.work_root)

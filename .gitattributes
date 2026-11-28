@@ -4,4 +4,6 @@ docs/evidence/routing_service_day_windows_2026-11-23.json -text whitespace=cr-at
 docs/evidence/routing_service_day_anchor_linux_2026-11-23.json -text
 docs/evidence/routing_service_day_anchor_windows_2026-11-28.json -text whitespace=cr-at-eol
 docs/evidence/routing_service_day_transfer_linux_2026-11-28.json -text
+docs/evidence/routing_service_day_transfer_refactored_linux_2026-11-28.json -text
+docs/evidence/routing_service_day_runner_refactor_linux_2026-11-28.json -text
 docs/evidence/routing_service_day_linux_2026-11-22.json -text

@@ -269,3 +269,16 @@ preserves service-day meaning. Any candidate must pass these controls, the
 earlier timing/geometry checks and independent source-calendar comparisons.
 Preserve the original GTFS archive and its audit evidence while evaluating that
 approach; no rewritten timetable or production routing claim is approved here.
+
+## Shared-runner checkpoint on 28 November 2026
+
+The original command now shares process/report handling and workspace lifecycle
+code with the separate [three-stop transfer baseline](commute_service_day_transfer_check.md#shared-runner-and-repeated-native-checks).
+Its scientific validator, native worker and CLI acceptance behavior are unchanged.
+The [actual Linux rerun](evidence/routing_service_day_runner_refactor_linux_2026-11-28.json)
+preserves all twelve case diagnostics and input hashes: eight cases pass and
+the same four previous-service-day positives fail, with no additional problems.
+It records fourteen execution-source fingerprints including the new helper,
+unchanged protected inputs and successful cleanup. The full local suite at this
+checkpoint passes 1,578 tests. This refactor does not repair the service-day
+compatibility result or modify the reviewed anchor execution dependencies.
