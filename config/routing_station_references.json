@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "crs": "EPSG:4326",
+  "source": "2026-10-13 audited nested GTFS train feed 2; parent stations (location_type=1)",
+  "status": "reference_only_not_public_entrances",
+  "stations": [
+    {"id":"dest_flinders","parent_stop_id":"vic:rail:FSS","name":"Flinders Street Railway Station","latitude":-37.8183051,"longitude":144.9669644},
+    {"id":"orig_footscray","parent_stop_id":"vic:rail:FSY","name":"Footscray Railway Station","latitude":-37.8014134,"longitude":144.9020201},
+    {"id":"orig_coburg","parent_stop_id":"vic:rail:COB","name":"Coburg Railway Station","latitude":-37.7418046,"longitude":144.9633511},
+    {"id":"orig_box_hill","parent_stop_id":"vic:rail:BOX","name":"Box Hill Railway Station","latitude":-37.8192217,"longitude":145.1214289},
+    {"id":"orig_dandenong","parent_stop_id":"vic:rail:DNG","name":"Dandenong Railway Station","latitude":-37.9899679,"longitude":145.2097254}
+  ]
+}

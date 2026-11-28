@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "evidence_type": "maintainer_supplied_terminal_output",
+  "date_supplied": "2026-11-21",
+  "run_timestamp_supplied": false,
+  "checkout": "219f326196ceb0208104cf7eb5f88e24a4084d93",
+  "branch": "feat/commute-location-review",
+  "windows_version_printed": "10.0.26300.9974",
+  "environment_prefix": "D:\\homereach-conda\\envs\\homereach-routing",
+  "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_smoke_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --isolate-itinerary-legs --check-walking-geometry --correct-walking-paths",
+  "observed": {
+    "status": "passed",
+    "itinerary_mode": "isolated_legs",
+    "walking_geometry_requested": true,
+    "walking_correction_requested": true,
+    "embedded_jvm_started": true,
+    "queries_attempted": 3,
+    "timeline_diagnostics": {
+      "options_checked": 53,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "single_bus_diagnostics": {
+      "options_checked": 53,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    },
+    "walking_geometry_diagnostics": {
+      "walking_legs_checked": 107,
+      "endpoint_mismatches": 0,
+      "geometry_distance_mismatches": 0,
+      "shortest_distance_mismatches": 0,
+      "off_reference_path": 0,
+      "malformed_rows": 0,
+      "malformed_geometries": 0,
+      "incomplete_options": 0,
+      "unsupported_crs": 0
+    },
+    "printed_walk_references": [
+      {
+        "role": "direct",
+        "reported_distance_m": 2644.836,
+        "reference_distance_m_printed": 2646.439
+      },
+      {
+        "role": "access",
+        "reported_distance_m": 11.1,
+        "reference_distance_m_printed": 11.119
+      },
+      {
+        "role": "egress",
+        "reported_distance_m": 11.254,
+        "reference_distance_m_printed": 11.119
+      }
+    ],
+    "walking_duration_diagnostics": {
+      "walking_legs_checked": 107,
+      "duration_mismatches": 0,
+      "malformed_legs": 0,
+      "speed_kmh": 3.6
+    },
+    "walking_correction_scopes_restored": {
+      "index": true,
+      "origin": true,
+      "geometry": true
+    },
+    "leg_snapshots": 159,
+    "original_method_restored": true,
+    "engine": {
+      "r5py": "1.1.7",
+      "r5": "v7.5.1-r5py",
+      "jar_sha256_verified": true,
+      "max_heap_bytes": 1073741824,
+      "python_routing_jobs": 1
+    },
+    "walking_positive_itinerary_verified": true,
+    "active_bus_route_stops_departure_and_five_minute_ride_verified": true,
+    "inactive_bus_only_query_returned_no_itinerary": true,
+    "queries_completed": 3,
+    "temporary_workspace_removed": true,
+    "real_project_datasets_read": 0,
+    "melbourne_journeys_computed": 0,
+    "exit_code": 0,
+    "not_tested_printed": [
+      "Melbourne input compatibility",
+      "station access",
+      "transfers",
+      "accessibility",
+      "real journey timing"
+    ]
+  },
+  "comparison": {
+    "linux_report": "routing_walk_correction_linux_2026-11-18.json",
+    "printed_timing_geometry_duration_and_snapshot_counts_match_linux": true,
+    "printed_reference_distances_match_linux_after_display_rounding": true,
+    "previous_windows_geometry_baseline": "routing_geometry_windows_checkpoint_2026-11-18.json"
+  },
+  "scope": [
+    "This records the supplied Windows console observations; the assistant did not execute on the maintainer computer.",
+    "The supplied date records receipt of the evidence, not an independently established execution timestamp.",
+    "No complete Windows raw-leg JSON report was supplied, so per-row equality, raw coordinate equality, the helper class fingerprint and native state traces are not independently compared with Linux.",
+    "The supplied Windows run passes all enabled synthetic timing, geometry and duration checks and reports restoration and cleanup.",
+    "The shared alternative count of 53 does not establish complete route enumeration or explain the change from 60 in the earlier baseline.",
+    "Melbourne inputs, public station access, transfers, accessibility and real journey timing remain unvalidated."
+  ]
+}

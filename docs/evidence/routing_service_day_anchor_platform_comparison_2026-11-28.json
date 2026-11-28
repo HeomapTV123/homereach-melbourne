@@ -1,0 +1,417 @@
+{
+  "schema_version": 1,
+  "stage": "reviewed_windows_native_service_day_anchor_comparison",
+  "review_date": "2026-11-28",
+  "review_mode": "Read-only JSON comparison, normalized source fingerprint checks, deterministic fixture regeneration and validator replay; no native engine run.",
+  "windows": {
+    "uploaded_filename": "routing-anchor-32043-5851.json",
+    "bytes": 518916,
+    "sha256": "ab0d7ddd51bc06a9089cf0a8b6652788619b476cfa1e7c524c7c40330571b33b",
+    "crlf_line_endings": 15909,
+    "lone_lf_line_endings": 0,
+    "utf8_bom": false,
+    "status": "passed",
+    "started_at_utc_reported": "2026-11-28T12:37:51.751862+00:00",
+    "elapsed_seconds_reported": 33.844,
+    "reported_checkout_association": "c8f813095e99564b2d86ff6ebeec8dc7d92f4f83",
+    "checkout_association_basis": "Supplied git log and command transcript plus matching normalized execution-source fingerprints; the JSON does not embed a Git commit.",
+    "path": "docs/evidence/routing_service_day_anchor_windows_2026-11-28.json"
+  },
+  "linux": {
+    "path": "docs/evidence/routing_service_day_anchor_linux_2026-11-23.json",
+    "bytes": 502926,
+    "sha256": "10a5616ef382929c6139d9067e2e7c205dbff84bbe5efcc66a9bbc643c1ef2de",
+    "crlf_line_endings": 0,
+    "lone_lf_line_endings": 15909,
+    "utf8_bom": false,
+    "status": "passed",
+    "started_at_utc_reported": "2026-11-23T12:53:49.132524+00:00",
+    "elapsed_seconds_reported": 17.08
+  },
+  "source_review": {
+    "execution_source_files_checked": 15,
+    "all_normalized_hashes_match_windows_linux_current_and_reported_checkout": true,
+    "checks": [
+      {
+        "path": "scripts/run_routing_service_day_anchor_test.py",
+        "sha256": "27e3cb70d5f9f29d171c467a47382c12585db3de0b686720a0541df93bfe2a78",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/_routing_service_day_anchor_worker.py",
+        "sha256": "b2f8c72752e4c024376a95a4334c7fb4bd38a2aee9b61b9fbcb0bf7539d48176",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_service_day_anchor.py",
+        "sha256": "4296fe3850cf842783caff4776170817ea89669f87cef3e4765b3e39a16f7b36",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_service_day_fixture.py",
+        "sha256": "5a36a37d5077cff6b6cc79d7f54ba8f52cfb9238c30545a4f82d2404ea4dbdc5",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/_routing_service_day_worker.py",
+        "sha256": "e581f4edb41125529cf382b08917f1e9cb9406b6ee6fb4211b10595edf4dbb13",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/run_routing_smoke_test.py",
+        "sha256": "6585babf487026913071c79b33a5585c1b6f9c234d019cea174510821546b19e",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/_routing_smoke_worker.py",
+        "sha256": "ebd3c90dd4e559faa2b487a53b5a74518c9ae36543ad434e368fdf213ca03ec7",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_smoke_fixture.py",
+        "sha256": "2acb1be2583ebc09633e0bd202c21a4874f905762aba16d96c4269ff02bb59ec",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_walk_geometry.py",
+        "sha256": "12dfbe416f8f306e9ad5516d247bec7a20c3b8d28bb8f482bf85592c8f95406a",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_leg_isolation.py",
+        "sha256": "c480b503acda3502fed550c0477e326b0012b487c07a4e25c93641d56afdf4f1",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_street_index_correction.py",
+        "sha256": "b2f89f7151bc992eada33c0749c7bb42cd93f2da1c56385f7cb78bfd01b515dd",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_street_origin_correction.py",
+        "sha256": "aa3aa3bfd3ab285784a2cd75fb1858e3d478210d43b1b6cc81943767d483d40c",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_street_geometry_correction.py",
+        "sha256": "e2ca593d35ae123d044ce419356dc1761da3a41eb1989f39ebc5870965f74e60",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/routing_native/HomeReachStreetOrigins.java",
+        "sha256": "f35f65457ba7dfeb976c50d874ffcbf0be4b4187f8bc55e88e62f31a72a6d5f5",
+        "matches_current_and_reported_checkout": true
+      },
+      {
+        "path": "scripts/check_routing_runtime.py",
+        "sha256": "6cb44425ebfc6948efaffd59230c6f7338350d351a9d73f2cf5786111eaf6481",
+        "matches_current_and_reported_checkout": true
+      }
+    ],
+    "request_source_sha256": {
+      "r5/regional_task.py": "2cb5729eb461fc66d7e482f833373121e87e8b21cc68f81f46cc4d5ea8be6876",
+      "r5/trip_planner.py": "541bcf3ec644bb717195518699ad540d1c448330539e26b1f36cd850ff7674a7"
+    },
+    "request_hashes_match_pinned_expectations": true
+  },
+  "input_review": {
+    "fixture_sha256": {
+      "r5-v7.5.1-r5py-all.jar": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+      "streets.osm.pbf": "5d8eee5ad473e362142887d9ea41f135d804b6d1fba42576e9a66fc56cf12879",
+      "service-day.gtfs.zip": "581f81b650f152e21a03a89f50714e9a330e55110d552a5bb641cc3552bafd33"
+    },
+    "all_three_hashes_match_linux": true,
+    "reported_jar_hash_matches_reviewed_pin": true,
+    "local_street_bytes_match_pin_and_report": true,
+    "regenerated_deterministic_gtfs_sha256": "581f81b650f152e21a03a89f50714e9a330e55110d552a5bb641cc3552bafd33",
+    "regenerated_gtfs_matches_both_reports": true
+  },
+  "native_observations": {
+    "queries_attempted": 14,
+    "independent_walking_queries_attempted": 1,
+    "pairs_passed": 7,
+    "samples": 840,
+    "native_paths": 190,
+    "native_state_snapshots": 570,
+    "pair_outcomes": [
+      {
+        "id": "previous_service_24h",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 38,
+            "state_snapshots": 114
+          }
+        ]
+      },
+      {
+        "id": "previous_service_25h",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 38,
+            "state_snapshots": 114
+          }
+        ]
+      },
+      {
+        "id": "previous_service_32h",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 38,
+            "state_snapshots": 114
+          }
+        ]
+      },
+      {
+        "id": "calendar_addition",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 38,
+            "state_snapshots": 114
+          }
+        ]
+      },
+      {
+        "id": "next_date_daytime_control",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 38,
+            "state_snapshots": 114
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          }
+        ]
+      },
+      {
+        "id": "calendar_removal",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          }
+        ]
+      },
+      {
+        "id": "inactive_date",
+        "arms": [
+          {
+            "name": "current_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          },
+          {
+            "name": "previous_date",
+            "samples": 60,
+            "paths": 0,
+            "state_snapshots": 0
+          }
+        ]
+      }
+    ],
+    "query_errors": [],
+    "all_pairs_equal_after_json_parsing": true,
+    "all_pair_diagnostics_equal": true,
+    "all_native_requests_active_service_sets_costs_sample_keys_chains_equal": true,
+    "all_catalogs_equal": true,
+    "catalogs_unchanged_within_each_report": true,
+    "independent_walking_row_exactly_equal": true,
+    "direct_walking_control_scope": "Geometry, distance and duration; its departure_time is NaT in both reports and is not a verified calendar timestamp.",
+    "walking_duration_diagnostics": {
+      "walking_legs_checked": 1,
+      "duration_mismatches": 0,
+      "malformed_legs": 0,
+      "speed_kmh": 3.6,
+      "problems": []
+    },
+    "native_transit_router_modified": false,
+    "transit_itinerary_serialization_used": false
+  },
+  "scope_and_cleanup": {
+    "walking_correction_scopes_restored": {
+      "index": true,
+      "origin": true,
+      "geometry": true
+    },
+    "graph_unchanged": true,
+    "helper_class_sha256_equal": true,
+    "protected_inputs_unchanged": true,
+    "temporary_workspace_removed": true,
+    "actual_worker_jvm_started": true,
+    "java_heap_bytes": 1073741824,
+    "routing_jobs": 1,
+    "real_project_datasets_read": 0,
+    "melbourne_journeys_computed": 0,
+    "routing_ready": false
+  },
+  "validator_replay": {
+    "windows": {
+      "parent_problems": [],
+      "oracle_problems": [],
+      "pair_diagnostics_reproduced_exactly": true,
+      "walking_duration_diagnostics_reproduced_exactly": true,
+      "pairs_passed": 7
+    },
+    "linux": {
+      "parent_problems": [],
+      "oracle_problems": [],
+      "pair_diagnostics_reproduced_exactly": true,
+      "walking_duration_diagnostics_reproduced_exactly": true,
+      "pairs_passed": 7
+    }
+  },
+  "comparison": {
+    "type_aware_json_comparison": true,
+    "differing_leaf_fields": 15,
+    "differences": [
+      {
+        "path": "$.elapsed_seconds",
+        "kind": "value",
+        "windows": 33.844,
+        "linux": 17.08
+      },
+      {
+        "path": "$.engine.java_version",
+        "kind": "value",
+        "windows": "21.0.10",
+        "linux": "21.0.13"
+      },
+      {
+        "path": "$.runtime_inventory.java.executable",
+        "kind": "value",
+        "windows": "D:\\homereach-conda\\envs\\homereach-routing\\Library\\bin\\java.exe",
+        "linux": "/usr/lib/jvm/java-21-openjdk-amd64/bin/java"
+      },
+      {
+        "path": "$.runtime_inventory.java.version_output",
+        "kind": "value",
+        "windows": "openjdk version \"21.0.10\" 2026-01-20 LTS\nOpenJDK Runtime Environment Zulu21.48+17-CA (build 21.0.10+7-LTS)\nOpenJDK 64-Bit Server VM Zulu21.48+17-CA (build 21.0.10+7-LTS, mixed mode, sharing)",
+        "linux": "openjdk version \"21.0.13\" 2026-10-20\nOpenJDK Runtime Environment (build 21.0.13+9-1-deb13u2-Debian)\nOpenJDK 64-Bit Server VM (build 21.0.13+9-1-deb13u2-Debian, mixed mode, sharing)"
+      },
+      {
+        "path": "$.runtime_inventory.next_check_command",
+        "kind": "value",
+        "windows": "conda run --no-capture-output --prefix D:\\homereach-conda\\envs\\homereach-routing python scripts/check_routing_runtime.py",
+        "linux": "conda run --no-capture-output -n homereach-routing python scripts/check_routing_runtime.py"
+      },
+      {
+        "path": "$.runtime_inventory.packages.numpy.version",
+        "kind": "value",
+        "windows": "2.3.5",
+        "linux": "2.5.4"
+      },
+      {
+        "path": "$.runtime_inventory.packages.pandas.version",
+        "kind": "value",
+        "windows": "3.0.3",
+        "linux": "3.1.1"
+      },
+      {
+        "path": "$.runtime_inventory.python.conda_environment",
+        "kind": "type",
+        "windows": "homereach-routing",
+        "linux": null
+      },
+      {
+        "path": "$.runtime_inventory.python.conda_prefix",
+        "kind": "type",
+        "windows": "D:\\homereach-conda\\envs\\homereach-routing",
+        "linux": null
+      },
+      {
+        "path": "$.runtime_inventory.python.executable",
+        "kind": "value",
+        "windows": "D:\\homereach-conda\\envs\\homereach-routing\\python.exe",
+        "linux": "/workspace/scratch/a83c039c1663/homereach-routing-native-nov23/bin/python"
+      },
+      {
+        "path": "$.runtime_inventory.python.platform",
+        "kind": "value",
+        "windows": "Windows-11-10.0.26300-SP0",
+        "linux": "Linux-6.18.57-x86_64-with-glibc2.41"
+      },
+      {
+        "path": "$.runtime_inventory.python.prefix",
+        "kind": "value",
+        "windows": "D:\\homereach-conda\\envs\\homereach-routing",
+        "linux": "/workspace/scratch/a83c039c1663/homereach-routing-native-nov23"
+      },
+      {
+        "path": "$.runtime_inventory.python.version",
+        "kind": "value",
+        "windows": "3.12.16",
+        "linux": "3.12.14"
+      },
+      {
+        "path": "$.started_at_utc",
+        "kind": "value",
+        "windows": "2026-11-28T12:37:51.751862+00:00",
+        "linux": "2026-11-23T12:53:49.132524+00:00"
+      },
+      {
+        "path": "$.walking_correction.origin.helper.compiler_java_version",
+        "kind": "value",
+        "windows": "21.0.10",
+        "linux": "21.0.13"
+      }
+    ],
+    "all_fields_outside_listed_metadata_differences_equal": true,
+    "complete_runtime_equivalence": false,
+    "reports_byte_identical": false
+  },
+  "limits": [
+    "These are supplied Windows observations. The reviewer did not execute the command on the Windows machine or independently attest its filesystem/runtime.",
+    "The JSON execution time, versions, paths, preservation and cleanup are reported evidence; the source and fixture comparisons provide additional checks but do not prove external machine state.",
+    "The nested runtime inventory precedes engine startup. Its embedded_jvm_started=false is consistent with the later worker engine.jvm_started=true.",
+    "The two native experiments have identical observed states but different runtime versions and execution environments. Elapsed times are not a controlled performance benchmark.",
+    "The 38-path counts are observations from fixed sampling; they are not an exact acceptance threshold or proof of complete departure coverage.",
+    "The fixture dates do not cross DST. The passing paired probe does not implement combined-service-day search, prove cross-date transfers or repair Python transit serialization.",
+    "The original twelve-case compatibility failure remains recorded. No real Melbourne journey or production routing approval follows from this comparison."
+  ],
+  "recommended_next_step": "Proceed with the separate three-stop mixed-service-day transfer fixture and independent oracle described by docs/commute_service_day_combined_contract.md; preserve the original two-stop guards and failed compatibility baseline."
+}

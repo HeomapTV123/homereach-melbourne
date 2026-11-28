@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "reference_set_id": "footscray_flinders_development_v1",
+  "status": "provisional_development_references",
+  "selected_on": "2026-11-18",
+  "purpose": "One station-area origin-destination pair for a stair-capable walking and scheduled-transit development experiment.",
+  "crs": "EPSG:4326",
+  "service_date": "2026-10-13",
+  "timezone": "Australia/Melbourne",
+  "profile": {
+    "stairs_allowed": true,
+    "wheelchair_accessibility_verified": false
+  },
+  "osm_source": {
+    "path": "data/raw/routing/victoria-261001.osm.pbf",
+    "snapshot_timestamp": "2026-10-01T20:22:06Z",
+    "size_bytes": 241895835,
+    "sha256": "5e775844a1b4424dc3c549e601c4a014f4d2816fe7f0ea3fda7d1b39fb966cc0",
+    "fingerprint_provenance": "Previously supplied local certutil output; the original PBF was not available in the implementation workspace.",
+    "url": "https://download.geofabrik.de/australia-oceania/australia/victoria-261001.osm.pbf",
+    "attribution": "OpenStreetMap contributors",
+    "license_url": "https://opendatacommons.org/licenses/odbl/1-0/"
+  },
+  "evidence": {
+    "path": "docs/evidence/footscray_flinders_access_2026-11-18.opl.txt",
+    "kind": "user_supplied_osmium_getid_output",
+    "received_on": "2026-11-18",
+    "execution_time_recorded": false,
+    "canonical_lf_sha256": "f12daf766bad7e9d7ced70f2eb02c65f9e7bcaa58f75c782441e428f2a933a87",
+    "canonicalization": "UTF-8, LF line endings, final newline; Windows CRLF checkout bytes can differ.",
+    "node_count": 22,
+    "way_count": 7,
+    "all_selected_way_node_coordinates_present": true,
+    "complete_station_network": false
+  },
+  "points": [
+    {
+      "id": "orig_footscray_approach",
+      "role": "origin",
+      "label": "Footscray - McNab Avenue pedestrian approach",
+      "osm_node_id": 2311217158,
+      "latitude": -37.8019695,
+      "longitude": 144.9018732,
+      "supporting_way_ids": [28615601],
+      "gtfs_station_reference": {
+        "feed_id": "2",
+        "parent_station_id": "vic:rail:FSY"
+      },
+      "observed_node_tags": {
+        "barrier": "bollard",
+        "bollard": "removable",
+        "foot": "yes",
+        "motor_vehicle": "no",
+        "maxwidth:physical": "1.7"
+      },
+      "selection_reason": "Explicit pedestrian permission at a bollard on named McNab Avenue provides a concrete approach reference near the station.",
+      "identity_limit": "Station-area approach reference, not a certified public station entrance or a residential origin.",
+      "original_candidate_retained": 3953464544
+    },
+    {
+      "id": "dest_flinders_stair_approach",
+      "role": "destination",
+      "label": "Flinders Street - lower endpoint of mapped entrance stairs",
+      "osm_node_id": 591431019,
+      "latitude": -37.8177265,
+      "longitude": 144.9671961,
+      "supporting_way_ids": [46325052],
+      "gtfs_station_reference": {
+        "feed_id": "2",
+        "parent_station_id": "vic:rail:FSS"
+      },
+      "observed_node_tags": {},
+      "supporting_way_tags": {
+        "highway": "steps",
+        "foot": "yes",
+        "incline": "up",
+        "step_count": "9",
+        "ramp": "no"
+      },
+      "selection_reason": "The first endpoint of the mapped upward stair way gives a candidate lower approach consistent with the operator's description of the Flinders/Swanston corner entrance.",
+      "identity_limit": "Street-facing stair-approach hypothesis; exact public access and a route to transit platforms remain unvalidated.",
+      "upper_stair_node_id": 13293687371
+    }
+  ],
+  "validation": {
+    "node_ids_and_coordinates_match_supplied_extract": true,
+    "source_pbf_rechecked_for_this_selection": false,
+    "public_access_at_service_time_verified": false,
+    "engine_linkage_verified": false,
+    "platform_access_path_verified": false,
+    "paid_barrier_handling_verified": false,
+    "journeys_computed": 0,
+    "active_routing_configuration": false
+  },
+  "review_document": "docs/commute_station_access_review.md"
+}

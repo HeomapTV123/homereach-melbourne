@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "historical_failed_report": "routing_smoke_linux_2026-11-18.json",
+  "upstream_control_report": "routing_smoke_upstream_control_linux_2026-11-18.json",
+  "isolated_report": "routing_smoke_isolated_linux_2026-11-18.json",
+  "observed_comparison": {
+    "historical_and_fresh_upstream_transit_rows_identical": true,
+    "transit_rows_each": 180,
+    "options_each": 60,
+    "same_option_segment_order": true,
+    "all_fields_except_departure_time_identical": true,
+    "all_bus_rows_identical": true,
+    "direct_walking_result_identical": true,
+    "inactive_service_results_empty": true,
+    "engine_identity_identical": true,
+    "input_fingerprints_identical": true,
+    "changed_walking_departure_times": {
+      "access": 59,
+      "egress": 53
+    },
+    "upstream_timeline": {
+      "options_checked": 60,
+      "overlaps": 23,
+      "wait_mismatches": 59,
+      "malformed_options": 0,
+      "examples": [
+        {
+          "option": 0,
+          "segment": 1,
+          "previous_arrival": "2026-10-13T08:09:25",
+          "departure": "2026-10-13T08:05:00",
+          "overlap_seconds": 265.0
+        },
+        {
+          "option": 5,
+          "segment": 1,
+          "previous_arrival": "2026-10-13T08:09:25",
+          "departure": "2026-10-13T08:05:00",
+          "overlap_seconds": 265.0
+        },
+        {
+          "option": 7,
+          "segment": 1,
+          "previous_arrival": "2026-10-13T08:09:25",
+          "departure": "2026-10-13T08:05:00",
+          "overlap_seconds": 265.0
+        },
+        {
+          "option": 10,
+          "segment": 1,
+          "previous_arrival": "2026-10-13T08:09:25",
+          "departure": "2026-10-13T08:05:00",
+          "overlap_seconds": 265.0
+        },
+        {
+          "option": 14,
+          "segment": 1,
+          "previous_arrival": "2026-10-13T08:09:25",
+          "departure": "2026-10-13T08:05:00",
+          "overlap_seconds": 265.0
+        }
+      ]
+    },
+    "isolated_timeline": {
+      "options_checked": 60,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "upstream_single_bus": {
+      "options_checked": 60,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 53
+    },
+    "isolated_single_bus": {
+      "options_checked": 60,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    }
+  },
+  "maintainer_windows_observation": {
+    "source": "Terminal output supplied in this conversation, not a retained Windows JSON report.",
+    "checkout": "c03cb4a",
+    "mode": "upstream",
+    "jvm_started": true,
+    "queries_attempted": 3,
+    "options_checked": 60,
+    "overlaps": 23,
+    "wait_mismatches": 59,
+    "malformed_options": 0,
+    "temporary_workspace_removed": true,
+    "exit_code": 1,
+    "isolated_adapter_execution": "pending"
+  },
+  "remaining_scope": [
+    "Observed counts are evidence, not a fixed required option count for future runs.",
+    "Only geometry_nonempty was captured; exact geometry coordinates were not compared from these reports.",
+    "The 678-second final walk remains unchanged; walking geometry/endpoints and expected route lengths require a separate oracle.",
+    "The adapter is scoped to the isolated, sequential smoke worker and has not validated transfers or general route enumeration.",
+    "Melbourne input compatibility, public station access, barriers, accessibility and real travel times remain unvalidated."
+  ]
+}

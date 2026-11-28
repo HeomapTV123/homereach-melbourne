@@ -1,0 +1,363 @@
+{
+  "schema_version": 1,
+  "evidence_type": "scratch_instrumentation_native_street_router_states",
+  "date": "2026-11-18",
+  "started_at_utc": "2026-11-18T09:52:04.222901+00:00",
+  "baseline_commit": "73543a89af3936fbfc407f1ff417f28158e958a9",
+  "related_reports": {
+    "historical_isolated_smoke": "routing_smoke_isolated_linux_2026-11-18.json",
+    "expanded_walking_geometry": "routing_walk_geometry_linux_2026-11-18.json"
+  },
+  "provenance": {
+    "platform": "Linux",
+    "method": "A scratch worker observed original returned geometry and delegated the original cached egress-path calculation unchanged. After that calculation it ran two fresh StreetRouter searches from the same destination, using separately copied requests with reverseSearch false and true.",
+    "repository_and_installed_sources_modified_by_instrumentation": false,
+    "fixture_queries_attempted": 3,
+    "additional_diagnostic_street_queries": 2,
+    "additional_queries_included_in_fixture_query_count": false,
+    "itinerary_mode": "isolated_legs",
+    "adapter_leg_snapshots": 180,
+    "adapter_method_restored": true,
+    "temporary_workspace_removed": true,
+    "raw_scratch_report_sha256": "5e15b552fefa4fe50402e54f95e368cf72b01ff9ba0d618b9cf380e0c4090326"
+  },
+  "engine": {
+    "r5py": "1.1.7",
+    "r5_tag": "v7.5.1-r5py",
+    "r5_jar_sha256": "d50be106cadd7b636cfc0e209052767d7df570629f79fdf98ecd5cf5d2d89be7",
+    "java_version": "21.0.13",
+    "max_heap_bytes": 1073741824,
+    "r5py_source_sha256": {
+      "r5/trip_leg.py": "1270678a17061467609296084bcf283bd472728729d13680614f839d6a9a31ea",
+      "r5/trip_planner.py": "541bcf3ec644bb717195518699ad540d1c448330539e26b1f36cd850ff7674a7",
+      "r5/trip.py": "ae7b1123d35d780cc5c10a407bc61dfb6017f919586259139b68f637422e96a9"
+    }
+  },
+  "fixture_sha256": {
+    "streets.osm.pbf": "5d8eee5ad473e362142887d9ea41f135d804b6d1fba42576e9a66fc56cf12879",
+    "synthetic.gtfs.zip": "66d4d61eca2b10edfd4930f8b74c8e572e4509f5e3959118d1df93cd4d745127"
+  },
+  "comparison": {
+    "historical_fields_of_all_fixture_rows_unchanged": {
+      "walking": true,
+      "transit": true,
+      "no_service": true
+    },
+    "fixture_row_counts": {
+      "walking": 1,
+      "transit": 180,
+      "no_service": 0
+    },
+    "historical_engine_identity_unchanged": true,
+    "historical_input_fingerprints_unchanged": true,
+    "original_geometry_probe_rows_unchanged_after_state_observation": {
+      "walking": true,
+      "transit": true,
+      "no_service": true
+    },
+    "timeline_diagnostics": {
+      "options_checked": 60,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "single_bus_diagnostics": {
+      "options_checked": 60,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    },
+    "meaning": "The extra observations did not alter the retained fixture results. Passing chronology and single-bus checks do not validate the walking distances or exact geometry."
+  },
+  "requested_destination_lon_lat": [
+    0.0299,
+    0.018
+  ],
+  "east_stop_lon_lat": [
+    0.03,
+    0.018
+  ],
+  "shared_origin_split": {
+    "edge": 98,
+    "vertex0": 26,
+    "vertex1": 27,
+    "fixedLon": 300000,
+    "fixedLat": 180000,
+    "distance0_mm": 0,
+    "distance1_mm": 666797,
+    "distanceToEdge_mm": 11099
+  },
+  "split_vertices": [
+    {
+      "index": 26,
+      "longitude": 0.03,
+      "latitude": 0.018
+    },
+    {
+      "index": 27,
+      "longitude": 0.036,
+      "latitude": 0.018
+    }
+  ],
+  "native_observations": [
+    {
+      "reverse_search": false,
+      "initial_states": {
+        "vertex0": [
+          {
+            "vertex": {
+              "index": 26,
+              "longitude": 0.03,
+              "latitude": 0.018
+            },
+            "back_edge": 99,
+            "distance_mm": 11099,
+            "duration_seconds": 11
+          }
+        ],
+        "vertex1": [
+          {
+            "vertex": {
+              "index": 27,
+              "longitude": 0.036,
+              "latitude": 0.018
+            },
+            "back_edge": 98,
+            "distance_mm": 677896,
+            "duration_seconds": 677
+          }
+        ]
+      },
+      "east_stop": {
+        "stop_index": 0,
+        "stop_id": "synthetic.gtfs:SMOKE_EAST",
+        "street_vertex": {
+          "index": 49,
+          "longitude": 0.03,
+          "latitude": 0.018
+        },
+        "reached_time_seconds": 12
+      },
+      "east_stop_state_chain": [
+        {
+          "vertex": {
+            "index": 49,
+            "longitude": 0.03,
+            "latitude": 0.018
+          },
+          "back_edge": 169,
+          "distance_mm": 11100,
+          "duration_seconds": 12
+        },
+        {
+          "vertex": {
+            "index": 26,
+            "longitude": 0.03,
+            "latitude": 0.018
+          },
+          "back_edge": 99,
+          "distance_mm": 11099,
+          "duration_seconds": 11
+        }
+      ],
+      "connector_edge": {
+        "from": {
+          "index": 26,
+          "longitude": 0.03,
+          "latitude": 0.018
+        },
+        "to": {
+          "index": 49,
+          "longitude": 0.03,
+          "latitude": 0.018
+        },
+        "length_mm": 0,
+        "geometry": "LINESTRING (0.03 0.018, 0.03 0.018)"
+      }
+    },
+    {
+      "reverse_search": true,
+      "initial_states": {
+        "vertex0": [
+          {
+            "vertex": {
+              "index": 26,
+              "longitude": 0.03,
+              "latitude": 0.018
+            },
+            "back_edge": 98,
+            "distance_mm": 677896,
+            "duration_seconds": 677
+          }
+        ],
+        "vertex1": [
+          {
+            "vertex": {
+              "index": 27,
+              "longitude": 0.036,
+              "latitude": 0.018
+            },
+            "back_edge": 99,
+            "distance_mm": 11099,
+            "duration_seconds": 11
+          }
+        ]
+      },
+      "east_stop": {
+        "stop_index": 0,
+        "stop_id": "synthetic.gtfs:SMOKE_EAST",
+        "street_vertex": {
+          "index": 49,
+          "longitude": 0.03,
+          "latitude": 0.018
+        },
+        "reached_time_seconds": 678
+      },
+      "east_stop_state_chain": [
+        {
+          "vertex": {
+            "index": 49,
+            "longitude": 0.03,
+            "latitude": 0.018
+          },
+          "back_edge": 168,
+          "distance_mm": 677897,
+          "duration_seconds": 678
+        },
+        {
+          "vertex": {
+            "index": 26,
+            "longitude": 0.03,
+            "latitude": 0.018
+          },
+          "back_edge": 98,
+          "distance_mm": 677896,
+          "duration_seconds": 677
+        }
+      ],
+      "connector_edge": {
+        "from": {
+          "index": 49,
+          "longitude": 0.03,
+          "latitude": 0.018
+        },
+        "to": {
+          "index": 26,
+          "longitude": 0.03,
+          "latitude": 0.018
+        },
+        "length_mm": 0,
+        "geometry": "LINESTRING (0.03 0.018, 0.03 0.018)"
+      }
+    }
+  ],
+  "confirmed_native_mechanism": {
+    "near_endpoint_index": 26,
+    "forward_initial_distance_mm": 11099,
+    "reverse_initial_distance_mm": 677896,
+    "difference_mm": 666797,
+    "split_edge_length_mm": 666797,
+    "explanation": "StreetRouter.setOrigin first calculates each endpoint cost, then swaps only the vertex fields when reverseSearch is true. The near endpoint therefore receives the far endpoint cost. This is observed before traversal, so the added distance is not a required network detour.",
+    "east_stop_connector_length_mm": 0,
+    "connector_minimum_increment_mm": 1,
+    "connector_minimum_increment_seconds": 1,
+    "forward_stop_distance_m": 11.1,
+    "forward_stop_duration_seconds": 12,
+    "reverse_stop_distance_m": 677.897,
+    "reverse_stop_duration_seconds": 678,
+    "returned_egress_matches_reverse_terminal_state": true
+  },
+  "separate_geometry_issue": {
+    "access_distance_m": 11.1,
+    "access_geometry_lon_lat": [
+      [
+        0.012,
+        0.018
+      ],
+      [
+        0.006,
+        0.018
+      ]
+    ],
+    "egress_distance_m": 677.897,
+    "egress_geometry_lon_lat": [
+      [
+        0.03,
+        0.018
+      ],
+      [
+        0.036,
+        0.018
+      ]
+    ],
+    "explanation": "r5py StreetSegment obtains costs from the StreetPath terminal state but builds geometry from complete edge geometries. The partial-edge endpoints are not clipped to the requested points. Correcting costs alone would not correct these geometries."
+  },
+  "source_evidence": [
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/streets/StreetRouter.java",
+      "lines": "327-371",
+      "finding": "Endpoint costs are assigned before reverseSearch swaps only the two state vertex fields."
+    },
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/streets/EdgeStore.java",
+      "lines": "705-715",
+      "finding": "Traversal adds edge cost and forces positive distance/time increments on zero-length links."
+    },
+    {
+      "url": "https://github.com/r5py/r5/blob/v7.5.1-r5py/src/main/java/com/conveyal/r5/profile/StreetPath.java",
+      "lines": "47-55",
+      "finding": "StreetPath distance and duration are taken from its terminal StreetRouter state."
+    },
+    {
+      "url": "https://github.com/r5py/r5py/blob/v1.1.7/src/r5py/r5/street_segment.py",
+      "lines": "28-38",
+      "finding": "Geometry is assembled from complete edge geometries while costs are copied from StreetPath."
+    },
+    {
+      "url": "https://github.com/r5py/r5py/blob/v1.1.7/src/r5py/r5/direct_leg.py",
+      "lines": "29-31",
+      "finding": "DirectLeg converts millimetres to metres and copies the StreetSegment time and geometry."
+    },
+    {
+      "url": "https://github.com/r5py/r5py/blob/v1.1.7/src/r5py/util/classpath.py",
+      "lines": "19-22",
+      "finding": "Released r5py 1.1.7 pins the reviewed v7.5.1-r5py JAR and its SHA-256."
+    }
+  ],
+  "read_only_release_review": {
+    "date": "2026-11-18",
+    "latest_r5py_release_observed": {
+      "tag": "v1.1.7",
+      "published_at": "2026-06-29T14:47:00Z",
+      "url": "https://api.github.com/repos/r5py/r5py/releases/latest"
+    },
+    "newer_r5py_r5_releases_checked": [
+      {
+        "tag": "v7.5.2-r5py",
+        "published_at": "2026-07-28T16:20:14Z",
+        "source_url": "https://github.com/r5py/r5/blob/v7.5.2-r5py/src/main/java/com/conveyal/r5/streets/StreetRouter.java",
+        "lines": "339-358",
+        "vertex_only_reverse_swap_remains": true
+      },
+      {
+        "tag": "v7.6-r5py",
+        "published_at": "2026-08-03T17:37:27Z",
+        "source_url": "https://github.com/r5py/r5/blob/v7.6-r5py/src/main/java/com/conveyal/r5/streets/StreetRouter.java",
+        "lines": "376-395",
+        "vertex_only_reverse_swap_remains": true
+      }
+    ],
+    "release_inventory_url": "https://api.github.com/repos/r5py/r5/releases?per_page=5",
+    "unreleased_r5py_main_default_observed": "v7.6-r5py",
+    "unreleased_r5py_main_source_url": "https://github.com/r5py/r5py/blob/main/src/r5py/util/classpath.py",
+    "newer_runtimes_downloaded_installed_or_executed": false,
+    "conclusion": "Neither checked newer engine release corrects this initialization in source. No replacement has been demonstrated compatible or validated for HomeReach; a version change alone is not a demonstrated fix."
+  },
+  "remaining_limits": [
+    "This is a diagnosis of the pinned synthetic fixture, not Melbourne travel-time evidence.",
+    "The cause of nearest-edge lookup selecting the eastern edge was not investigated further; the endpoint-cost swap is directly observable for that shared split.",
+    "A source correction needs regression coverage for reverse endpoint costs, directional traversal, partial-edge accounting and exact route geometry before runtime adoption.",
+    "Changing StreetPath reverseSearch alone is not a demonstrated correction: the cost is already wrong before StreetPath construction.",
+    "No production repair or replacement engine is included in this evidence."
+  ]
+}

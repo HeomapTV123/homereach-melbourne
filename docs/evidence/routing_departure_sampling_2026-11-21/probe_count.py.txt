@@ -1,0 +1,266 @@
+"""Read-only project, paired native counterfactual for the fixed fictional fixture."""
+from __future__ import annotations
+import argparse
+from collections import Counter
+from contextlib import ExitStack, contextmanager
+import datetime
+import hashlib
+import importlib
+import importlib.metadata
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+ROOT = Path('/workspace/scratch/a83c039c1663/homereach-routing-next')
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(ROOT / 'scripts'))
+import routing_smoke_fixture as fixture
+import run_routing_smoke_test as smoke
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+
+
+def native_trace(work):
+    jar = work / smoke.ENGINE_NAME
+    smoke.check_engine(jar)
+    inputs_before = {n: smoke.sha256(work / n) for n in
+                     ('streets.osm.pbf', 'synthetic.gtfs.zip', smoke.ENGINE_NAME)}
+    source_paths = [ROOT / name for name in (
+        'scripts/_routing_smoke_worker.py', 'scripts/run_routing_smoke_test.py',
+        'scripts/routing_smoke_fixture.py', 'scripts/routing_leg_isolation.py',
+        'scripts/routing_street_index_correction.py', 'scripts/routing_street_origin_correction.py',
+        'scripts/routing_street_geometry_correction.py', 'scripts/routing_native/HomeReachStreetOrigins.java')]
+    sources_before = {str(p.relative_to(ROOT)): sha(p) for p in source_paths}
+    sys.addaudithook(smoke.python_write_guard(work))
+    import configargparse
+    configargparse.get_argument_parser(prog='r5py', default_config_files=[])
+    sys.argv = [sys.argv[0], '--r5-classpath', str(jar), '--max-memory', '1G',
+                '--temporary-directory', str(work / 'tmp')]
+    import r5py
+    import jpype
+    import geopandas as gpd
+    import rasterio
+    from shapely.geometry import Point
+    from routing_leg_isolation import isolate_cached_legs
+    from routing_street_index_correction import correct_fixture_index
+    from routing_street_origin_correction import correct_street_origins, _NamespaceOverride
+    from routing_street_geometry_correction import correct_street_geometries
+    from _routing_smoke_worker import records
+    r5py.DetailedItineraries.NUM_THREADS = 1
+    planner = importlib.import_module('r5py.r5.trip_planner')
+    network = r5py.TransportNetwork(work / 'streets.osm.pbf', [work / 'synthetic.gtfs.zip'], allow_errors=False)
+    origins = gpd.GeoDataFrame({'id': [smoke.ORIGIN_ID]}, geometry=[Point(*fixture.ORIGIN)], crs='EPSG:4326')
+    destinations = gpd.GeoDataFrame({'id': [smoke.DESTINATION_ID]}, geometry=[Point(*fixture.DESTINATION)], crs='EPSG:4326')
+    native_class = jpype.JClass('com.conveyal.r5.profile.McRaptorSuboptimalPathProfileRouter')
+    fields = {}
+    for name in ('bestTimesAtTargetByAccessMode', 'round', 'bestStates', 'request'):
+        field = native_class.class_.getDeclaredField(name)
+        field.setAccessible(True)
+        fields[name] = field
+    audits = {}
+    arms = {}
+
+    def modes_map(value):
+        return {str(entry.getKey()): {str(int(k)): int(entry.getValue().get(k)) for k in entry.getValue().keys()}
+                for entry in value.entrySet()}
+
+    def bounds_map(value):
+        return {str(k): int(value.get(k)) for k in value.keys()}
+
+    def state_chain(state):
+        chain = []
+        while state is not None:
+            row = {name: int(getattr(state, name)) for name in
+                   ('stop', 'time', 'boardTime', 'pattern', 'trip', 'round',
+                    'boardStopPosition', 'alightStopPosition')}
+            row['accessMode'] = None if state.accessMode is None else str(state.accessMode)
+            row['egressMode'] = None if state.egressMode is None else str(state.egressMode)
+            chain.append(row)
+            state = state.back
+        return chain
+
+    @contextmanager
+    def trace_scope(name, reset):
+        original = planner.com
+        native_factory = original.conveyal.r5.profile.McRaptorSuboptimalPathProfileRouter
+        calls = []
+
+        def factory(*args):
+            # The constructor finishes before route invokes this callback.
+            sample_observations = []
+            seen = set()
+            native = None
+            callback = args[4]
+            access_iteration = []
+            # The fixture has one access mode. Record the exact native integer-map
+            # traversal used by route(), without changing its entries or order.
+            assert int(args[2].size()) == 1
+            for entry in args[2].entrySet():
+                def record_access(stop, cost):
+                    access_iteration.append({'mode': str(entry.getKey()),
+                                             'stop': int(stop), 'seconds': int(cost)})
+                    return True
+                entry.getValue().forEachEntry(jpype.JProxy(
+                    'gnu.trove.procedure.TIntIntProcedure', dict(execute=record_access)))
+            def wrapped_callback(departure):
+                departure = int(departure)
+                if departure not in seen:
+                    seen.add(departure)
+                    bound = fields['bestTimesAtTargetByAccessMode'].get(native)
+                    row = {'departure_seconds': departure,
+                           'round': int(fields['round'].get(native)),
+                           'best_state_stop_count': int(fields['bestStates'].get(native).size()),
+                           'bound_before': bounds_map(bound),
+                           'no_entry_value': int(bound.getNoEntryValue()),
+                           'reset_requested': reset}
+                    request = fields['request'].get(native)
+                    first_access = access_iteration[0]
+                    first_arrival = departure + first_access['seconds']
+                    target_bound = row['bound_before'].get(first_access['mode'], row['no_entry_value'])
+                    row['first_access_arrival_seconds'] = first_arrival
+                    row['first_access_passes_pre_callback_pruning'] = (
+                        first_arrival <= int(request.toTime) + int(request.maxTripDurationMinutes) * 60
+                        and (int(request.maxFare) >= 0 or
+                             first_arrival - int(request.suboptimalMinutes) * 60 <= target_bound))
+                    assert row['round'] == 0, row
+                    assert row['best_state_stop_count'] == 0, row
+                    assert row['first_access_passes_pre_callback_pruning'], row
+                    if reset:
+                        bound.clear()
+                    row['bound_after'] = bounds_map(bound)
+                    sample_observations.append(row)
+                return callback(departure)
+            native = native_factory(*args[:4], wrapped_callback, *args[5:])
+            request = fields['request'].get(native)
+            call = {'samples': sample_observations, 'native': native,
+                    'access_iteration': access_iteration,
+                    'access_times': modes_map(args[2]), 'egress_times': modes_map(args[3]),
+                    'request': {key: str(getattr(request, key)) for key in
+                                ('fromTime', 'toTime', 'date', 'fromLat', 'fromLon', 'toLat', 'toLon',
+                                 'monteCarloDraws', 'suboptimalMinutes', 'maxFare', 'maxRides',
+                                 'maxTripDurationMinutes', 'maxWalkTime', 'walkSpeed',
+                                 'accessModes', 'egressModes', 'directModes', 'transitModes')}}
+            calls.append(call)
+            class NativeRouterObservation:
+                def route(self):
+                    result = native.route()
+                    states = native.finalStatesByDepartureTime
+                    call['native_final_states'] = {
+                        str(int(key)): [state_chain(state) for state in list(states.get(key))]
+                        for key in sorted(states.keys())}
+                    call['final_bound'] = bounds_map(fields['bestTimesAtTargetByAccessMode'].get(native))
+                    call['native_states_captured_before_python_assembly'] = True
+                    return result
+
+                def __getattr__(self, attribute):
+                    return getattr(native, attribute)
+            return NativeRouterObservation()
+
+        profile = _NamespaceOverride(original.conveyal.r5.profile, 'McRaptorSuboptimalPathProfileRouter', factory)
+        r5 = _NamespaceOverride(original.conveyal.r5, 'profile', profile)
+        conveyal = _NamespaceOverride(original.conveyal, 'r5', r5)
+        replacement = _NamespaceOverride(original, 'conveyal', conveyal)
+        planner.com = replacement
+        try:
+            yield
+        finally:
+            assert planner.com is replacement
+            planner.com = original
+            assert len(calls) == 1
+            call = calls[0]
+            native = call.pop('native')
+            states = native.finalStatesByDepartureTime
+            after_assembly = {str(int(key)): [state_chain(state) for state in list(states.get(key))]
+                              for key in sorted(states.keys())}
+            call['native_states_unchanged_by_python_assembly'] = call['native_final_states'] == after_assembly
+            assert call['native_states_unchanged_by_python_assembly']
+            call['namespace_restored'] = planner.com is original
+            arms[name].update(call)
+
+    with ExitStack() as contexts:
+        audits['leg_isolation'] = contexts.enter_context(isolate_cached_legs(r5py))
+        audits['index'] = contexts.enter_context(correct_fixture_index(network, fixture))
+        audits['origin'] = contexts.enter_context(correct_street_origins(r5py, work, jar))
+        audits['geometry'] = contexts.enter_context(correct_street_geometries(r5py))
+        for name, reset in [('observe', False), ('reset_per_sample_counterfactual', True)]:
+            arms[name] = {}
+            with trace_scope(name, reset):
+                frame = r5py.DetailedItineraries(
+                    network, origins=origins, destinations=destinations,
+                    departure=fixture.ACTIVE_DEPARTURE, departure_time_window=datetime.timedelta(minutes=10),
+                    transport_modes=[r5py.TransportMode.BUS], access_modes=[r5py.TransportMode.WALK],
+                    egress_modes=[r5py.TransportMode.WALK], snap_to_network=False,
+                    max_time=datetime.timedelta(minutes=90), max_time_walking=datetime.timedelta(minutes=90),
+                    max_public_transport_rides=1, speed_walking=smoke.WALK_SPEED_KMH)
+                arms[name]['rows'] = records(frame, include_geometry=True)
+                arms[name]['geometry_crs'] = str(frame.crs)
+    result = {'arms': arms, 'audits': audits, 'python': sys.version,
+              'versions': {n: importlib.metadata.version(n) for n in
+                           ('r5py', 'jpype1', 'geopandas', 'pandas', 'numpy', 'shapely', 'pyproj', 'rasterio')},
+              'java': str(jpype.JClass('java.lang.System').getProperty('java.version')),
+              'native_queries': 2, 'real_project_datasets_read': 0, 'Melbourne_journeys_computed': 0,
+              'jar_sha256': smoke.sha256(jar),
+              'input_sha256': {n: smoke.sha256(work / n) for n in ('streets.osm.pbf', 'synthetic.gtfs.zip')},
+              'script_sha256_canonical_lf': sha(__file__),
+              'source_sha256_canonical_lf': {str(p.relative_to(ROOT)): sha(p) for p in source_paths}}
+    result['source_hashes_unchanged_after_pair'] = sources_before == result['source_sha256_canonical_lf']
+    result['input_hashes_unchanged_after_pair'] = inputs_before == {
+        n: smoke.sha256(work / n) for n in inputs_before}
+    assert result['source_hashes_unchanged_after_pair']
+    assert result['input_hashes_unchanged_after_pair']
+    package = Path(r5py.__file__).resolve().parent
+    result['upstream_source_sha256_canonical_lf'] = {name: sha(package / name) for name in
+                                                  ('r5/trip_planner.py', 'r5/regional_task.py', 'r5/detailed_itineraries.py')}
+    (work / 'paired-result.json').write_text(json.dumps(result, indent=2, allow_nan=False))
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--worker', type=Path)
+    args = parser.parse_args()
+    if args.worker:
+        native_trace(args.worker.resolve())
+        return
+    started = time.monotonic()
+    started_at_utc = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    parent = Path('/workspace/scratch/a83c039c1663/routing-count-inputs')
+    jar = parent / smoke.ENGINE_NAME
+    smoke.check_engine(jar)
+    with tempfile.TemporaryDirectory(prefix='homereach-smoke-count-', dir=parent) as directory:
+        work = Path(directory)
+        for folder in ('config', 'cache', 'tmp'):
+            (work / folder).mkdir()
+        shutil.copyfile(jar, work / smoke.ENGINE_NAME)
+        shutil.copyfile(smoke.STREET_FIXTURE, work / 'streets.osm.pbf')
+        fixture.write_gtfs(work / 'synthetic.gtfs.zip')
+        completed = subprocess.run([sys.executable, '-I', '-B', str(Path(__file__).resolve()), '--worker', str(work)],
+                                   cwd=work, env=smoke.child_environment(work), capture_output=True,
+                                   text=True, timeout=180, check=False)
+        if completed.returncode:
+            print(completed.stdout[-2000:]); print(completed.stderr[-10000:])
+            raise SystemExit(completed.returncode)
+        result = json.loads((work / 'paired-result.json').read_text())
+        result['native_log_tail'] = (completed.stdout + completed.stderr)[-10000:]
+    result.update(temporary_workspace_removed=not work.exists(), elapsed_seconds=round(time.monotonic()-started,3),
+                  started_at_utc=started_at_utc,
+                  finished_at_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+    output = Path(__file__).parent / 'paired_count_result.json'
+    output.write_text(json.dumps(result, indent=2, allow_nan=False))
+    print('Report:', output)
+    for name, arm in result['arms'].items():
+        print(name, 'sample callbacks', len(arm['samples']), 'native keys', len(arm['native_final_states']),
+              'nonempty keys', sum(bool(s) for s in arm['native_final_states'].values()),
+              'BUS departures',dict(Counter(r['departure_time'] for r in arm['rows'] if r['mode']=='BUS')),
+              'final bound',arm['final_bound'])
+    print('Cleanup',result['temporary_workspace_removed'],'elapsed',result['elapsed_seconds'])
+
+
+if __name__ == '__main__':
+    main()

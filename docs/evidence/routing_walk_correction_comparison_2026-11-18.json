@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "baseline_report": "routing_walk_geometry_linux_2026-11-18.json",
+  "corrected_report": "routing_walk_correction_linux_2026-11-18.json",
+  "baseline": {
+    "status": "failed",
+    "alternatives": 60,
+    "transit_rows": 180,
+    "bus_departures": {
+      "2026-10-13T08:05:00": 23,
+      "2026-10-13T08:15:00": 7,
+      "2026-10-13T08:10:00": 30
+    },
+    "timeline": {
+      "options_checked": 60,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "sequence": {
+      "options_checked": 60,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    },
+    "geometry": {
+      "walking_legs_checked": 121,
+      "endpoint_mismatches": 121,
+      "geometry_distance_mismatches": 121,
+      "shortest_distance_mismatches": 61,
+      "off_reference_path": 121,
+      "malformed_rows": 0,
+      "malformed_geometries": 0,
+      "incomplete_options": 0,
+      "unsupported_crs": 0
+    },
+    "duration": null,
+    "first_walk_for_each_role": {
+      "direct": {
+        "distance_m": 2656.089,
+        "duration_seconds": 2656.0,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              0.006,
+              0.018
+            ],
+            [
+              0.012,
+              0.018
+            ],
+            [
+              0.018,
+              0.018
+            ],
+            [
+              0.024,
+              0.018
+            ],
+            [
+              0.03,
+              0.018
+            ],
+            [
+              0.036,
+              0.018
+            ]
+          ]
+        }
+      },
+      "access": {
+        "distance_m": 11.1,
+        "duration_seconds": 12.0,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              0.012,
+              0.018
+            ],
+            [
+              0.006,
+              0.018
+            ]
+          ]
+        }
+      },
+      "egress": {
+        "distance_m": 677.897,
+        "duration_seconds": 678.0,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              0.03,
+              0.018
+            ],
+            [
+              0.036,
+              0.018
+            ]
+          ]
+        }
+      }
+    },
+    "temporary_workspace_removed": true
+  },
+  "corrected": {
+    "status": "passed",
+    "alternatives": 53,
+    "transit_rows": 159,
+    "bus_departures": {
+      "2026-10-13T08:05:00": 23,
+      "2026-10-13T08:10:00": 30
+    },
+    "timeline": {
+      "options_checked": 53,
+      "overlaps": 0,
+      "wait_mismatches": 0,
+      "malformed_options": 0,
+      "examples": []
+    },
+    "sequence": {
+      "options_checked": 53,
+      "unexpected_leg_sequences": 0,
+      "egress_padding_mismatches": 0
+    },
+    "geometry": {
+      "walking_legs_checked": 107,
+      "endpoint_mismatches": 0,
+      "geometry_distance_mismatches": 0,
+      "shortest_distance_mismatches": 0,
+      "off_reference_path": 0,
+      "malformed_rows": 0,
+      "malformed_geometries": 0,
+      "incomplete_options": 0,
+      "unsupported_crs": 0
+    },
+    "duration": {
+      "walking_legs_checked": 107,
+      "duration_mismatches": 0,
+      "malformed_legs": 0,
+      "speed_kmh": 3.6,
+      "problems": []
+    },
+    "first_walk_for_each_role": {
+      "direct": {
+        "distance_m": 2644.836,
+        "duration_seconds": 2645.0,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              0.0061,
+              0.018
+            ],
+            [
+              0.012,
+              0.018
+            ],
+            [
+              0.018,
+              0.018
+            ],
+            [
+              0.024,
+              0.018
+            ],
+            [
+              0.0299,
+              0.018
+            ]
+          ]
+        }
+      },
+      "access": {
+        "distance_m": 11.1,
+        "duration_seconds": 12.0,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              0.0061,
+              0.018
+            ],
+            [
+              0.006,
+              0.018
+            ]
+          ]
+        }
+      },
+      "egress": {
+        "distance_m": 11.254,
+        "duration_seconds": 12.0,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              0.03,
+              0.018
+            ],
+            [
+              0.0299,
+              0.018
+            ]
+          ]
+        }
+      }
+    },
+    "temporary_workspace_removed": true
+  },
+  "engine_identity_identical": true,
+  "fixture_fingerprints_identical": true,
+  "fixture_and_geometry_oracle_unchanged": true,
+  "all_captured_bus_values_in_corrected_run_present_in_baseline": true,
+  "limits": [
+    "The alternative count changed from 60 to 53 and the 08:15 BUS alternatives are absent in the corrected run. The cause has not been isolated.",
+    "This correction and serializer do not add row filtering; the report retains all returned alternatives. Complete route enumeration is not validated.",
+    "Timing, geometry and duration checks apply to every returned alternative. The original fixture and tolerances were not changed."
+  ],
+  "all_captured_bus_service_fields_in_corrected_run_present_in_baseline": true
+}

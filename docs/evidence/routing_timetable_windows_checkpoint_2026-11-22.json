@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "stage": "supplied_windows_gtfs_timetable_checkpoint",
+  "received_date": "2026-11-22",
+  "provenance": {
+    "evidence_type": "Maintainer-supplied JSON report, reviewed without rerunning the real archive.",
+    "raw_report_path": "docs/evidence/routing_timetable_windows_2026-11-22.json",
+    "original_upload_name": "routing-timetable-12316-23108.json",
+    "raw_report_bytes": 5188,
+    "raw_report_sha256": "eea15e02ba4b255939a4be7c20954323d43436e629bd53218a4f60bf13a2ab49",
+    "raw_report_preserved_byte_for_byte": true,
+    "preceding_terminal_association": {
+      "platform": "Windows",
+      "environment": "homereach",
+      "reported_checkout_short_sha": "d5bc9a5",
+      "resolved_code_revision": "d5bc9a55bc344eb9cb4940aafd5f2b1e969e60d8",
+      "command_summary": "python -B scripts/audit_routing_timetable.py --work-root D:\\homereach-conda\\tmp --json",
+      "reported_exit_code": 0
+    },
+    "not_embedded_in_json_report": [
+      "execution timestamp",
+      "code revision",
+      "operating system",
+      "Python/package versions",
+      "duration",
+      "peak memory"
+    ],
+    "execution_timestamp": null
+  },
+  "verification": {
+    "status": "passed",
+    "service_date": "2026-10-13",
+    "timezone": "Australia/Melbourne",
+    "selected_feeds": [
+      "2",
+      "3",
+      "4"
+    ],
+    "source_totals_equal_expected": true,
+    "active_totals_equal_expected": true,
+    "all_feeds_passed": true,
+    "all_source_scans_complete": true,
+    "all_logical_trip_checks_complete": true,
+    "all_source_rows_indexed_and_checked": true,
+    "all_declared_and_active_trips_have_rows": true,
+    "issues_errors_and_blockers_empty": true,
+    "gtfs_expected_and_actual_sha256": "c88af3abcaf0872e45196dcc1d5af9bc20a82c54a00a9dfef46c809ec2e34814",
+    "snapshot_sha256_matches_code_revision": true,
+    "protected_inputs_unchanged": true,
+    "temporary_workspace_removed": true
+  },
+  "derived_totals": {
+    "rows_scanned": 11847183,
+    "active_rows_scanned": 1311746,
+    "rows_with_extended_times": 250932,
+    "active_rows_with_extended_times": 8430,
+    "declared_trip_records": 311483,
+    "active_trip_records": 35580,
+    "known_trips_with_rows": 311483,
+    "active_trips_with_rows": 35580,
+    "labelled_replacement_trip_records": 52,
+    "rows_with_unresolved_times": 0,
+    "arrangement_required_rows": 0,
+    "flexible_service_rows": 0,
+    "effective_continuous_service_rows": 0
+  },
+  "per_feed_observations": [
+    {
+      "feed_id": "2",
+      "rows_scanned": 688380,
+      "active_rows_scanned": 49389,
+      "rows_with_extended_times": 30652,
+      "active_rows_with_extended_times": 1064,
+      "all_source_minimum_time": "03:02:00",
+      "all_source_maximum_time": "27:49:00"
+    },
+    {
+      "feed_id": "3",
+      "rows_scanned": 2568892,
+      "active_rows_scanned": 232760,
+      "rows_with_extended_times": 106899,
+      "active_rows_with_extended_times": 4897,
+      "all_source_minimum_time": "01:56:00",
+      "all_source_maximum_time": "28:32:00"
+    },
+    {
+      "feed_id": "4",
+      "rows_scanned": 8589911,
+      "active_rows_scanned": 1029597,
+      "rows_with_extended_times": 113381,
+      "active_rows_with_extended_times": 2469,
+      "all_source_minimum_time": "00:54:00",
+      "all_source_maximum_time": "32:47:00"
+    }
+  ],
+  "configuration_line_endings": {
+    "repository_path": "config/routing_pilot.json",
+    "code_revision": "d5bc9a55bc344eb9cb4940aafd5f2b1e969e60d8",
+    "repository_lf_bytes": 417,
+    "repository_lf_sha256": "0858fd0a8a36c7fad5f592bf243cc8e160b5c04dbf4df107c33ea8d1f6a4a473",
+    "same_content_crlf_bytes": 430,
+    "same_content_crlf_sha256": "e6b23abed998e1fd17dcf8505056f07f4bdf17a13ad2ec5945592800ad051595",
+    "reported_sha256": "e6b23abed998e1fd17dcf8505056f07f4bdf17a13ad2ec5945592800ad051595",
+    "finding": "Replacing only LF line endings with CRLF exactly reproduces the reported configuration fingerprint."
+  },
+  "scope": {
+    "routing_ready": false,
+    "project_files_written": 0,
+    "journeys_computed": 0,
+    "extended_time_counts_are_stop_time_rows_not_trips": true,
+    "time_extrema_include_inactive_trips": true,
+    "active_trip_time_extrema": "Not separately reported.",
+    "source_audit_scope_only": true
+  },
+  "next_gate": {
+    "name": "Controlled service-day boundary engine compatibility test",
+    "status": "Pending; this checkpoint contains no new engine results.",
+    "reason": "The source includes times at or beyond 24:00:00, including 8,430 active-date rows, and an all-source maximum of 32:47:00."
+  }
+}

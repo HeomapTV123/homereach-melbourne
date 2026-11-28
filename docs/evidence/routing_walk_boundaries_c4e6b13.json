@@ -1,0 +1,755 @@
+{
+  "strict_audit": {
+    "counts": {
+      "ways_seen": 394496,
+      "ways_excluded": 233125,
+      "ways_included": 161371
+    },
+    "results": [
+      {
+        "id": "dest_flinders",
+        "node": null,
+        "result": "unresolved_entrance"
+      },
+      {
+        "id": "orig_footscray",
+        "node": 3953464544,
+        "result": "strict_component_found",
+        "incident_ways": [
+          241661387
+        ],
+        "component_nodes": 17
+      },
+      {
+        "id": "orig_coburg",
+        "node": 13503054206,
+        "result": "strict_component_found",
+        "incident_ways": [
+          1368503589
+        ],
+        "component_nodes": 75962
+      },
+      {
+        "id": "orig_box_hill",
+        "node": 8317160002,
+        "result": "strict_component_found",
+        "incident_ways": [
+          894767007
+        ],
+        "component_nodes": 215100
+      },
+      {
+        "id": "orig_dandenong",
+        "node": 13901273237,
+        "result": "strict_component_found",
+        "incident_ways": [
+          1413163523
+        ],
+        "component_nodes": 537
+      }
+    ],
+    "warnings": [
+      "This tests exact OSM node-sharing in a deliberately restricted set of ways, not full pedestrian routing.",
+      "Excluded stairs, all indoor ways, tunnels, area polygons, nonzero levels/layers and most roads; false negatives expected.",
+      "OSM node-sharing does not certify legal public access, vertical movement, entrance identity, barriers, or reachable transit platforms.",
+      "Component node counts are diagnostics only; component connections can be interrupted by unmapped barriers or access rules.",
+      "This input is an extracted highway dataset, not a validated routing-engine network."
+    ]
+  },
+  "boundary_review": {
+    "selected_locations": [
+      "orig_footscray",
+      "orig_dandenong"
+    ],
+    "example_limit_per_component": 20,
+    "example_order": "touches_other_strict_components_first_then_way_id",
+    "results": [
+      {
+        "id": "orig_footscray",
+        "node": 3953464544,
+        "result": "strict_component_boundary_review",
+        "component_id_min_node": 655123860,
+        "component_nodes": 17,
+        "excluded_ways_touching": 6,
+        "exclusion_reason_counts": {
+          "highway_outside_strict_subset": 3,
+          "layer_outside_ground": 4,
+          "level_outside_ground": 4
+        },
+        "relationship_counts": {
+          "extends_outside_strict_graph": 4,
+          "touches_other_strict_components": 2
+        },
+        "examples_shown": 6,
+        "examples_omitted": 0,
+        "examples": [
+          {
+            "way_id": 28615601,
+            "tags_opl": {
+              "cycleway:both": "no",
+              "foot": "yes",
+              "highway": "unclassified",
+              "lane_markings": "no",
+              "lit": "yes",
+              "name": "McNab%20%Avenue",
+              "sidewalk:left": "no",
+              "sidewalk:right": "separate",
+              "surface": "asphalt"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              2311217158
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 314476055,
+                "component_nodes": 2,
+                "shared_nodes": [
+                  314476055
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1499210381,
+            "tags_opl": {
+              "bridge": "yes",
+              "highway": "footway",
+              "layer": "1",
+              "surface": "asphalt"
+            },
+            "exclusion_reasons": [
+              "layer_outside_ground"
+            ],
+            "shared_component_nodes": [
+              13728939500
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 35862870,
+                "component_nodes": 37081,
+                "shared_nodes": [
+                  13728950701
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 51335781,
+            "tags_opl": {
+              "access": "yes",
+              "handrail": "yes",
+              "highway": "steps",
+              "incline": "down",
+              "level": "1;0",
+              "lit": "yes",
+              "ramp": "no",
+              "surface": "concrete",
+              "tactile_paving": "yes"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset",
+              "level_outside_ground"
+            ],
+            "shared_component_nodes": [
+              655123860
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 1,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 1392282716,
+            "tags_opl": {
+              "bridge": "yes",
+              "highway": "footway",
+              "incline": "up",
+              "layer": "1",
+              "level": "0;1"
+            },
+            "exclusion_reasons": [
+              "level_outside_ground",
+              "layer_outside_ground"
+            ],
+            "shared_component_nodes": [
+              12888161632
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 5,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 1392282720,
+            "tags_opl": {
+              "conveying": "yes",
+              "highway": "steps",
+              "incline": "down",
+              "layer": "1",
+              "level": "1;0",
+              "lit": "yes",
+              "ramp:wheelchair": "yes",
+              "smoothness": "excellent",
+              "surface": "concrete"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset",
+              "level_outside_ground",
+              "layer_outside_ground"
+            ],
+            "shared_component_nodes": [
+              2492542331
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 1,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 1412090321,
+            "tags_opl": {
+              "bridge": "yes",
+              "highway": "footway",
+              "layer": "1",
+              "level": "1"
+            },
+            "exclusion_reasons": [
+              "level_outside_ground",
+              "layer_outside_ground"
+            ],
+            "shared_component_nodes": [
+              12888161638
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 2,
+            "relationship": "extends_outside_strict_graph"
+          }
+        ]
+      },
+      {
+        "id": "orig_dandenong",
+        "node": 13901273237,
+        "result": "strict_component_boundary_review",
+        "component_id_min_node": 369678900,
+        "component_nodes": 537,
+        "excluded_ways_touching": 98,
+        "exclusion_reason_counts": {
+          "area_yes": 3,
+          "foot_restricted": 1,
+          "highway_outside_strict_subset": 92,
+          "indoor_yes": 3,
+          "layer_outside_ground": 3,
+          "level_outside_ground": 2,
+          "tunnel_present": 1
+        },
+        "relationship_counts": {
+          "extends_outside_strict_graph": 85,
+          "touches_other_strict_components": 10,
+          "within_same_strict_component": 3
+        },
+        "examples_shown": 20,
+        "examples_omitted": 78,
+        "examples": [
+          {
+            "way_id": 23946383,
+            "tags_opl": {
+              "highway": "residential",
+              "name": "Pultney%20%Street",
+              "surface": "paved"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              7327117997
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 7836177767,
+                "component_nodes": 11,
+                "shared_nodes": [
+                  7836177777
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 7,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 32807634,
+            "tags_opl": {
+              "area": "yes",
+              "highway": "pedestrian",
+              "name": "Palm%20%Plaza",
+              "surface": "paving_stones"
+            },
+            "exclusion_reasons": [
+              "area_yes"
+            ],
+            "shared_component_nodes": [
+              9395924252,
+              11692140826
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 369685134,
+                "component_nodes": 2,
+                "shared_nodes": [
+                  369685134
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 27,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 185938134,
+            "tags_opl": {
+              "highway": "service",
+              "name": "Halpin%20%Way",
+              "surface": "paving_stones"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              3896048495,
+              12986819488
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 3896048484,
+                "component_nodes": 4,
+                "shared_nodes": [
+                  3896048484
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 8,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 198584581,
+            "tags_opl": {
+              "foot": "no",
+              "highway": "cycleway",
+              "oneway": "no",
+              "source": "NearMap",
+              "width": "2"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset",
+              "foot_restricted"
+            ],
+            "shared_component_nodes": [
+              5252052265,
+              6144046320,
+              7418470032,
+              9244930857,
+              12986819590,
+              13848377451
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 9245036328,
+                "component_nodes": 4,
+                "shared_nodes": [
+                  9245036328
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 21,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1413163548,
+            "tags_opl": {
+              "highway": "steps",
+              "incline": "up",
+              "motor_vehicle": "no"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              12986819500
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 3896048484,
+                "component_nodes": 4,
+                "shared_nodes": [
+                  12986819501
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1489314219,
+            "tags_opl": {
+              "highway": "steps",
+              "incline": "down"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              13651230828
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 13651230829,
+                "component_nodes": 12,
+                "shared_nodes": [
+                  13651230829
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1489314223,
+            "tags_opl": {
+              "highway": "steps",
+              "incline": "down"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              13651230833
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 13651230831,
+                "component_nodes": 17,
+                "shared_nodes": [
+                  13651230832
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1489360047,
+            "tags_opl": {
+              "highway": "steps"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              13651553464
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 13651553465,
+                "component_nodes": 4,
+                "shared_nodes": [
+                  13651553465
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1489360051,
+            "tags_opl": {
+              "highway": "steps"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              13651553484
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 13651553483,
+                "component_nodes": 2,
+                "shared_nodes": [
+                  13651553483
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 1489360053,
+            "tags_opl": {
+              "highway": "steps"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              13651553487
+            ],
+            "other_strict_components": [
+              {
+                "component_id_min_node": 13651553483,
+                "component_nodes": 2,
+                "shared_nodes": [
+                  13651553486
+                ]
+              }
+            ],
+            "nodes_outside_strict_graph_count": 0,
+            "relationship": "touches_other_strict_components"
+          },
+          {
+            "way_id": 23911717,
+            "tags_opl": {
+              "cycleway:left": "no",
+              "cycleway:right": "lane",
+              "cycleway:right:lane": "exclusive",
+              "cycleway:right:traffic_mode:left": "parking",
+              "cycleway:right:width": "1.2",
+              "highway": "secondary",
+              "maxspeed": "50",
+              "name": "Foster%20%Street",
+              "source": "survey"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              2108231369
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 6,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 23912133,
+            "tags_opl": {
+              "highway": "track",
+              "name": "Swords%20%Street",
+              "surface": "grass",
+              "tracktype": "grade5"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              13848377488
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 2,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 23912263,
+            "tags_opl": {
+              "bus": "designated",
+              "emergency": "yes",
+              "highway": "busway",
+              "lanes": "1",
+              "oneway": "yes",
+              "psv": "designated",
+              "tourist_bus": "no"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              12856877754
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 7,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 24549115,
+            "tags_opl": {
+              "cycleway:both": "no",
+              "highway": "tertiary",
+              "lanes": "2",
+              "maxspeed": "50",
+              "name": "Clow%20%Street",
+              "oneway": "yes",
+              "surface": "asphalt"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              875325268
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 6,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 24549118,
+            "tags_opl": {
+              "cycleway:both": "no",
+              "highway": "tertiary",
+              "lanes": "2",
+              "maxspeed": "50",
+              "name": "Clow%20%Street",
+              "oneway": "yes",
+              "surface": "asphalt"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              9699246576
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 5,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 24707899,
+            "tags_opl": {
+              "alt_name": "Princes%20%Highway",
+              "bicycle": "yes",
+              "cycleway:both": "no",
+              "foot": "yes",
+              "highway": "trunk",
+              "lanes": "2",
+              "maxspeed": "60",
+              "maxspeed:conditional": "40%20%%40%%20%(Mo-Su%20%08:00-24:00)",
+              "maxspeed:variable": "yes",
+              "name": "Lonsdale%20%Street",
+              "network": "AU:VIC:ALT_NR",
+              "oneway": "yes",
+              "ref": "1"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              9813550439
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 1,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 24707901,
+            "tags_opl": {
+              "alt_name": "Princes%20%Highway",
+              "bicycle": "yes",
+              "cycleway:left": "lane",
+              "cycleway:left:lane": "exclusive",
+              "cycleway:left:traffic_mode:left": "no",
+              "cycleway:left:width": "1.4",
+              "cycleway:right": "no",
+              "foot": "yes",
+              "highway": "trunk",
+              "lanes": "3",
+              "maxspeed": "60",
+              "maxspeed:conditional": "40%20%%40%%20%(Mo-Su%20%08:00-24:00)",
+              "maxspeed:variable": "yes",
+              "name": "Lonsdale%20%Street",
+              "network": "AU:VIC:ALT_NR",
+              "oneway": "yes",
+              "ref": "1",
+              "source": "Survey"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              875313168,
+              9244930851
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 5,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 32807541,
+            "tags_opl": {
+              "alt_name": "Princes%20%Highway",
+              "highway": "unclassified",
+              "lanes": "1",
+              "name": "Lonsdale%20%Street",
+              "oneway": "yes",
+              "source": "Survey",
+              "surface": "paving_stones"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              3295982905
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 6,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 32807949,
+            "tags_opl": {
+              "highway": "service",
+              "lanes": "1",
+              "name": "Dandenong%20%Arcade",
+              "service": "alley",
+              "source:name": "services.land.vic.gov.au"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              9962774759
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 8,
+            "relationship": "extends_outside_strict_graph"
+          },
+          {
+            "way_id": 73972784,
+            "tags_opl": {
+              "highway": "tertiary",
+              "name": "George%20%Street",
+              "source": "nearmap"
+            },
+            "exclusion_reasons": [
+              "highway_outside_strict_subset"
+            ],
+            "shared_component_nodes": [
+              3896048487,
+              5252052267
+            ],
+            "other_strict_components": [],
+            "nodes_outside_strict_graph_count": 6,
+            "relationship": "extends_outside_strict_graph"
+          }
+        ]
+      }
+    ],
+    "warnings": [
+      "Only excluded ways sharing an exact node with a selected strict component are inspected; excluded-way chains are not followed.",
+      "Touching another strict component is structural evidence only, not a usable connection, public-access certification, or route.",
+      "Area rings and ways with stairs, indoor levels, restrictions or barriers can share nodes without providing a usable pedestrian connection.",
+      "Tags retain OPL percent escapes. Every matching strict exclusion is counted, so reason counts can exceed the number of excluded ways.",
+      "Examples are bounded per component; totals include all touching excluded ways. No excluded edge is added to the strict graph."
+    ]
+  },
+  "verification": {
+    "two_pass_way_stream_matches": true,
+    "way_stream_sha256": "834fdb12e18d4f3632744a8f5938a6cb9c0c1476e828bb272fc5f035f0468931",
+    "ways_scanned_each_pass": 394496
+  },
+  "source": {
+    "path": "data/interim/routing/melbourne_highway_ways.osm.pbf",
+    "sha256": "6d5247f5632a229fae87a1048c2c3675461b98b48d75163bece8513329259361",
+    "bytes": 23893427,
+    "unchanged_during_audit": true,
+    "expected_derived_sha256": null
+  }
+}

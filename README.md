@@ -432,6 +432,41 @@ original local GTFS archive against the audited snapshot and reports missing
 routing prerequisites. Street-network data and verified origin/destination
 coordinates are not yet configured; no journey times have been produced.
 
+The [complete GTFS timetable audit](docs/commute_gtfs_timetable_audit.md) passed
+on the maintainer's Windows archive: **11,847,183 source rows** and **1,311,746
+active-service rows**, with no reported issues, unchanged protected inputs and
+successful temporary cleanup. The supplied JSON is preserved with its checksum.
+It includes **8,430 active rows** at or beyond `24:00:00`; the maximum over all
+source rows is `32:47:00`. These are timetable observations, not journey estimates.
+The [fictional service-day compatibility experiment](docs/commute_routing_service_day_check.md)
+checks midnight crossings, previous-service-day trips and calendar exceptions
+while retaining the existing walking and timing checks. Its Linux run completes
+all twelve BUS queries but misses four expected previous-service-day trips.
+The ordinary daytime, same-day exception and midnight-crossing controls pass;
+the overall compatibility gate correctly fails. The complete supplied Windows
+report at `3dab578` confirms all twelve outcomes, matching execution-source and
+fixture hashes, unchanged inputs and successful cleanup. Returned clocks,
+identities and geometry match Linux; the only row difference is negligible BUS
+distance rounding. A [review of service-day selection](docs/commute_service_day_selection_review.md)
+identifies the mechanism. The [paired native anchor experiment](docs/commute_service_day_anchor_probe.md)
+recovers all four missing trips under their previous service date, while that
+same change excludes the ordinary current-day control. Its seven Linux pairs
+pass with identical civil sample times and unchanged walking costs. The complete
+[Windows probe review](docs/commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint)
+at `c8f8130` confirms seven passing pairs: all 840 samples, 190 native paths and
+570 state snapshots match Linux exactly, with matching normalized source/input
+fingerprints, unchanged inputs and successful cleanup. Runtime versions and
+execution metadata differ. This diagnostic result preserves the failed
+compatibility baseline. The [transfer regression contract](docs/commute_service_day_combined_contract.md)
+requires a continuous journey transferring between previous-day and current-day
+services in a separate three-stop fixture. Its
+[native transfer baseline](docs/commute_service_day_transfer_check.md) now completes
+eight Linux cases: the same-day two-bus journey and six negative controls pass,
+but the required mixed-day journey is missing. All 480 samples are retained,
+with 38 same-day native paths and no query errors. This transit-only experiment
+uses explicit artificial endpoint costs and an empty interstop-transfer model;
+it does not validate physical walking or implement a service-day correction.
+
 ## Sources, attribution and project ownership
 
 Source publishers are **Homes Victoria / DFFH**, **Transport Victoria / Department
