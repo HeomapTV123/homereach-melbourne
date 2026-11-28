@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "stage": "supplied_windows_service_day_anchor_checkpoint",
-  "evidence_type": "maintainer_supplied_terminal_summary",
+  "evidence_type": "maintainer_supplied_terminal_summary_and_reviewed_raw_report",
   "received_date": "2026-11-28",
-  "execution_timestamp_supplied": false,
+  "execution_timestamp_supplied": true,
   "checkout": {
     "reported_short_sha": "c8f8130",
     "resolved_commit_sha": "c8f813095e99564b2d86ff6ebeec8dc7d92f4f83",
     "branch": "feat/commute-location-review",
-    "association_source": "Supplied git log and command transcript; full report and its execution-source fingerprints have not yet been reviewed."
+    "association_source": "Supplied git log and command transcript plus matching normalized execution-source fingerprints; the raw JSON does not contain a Git commit field."
   },
   "windows_version_printed": "10.0.26300.9974",
   "environment_prefix_requested": "D:\\homereach-conda\\envs\\homereach-routing",
   "command": "conda run --no-capture-output --prefix \"D:\\homereach-conda\\envs\\homereach-routing\" python -B scripts/run_routing_service_day_anchor_test.py --jar \"D:\\homereach-conda\\r5-engine\\r5-v7.5.1-r5py-all.jar\" --work-root \"D:\\homereach-conda\\tmp\" --json > \"%HOMEREACH_ANCHOR_REPORT%\"",
   "reported_output_path": "D:\\homereach-conda\\tmp\\routing-anchor-32043-5851.json",
-  "full_windows_json_received": false,
-  "raw_report_sha256": null,
+  "full_windows_json_received": true,
+  "raw_report_sha256": "ab0d7ddd51bc06a9089cf0a8b6652788619b476cfa1e7c524c7c40330571b33b",
   "observed": {
     "exit_code": 0,
     "overall_status": "passed",
@@ -58,20 +58,58 @@
     "linux_report": "docs/evidence/routing_service_day_anchor_linux_2026-11-23.json",
     "printed_overall_status_and_named_pair_outcomes_match_linux": true,
     "printed_input_preservation_and_cleanup_match_linux": true,
-    "full_report_comparison_completed": false,
-    "runtime_equivalence_established": false
+    "full_report_comparison_completed": true,
+    "runtime_equivalence_established": false,
+    "detailed_comparison_report": "docs/evidence/routing_service_day_anchor_platform_comparison_2026-11-28.json",
+    "all_native_pairs_samples_paths_states_and_catalogs_equal": true,
+    "independent_walking_row_equal": true,
+    "execution_source_files_checked": 15,
+    "normalized_execution_source_and_fixture_hashes_equal": true,
+    "differing_leaf_fields": 15
   },
   "limitations": [
-    "This records supplied terminal output; the assistant did not run the command on the maintainer computer.",
-    "The receipt date does not establish when the command executed.",
-    "The full Windows probe JSON has not been supplied. Its actual runtime versions, source/JAR/fixture fingerprints, active services, samples, native paths, costs, correction-restoration details and elapsed time have not been independently reviewed.",
-    "Seven passing pairs establish the displayed probe result, not detailed raw-state equivalence with Linux or exhaustive departure coverage.",
+    "This records supplied Windows terminal output and raw JSON. The reviewer replayed validators and compared fingerprints/states, but did not execute the original Windows command or independently attest that machine.",
+    "The receipt date is distinct from the execution timestamp reported in the JSON.",
+    "Observed native states and the direct WALK row match Linux exactly after parsing. Python, Java, pandas and NumPy versions, runtime paths, timestamps and elapsed time differ; this is not identical runtime configuration or a controlled performance comparison.",
+    "The direct WALK departure_time is NaT on both platforms. Its geometry, distance and duration are checked; its calendar timestamp is not verified.",
+    "The 38-path counts are observations from fixed sampling, not an exact acceptance requirement or exhaustive departure coverage.",
     "The original twelve-case compatibility failure remains preserved. This paired experiment does not implement combined-service-day search, transfers, production itinerary serialization or a general DST policy."
   ],
   "next_evidence": {
     "existing_filename": "routing-anchor-32043-5851.json",
-    "action": "Supply the existing complete JSON for read-only fingerprint, native-state and validator review.",
-    "rerun_required": false
+    "full_report_review_completed": true,
+    "rerun_required": false,
+    "next_step": "Run and review the Windows three-stop native transfer baseline; its retained Linux baseline has seven passing cases and the required mixed-day transfer missing.",
+    "guide": "docs/commute_service_day_transfer_check.md",
+    "linux_baseline": "docs/evidence/routing_service_day_transfer_linux_2026-11-28.json"
   },
-  "next_implementation_contract": "docs/commute_service_day_combined_contract.md"
+  "next_implementation_contract": "docs/commute_service_day_combined_contract.md",
+  "raw_report_review": {
+    "date": "2026-11-28",
+    "path": "docs/evidence/routing_service_day_anchor_windows_2026-11-28.json",
+    "bytes": 518916,
+    "sha256": "ab0d7ddd51bc06a9089cf0a8b6652788619b476cfa1e7c524c7c40330571b33b",
+    "crlf_line_endings": 15909,
+    "original_bytes_preserved": true,
+    "started_at_utc_reported": "2026-11-28T12:37:51.751862+00:00",
+    "elapsed_seconds_reported": 33.844,
+    "native_queries": 14,
+    "independent_walking_queries": 1,
+    "samples": 840,
+    "native_paths": 190,
+    "native_state_snapshots": 570,
+    "parent_and_oracle_validator_replay_passed": true,
+    "stored_pair_and_walking_duration_diagnostics_reproduced": true,
+    "actual_worker_jvm_started": true,
+    "java_heap_bytes": 1073741824,
+    "routing_jobs": 1,
+    "walking_correction_scopes_restored": {
+      "index": true,
+      "origin": true,
+      "geometry": true
+    },
+    "graph_unchanged": true,
+    "protected_inputs_unchanged": true,
+    "temporary_workspace_removed": true
+  }
 }

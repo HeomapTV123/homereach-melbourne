@@ -1,19 +1,20 @@
-# Combined service-day transfer: next regression contract
+# Combined service-day transfer: regression contract
 
 ## Decision and evidence boundary
 
-This is an acceptance contract for the next isolated experiment. No new transfer
-fixture, runner, timetable transformation or engine correction is implemented by
-this documentation checkpoint.
+This contract is now exercised by a separate
+[three-stop native transfer baseline](commute_service_day_transfer_check.md).
+The baseline preserves the original service dates and timetable seconds. It
+does not implement a timetable transformation or service-day correction.
 
-The [paired anchor probe](commute_service_day_anchor_probe.md) passes on Linux.
-The supplied Windows terminal summary at `c8f8130` also reports seven passing
-pairs, exit 0, unchanged inputs and successful cleanup. Review the existing
-`routing-anchor-32043-5851.json` for detailed Windows evidence before recording
-platform equivalence. The original service-day compatibility baseline remains
-failed and `routing_ready` remains `false`.
+The [paired anchor probe](commute_service_day_anchor_probe.md) passes on Linux
+and in the fully reviewed Windows report at `c8f8130`. All seven pairs, 840
+samples, 190 native paths and 570 state snapshots match; source/input hashes and
+validator replay agree. Runtime versions and execution metadata differ. The
+original service-day compatibility baseline remains failed and `routing_ready`
+remains `false`.
 
-The next useful test must require both service dates in one continuous journey.
+The discriminating test requires both service dates in one continuous journey.
 Selecting yesterday recovers the extended-time trips but loses the current-day
 control. Joining completed answers from separate single-date searches does not
 construct a transfer between those searches.
@@ -44,9 +45,17 @@ does not establish a general DST conversion policy.
 |---|---|
 | Mixed-service-day positive | One native path contains A-to-B and B-to-C in order, with their different original service dates, correct trip/stop identities and expected civil clocks. |
 | Same-day transfer control | The same physical two-ride layout and civil timetable succeeds with both rides attached to Wednesday. This isolates ordinary transfer support from service-day handling. |
-| Remove first ride | A Tuesday calendar exception removes A-to-B; the required two-bus chain must be absent. |
-| Remove second ride | A Wednesday calendar exception removes B-to-C; the required two-bus chain must be absent. |
-| Impossible connection | B-to-C departs before A-to-B arrives; the required chain must be absent even though both services are active. |
+| Mixed-day removal of first ride | A Tuesday calendar exception removes A-to-B; the required two-bus chain must be absent. |
+| Mixed-day removal of second ride | A Wednesday calendar exception removes B-to-C; the required two-bus chain must be absent. |
+| Mixed-day impossible connection | B-to-C departs before A-to-B arrives; the required chain must be absent. |
+| Same-day removal of first ride | A Wednesday calendar exception removes A-to-B from the otherwise working transfer; the required chain must be absent. |
+| Same-day removal of second ride | A Wednesday calendar exception removes B-to-C from the otherwise working transfer; the required chain must be absent. |
+| Same-day impossible connection | Both Wednesday services are active, but B-to-C departs before A-to-B arrives; the required chain must be absent. |
+
+The three same-day negative cases make the controls informative even while the
+mixed-day positive fails. Each case has its own GTFS archive and fresh network,
+so the same-day control cannot contribute an alternative trip to the mixed-day
+case.
 
 Declare expected calendars, original service-instance identities, timetable
 values and civil timestamps independently of returned engine results and of the
@@ -72,11 +81,18 @@ deliberately bounded to two stops and one ride. Preserve those fixtures,
 fingerprints and guards. Increasing the ride limit alone does not supply a
 reviewed third stop, its connector or a transfer oracle.
 
-Build the new timetable and independent oracle first. A native experiment then
-needs separately checked three-stop street linkage and walking costs, or an
-explicitly labelled transit-only experiment with fixed artificial cost maps.
-Choose and document that boundary before running the engine; neither may inherit
-an unsupported claim of validated walking or platform access from the old fixture.
+The implemented experiment selects the explicitly transit-only boundary:
+artificial access to A and egress from C each cost twelve seconds; no other stop
+is present in those maps. Interstop street transfers are temporarily replaced
+with empty lists, with before/during/after snapshots and restoration checks.
+The same-stop transfer at B remains available. Each boarding must satisfy the
+pinned native rule `departure > preceding arrival + 60 seconds`.
+
+The reviewed fictional street file still supports network construction, but this
+experiment does not validate its three-stop walking linkage, geometry, walking
+duration or public station access. Existing walking corrections are not enabled.
+The native transit algorithm is unchanged; the deliberately altered transfer
+table is an explicit fixture-model assumption, not a service-day repair.
 
 Inspect native state chains before testing normal Python itinerary serialization.
 The [source review](commute_service_day_selection_review.md) identifies a separate
@@ -86,7 +102,7 @@ durations and walking legs have independent checks.
 
 ## Later integration acceptance
 
-The minimal fixture is a discriminating next test, not the complete production
+The minimal fixture is a discriminating regression, not the complete production
 contract. A general integration must also preserve the original twelve-case
 expectations and cover overlapping service instances, midnight-spanning query
 windows, calendar exceptions on both dates, date/DST boundaries and the full

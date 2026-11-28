@@ -122,16 +122,24 @@ The original GTFS archive and the completed source audit remain the reference.
 
 ## Next verification
 
-The original Windows baseline JSON is reviewed and preserved. The maintainer
-has now supplied a successful seven-pair anchor-probe terminal summary at
-`c8f8130`; see [the recorded checkpoint](commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint).
-The existing `routing-anchor-32043-5851.json` still needs full review; no rerun is
-required to supply it. The summary does not expose detailed native states,
-fingerprints or actual runtime versions.
+The original Windows baseline and full anchor-probe JSON are reviewed and
+preserved. At `c8f8130`, all seven pairs pass; all 840 samples, 190 paths, 570
+native state snapshots, shared costs, active sets and catalogs match Linux
+exactly after parsing. Source/input fingerprints and validator replay also
+match; runtime versions and execution metadata differ. See
+[the complete Windows review](commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint).
+No anchor-probe rerun is required for this completed checkpoint.
 
-The [next regression contract](commute_service_day_combined_contract.md) requires
+The [regression contract](commute_service_day_combined_contract.md) requires
 a journey that transfers from a previous-service-day trip to a current-day trip.
 It uses a distinct three-stop fixture because the existing two-stop, one-ride
 guards cannot prove transfer correctness. The passing anchor probe supports the
 fixed experiment's causal explanation; it does not clear the failed
 compatibility gate or establish mixed-service-day transfers.
+
+The [implemented three-stop baseline](commute_service_day_transfer_check.md)
+now retains eight native Linux queries: the same-day transfer succeeds, six
+negative controls pass, and the required mixed-day transfer is missing. All
+native paths are checked against independently declared calendars and clocks.
+This isolates a remaining search limitation under an explicit transit-only
+model; it does not implement a correction or validate Python itinerary output.

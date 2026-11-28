@@ -113,11 +113,11 @@ actual native report above.
 
 ## Run on Windows
 
-The full Windows baseline JSON is already reviewed. The maintainer has now also
-supplied a successful terminal summary for this probe at `c8f8130`, recorded in
-[the Windows checkpoint](evidence/routing_service_day_anchor_windows_checkpoint_2026-11-28.json).
-The existing `routing-anchor-32043-5851.json` is the next evidence to review;
-no rerun or environment reinstall is needed to supply it.
+The full Windows baseline and anchor-probe JSON reports are now reviewed. The
+successful probe at `c8f8130` is recorded in [the Windows checkpoint](evidence/routing_service_day_anchor_windows_checkpoint_2026-11-28.json),
+[raw report](evidence/routing_service_day_anchor_windows_2026-11-28.json) and
+[detailed comparison](evidence/routing_service_day_anchor_platform_comparison_2026-11-28.json).
+No rerun or environment reinstall is needed for this completed checkpoint.
 
 The following command is retained for reproducibility. It uses the existing D:
 routing environment and reviewed JAR in Anaconda Command Prompt:
@@ -146,15 +146,39 @@ successful temporary cleanup and an empty problem list. These printed fields
 match the recorded Linux probe. The receipt date is not an independently
 established execution timestamp.
 
-The full Windows probe JSON is still pending. Actual runtime versions,
-source/JAR/fixture fingerprints, service bitsets, samples, path counts, native
-state chains, costs and correction-restoration details were not printed in the
-supplied summary and have not yet been independently compared. The prior
-Windows baseline report is a separate, already-reviewed file.
+The subsequently supplied full JSON has now passed read-only review. It is
+**518,916 bytes**, preserving **15,909 CRLF** endings, with SHA-256:
 
-Next, review the existing complete JSON and replay the validators before
-recording any detailed platform comparison. The next implementation boundary is
-defined in the [combined-service-day transfer contract](commute_service_day_combined_contract.md).
+```text
+ab0d7ddd51bc06a9089cf0a8b6652788619b476cfa1e7c524c7c40330571b33b
+```
+
+The report records start **2026-11-28T12:37:51.751862+00:00** and elapsed time
+**33.844 seconds**. All **840 samples**, **190 native paths** and **570 state
+snapshots** match the retained Linux report exactly after type-aware JSON
+comparison. Request fields, active services, shared costs, original/after
+catalogs and pair diagnostics match. The parent and independent oracle replay
+reproduces the stored diagnostics with no problems. All **15 normalized source
+hashes**, **two request-source pins** and **three JAR/fixture hashes** match;
+deterministic GTFS regeneration independently reproduces the recorded hash.
+
+Exactly 15 leaf values differ, all execution timestamps, elapsed time or runtime
+metadata. Windows/Linux versions are Python **3.12.16/3.12.14**, Java
+**21.0.10/21.0.13**, pandas **3.0.3/3.1.1** and NumPy **2.3.5/2.5.4**. Thus the
+observed results match across these environments; the environments are not
+identical and these durations are not a controlled speed benchmark.
+
+All three correction scopes report restoration, with unchanged native graph and
+protected inputs and successful cleanup. The direct WALK row matches exactly,
+including its `departure_time: "NaT"`; its geometry, distance and duration are
+checked, not a calendar timestamp. The checkout association comes from the
+terminal transcript and matching source fingerprints, not an embedded Git field.
+
+The [combined-service-day transfer contract](commute_service_day_combined_contract.md)
+is now exercised by a separate [native three-stop baseline](commute_service_day_transfer_check.md).
+The same-day two-bus positive and six negative controls pass on Linux; the
+required mixed-day journey remains missing. That is a separate failed
+compatibility result, with artificial access/egress and no physical walking claim.
 
 ## Remaining integration decision
 

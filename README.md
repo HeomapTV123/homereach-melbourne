@@ -451,13 +451,21 @@ distance rounding. A [review of service-day selection](docs/commute_service_day_
 identifies the mechanism. The [paired native anchor experiment](docs/commute_service_day_anchor_probe.md)
 recovers all four missing trips under their previous service date, while that
 same change excludes the ordinary current-day control. Its seven Linux pairs
-pass with identical civil sample times and unchanged walking costs. The supplied
-[Windows terminal checkpoint](docs/commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint)
-at `c8f8130` also reports seven passing pairs, unchanged inputs and successful
-cleanup; detailed review of its complete JSON remains pending. This diagnostic
-result preserves the failed compatibility baseline. The [next regression contract](docs/commute_service_day_combined_contract.md)
+pass with identical civil sample times and unchanged walking costs. The complete
+[Windows probe review](docs/commute_service_day_anchor_probe.md#supplied-windows-terminal-checkpoint)
+at `c8f8130` confirms seven passing pairs: all 840 samples, 190 native paths and
+570 state snapshots match Linux exactly, with matching normalized source/input
+fingerprints, unchanged inputs and successful cleanup. Runtime versions and
+execution metadata differ. This diagnostic result preserves the failed
+compatibility baseline. The [transfer regression contract](docs/commute_service_day_combined_contract.md)
 requires a continuous journey transferring between previous-day and current-day
-services in a separate three-stop fixture.
+services in a separate three-stop fixture. Its
+[native transfer baseline](docs/commute_service_day_transfer_check.md) now completes
+eight Linux cases: the same-day two-bus journey and six negative controls pass,
+but the required mixed-day journey is missing. All 480 samples are retained,
+with 38 same-day native paths and no query errors. This transit-only experiment
+uses explicit artificial endpoint costs and an empty interstop-transfer model;
+it does not validate physical walking or implement a service-day correction.
 
 ## Sources, attribution and project ownership
 
